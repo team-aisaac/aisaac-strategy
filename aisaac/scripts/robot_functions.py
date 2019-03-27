@@ -194,6 +194,9 @@ class RobotKick:
         self.status = status
         self.cmd = cmd
         self.command_pub = command_pub
+        self.dispersion = [10] * 100
+        self.access_threshold = 3
+        self.const = 4.0
 
     def kick_x(self):
         area = 0.3
@@ -215,9 +218,15 @@ class RobotKick:
             pose_x = (- 0.15 * target_x + (0.15 + distance) * self.ball_params.ball_pos_x) / distance
             pose_y = (- 0.15 * target_y + (0.15 + distance) * self.ball_params.ball_pos_y) / distance
             pose_theta = math.atan2( (target_y - self.robot_params.current_y) , (target_x - self.robot_params.current_x) )
-            area = 0.16
-            if math.sqrt((self.ball_params.ball_pos_x - self.robot_params.current_x)**2 + (self.ball_params.ball_pos_y - self.robot_params.current_y)**2) < area:
-                self.kick_power_x = distance * 2.8
+            #area = 0.16
+
+            self.dispersion.append((self.ball_params.ball_pos_x - self.robot_params.current_x)**2 + (self.ball_params.ball_pos_y - self.robot_params.current_y)**2)
+            del self.dispersion[0]
+
+
+
+            if sum(self.dispersion) < self.access_threshold:
+                self.kick_power_x = math.sqrt(distance) * self.const
                 self.status.robot_status = "kick"
                 return
 
