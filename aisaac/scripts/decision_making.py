@@ -134,7 +134,7 @@ class WorldModel():
 
         """statusのパラメータ初期化"""
         for id in range(self.robot_num):
-        	self.status[id].status = "None"
+            self.status[id].status = "None"
 
 
         """positionの割り振り(動的にPositionが切り替わるのは多分大事、現状使っていない)"""
@@ -527,7 +527,7 @@ class WorldModel():
     def referee_listener(self):
         rospy.Subscriber("/refbox/command", Int8, self.ref_command_callback)
         rospy.Subscriber("/refbox/stage", Int8, self.ref_stage_callback)
-        rospy.Subscriber("/refbox/blue_info", RefereeTeamInfo, self.ref_teaminfo_callback)
+        rospy.Subscriber("/refbox/" + self.team_color + "_info", RefereeTeamInfo, self.ref_teaminfo_callback)
 
     """---各機体にベクトルをPublishする--"""
     def robot_cmd_publisher_2(self):
@@ -735,16 +735,16 @@ class WorldModel():
                 self.cmd[id].kick_speed_x=10
                 #self.kick_call()
             else:
-            	self.cmd[id].kick_speed_x=0
+                self.cmd[id].kick_speed_x=0
                 #self.kick_end_call()
 
-	"""
+    """
     def kick_client(self):
-    	rospy.wait_for_service("robot_0/kick")
-    	rospy.wait_for_service("robot_0/kick")
-    	self.kick_call = rospy.ServiceProxy("robot_0/kick", Kick)
-    	self.kick_end_call = rospy.ServiceProxy("robot_0/kick_end", Kick)
-	"""
+        rospy.wait_for_service("robot_0/kick")
+        rospy.wait_for_service("robot_0/kick")
+        self.kick_call = rospy.ServiceProxy("robot_0/kick", Kick)
+        self.kick_end_call = rospy.ServiceProxy("robot_0/kick_end", Kick)
+    """
 
 
     """---ドリブル判定---"""
@@ -955,6 +955,5 @@ if __name__ == "__main__":
 
 
     while not rospy.is_shutdown():
-    	#a.robot_status_publisher()
-        print("check")
-    	time.sleep(0.1)
+        #a.robot_status_publisher()
+        time.sleep(0.1)
