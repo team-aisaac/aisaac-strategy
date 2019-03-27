@@ -1,0 +1,75 @@
+<launch>
+  <arg name="ai_name" default="/" />
+  <arg name="color" default="blue" />
+  <arg name="side" default="left" />
+
+  <group ns="$(arg ai_name)">
+    <param name="ai_name" type="string" value="$(arg ai_name)" />
+    <param name="friend_color" type="string" value="$(arg color)" />
+    <param name="team_side" type="string" value="$(arg side)" />
+
+    <rosparam command="load" file="$(find ai_core)/param/our_team.yaml" />
+
+    <include file="$(find ai_core)/launch/simulator.launch" />
+    <!-- <include file="$(find ai_core)/launch/real.launch" /> -->
+
+    <!-- Run Refbox -->
+    <node name="refbox" pkg="ssl_refbox_wrapper" type="ssl_refbox_wrapper_node.py" required="true">
+      <param name="multicast_addr" value="224.5.23.1" />
+      <param name="multicast_port" value="10003" />
+    </node>
+
+    <!-- Run the map server -->
+    <node pkg="tf" type="static_transform_publisher" name="enemy_goal_left" args="4.5 0.5 0 0 0 0 1 map enemy_goal_left 100" />
+    <node pkg="tf" type="static_transform_publisher" name="enemy_goal_center" args="4.5 0 0 0 0 0 1 map enemy_goal_center 100" />
+    <node pkg="tf" type="static_transform_publisher" name="enemy_goal_right" args="4.5 -0.5 0 0 0 0 1 map enemy_goal_right 100" />
+    <node pkg="tf" type="static_transform_publisher" name="friend_goal_left" args="-4.5 0.5 0 0 0 0 1 map friend_goal_left 100" />
+    <node pkg="tf" type="static_transform_publisher" name="friend_goal_center" args="-4.5 0 0 0 0 0 1 map friend_goal_center 100" />
+    <node pkg="tf" type="static_transform_publisher" name="friend_goal_right" args="-4.5 -0.5 0 0 0 0 1 map friend_goal_right 100" />
+
+    <node name="ball_observer" pkg="world_observer" type="world_observer" required="true">
+      <param name="observe_target" type="string" value="Ball" />
+    </node>
+
+    <!--  <node name="decision_making" pkg="aisaac" type="decision_making.py" output="screen" />  -->
+    <node name="world_model" pkg="aisaac" type="world_model.py" output="screen" />
+    <node name="launch_manager" pkg="launch_manager" type="launch_manager.py" required="true"/>
+
+    <!-- Visualizer -->
+    <!--<node name="sai_visualizer" pkg="sai_visualizer" type="sai_visualizer" /> -->
+    <!-- <node name="rviz" pkg="rviz" type="rviz" /> -->
+    <!-- <node name="rqt_console" pkg="rqt_console" type="rqt_console" /> -->
+    <!-- <node name="plot" pkg="rqt_plot" type="rqt_plot" /> -->
+
+    <!-- Run Robot -->
+    <node name="robot0" pkg="aisaac" type="robot.py" output="screen">
+      <param name="robot_num" value="0" />
+    </node>
+    <!--
+    <node name="robot1" pkg="aisaac" type="robot.py" output="screen">
+      <param name="robot_num" value="1" />
+    </node>
+
+    <node name="robot2" pkg="aisaac" type="robot.py">
+      <param name="robot_num" value="0" />
+    </node>
+    <node name="robot3" pkg="aisaac" type="robot.py">
+      <param name="robot_num" value="0" />
+    </node>
+    <node name="robot4" pkg="aisaac" type="robot.py">
+      <param name="robot_num" value="0" />
+    </node>
+    <node name="robot5" pkg="aisaac" type="robot.py">
+      <param name="robot_num" value="0" />
+    </node>
+    <node name="robot6" pkg="aisaac" type="robot.py">
+      <param name="robot_num" value="0" />
+    </node>
+    <node name="robot7" pkg="aisaac" type="robot.py">
+      <param name="robot_num" value="0" />
+    </node>
+    -->
+
+  </group>
+
+</launch>

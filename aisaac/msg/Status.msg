@@ -1,0 +1,8 @@
+string status
+float32 pid_goal_pos_x
+float32 pid_goal_pos_y
+float32 pid_goal_theta
+float32 pid_circle_center_x
+float32 pid_circle_center_y
+float32 pass_target_pos_x
+float32 pass_target_pos_y
