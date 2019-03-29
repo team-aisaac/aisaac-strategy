@@ -289,6 +289,10 @@ class RobotKick:
         self.command_pub = command_pub
         self.dispersion = [10] * 100
 
+        self.access_threshold = 3
+        self.const = 4.0
+
+
     def kick_x(self):
         area = 0.3
         if math.sqrt((self.ball_params.ball_pos_x - self.robot_params.current_x)**2 + (self.ball_params.ball_pos_y - self.robot_params.current_y)**2) > self.robot_params.robot_r + area:
@@ -313,8 +317,9 @@ class RobotKick:
             self.dispersion.append((self.ball_params.ball_pos_x - self.robot_params.current_x)**2 + (self.ball_params.ball_pos_y - self.robot_params.current_y)**2)
             del self.dispersion[0]
 
-            if sum(self.dispersion) < 3:
-                self.kick_power_x = math.sqrt(distance) * 4.0
+
+            if sum(self.dispersion) < self.access_threshold:
+                self.kick_power_x = math.sqrt(distance) * self.const
                 self.status.robot_status = "kick"
                 return
 

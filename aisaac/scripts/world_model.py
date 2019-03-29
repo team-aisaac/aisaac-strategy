@@ -21,7 +21,7 @@ from aisaac.msg import Status
 
 WORLD_LOOP_RATE = 100.
 
-from test.world_model_functions import WorldState, Referee, Objects, DecisionMaker
+from world_model_functions import WorldState, Referee, Objects, DecisionMaker
 import functions
 
 #import physics as phy
