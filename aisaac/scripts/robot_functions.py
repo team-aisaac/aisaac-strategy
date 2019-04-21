@@ -126,6 +126,7 @@ class RobotPid:
                             return True, x, y, self.ball_params.ball_pos_x , self.ball_params.ball_pos_y, distance
         return False, 0, 0, 0, 0, 0
 
+
     def get_sub_goal(self, x, y, obstacle_x, obstacle_y, distance):
         if distance != 0:
             sub_goal_x = (-5 * self.robot_params.robot_r * obstacle_x + (distance + 5 * self.robot_params.robot_r) * x) / distance
@@ -289,8 +290,8 @@ class RobotKick:
         self.command_pub = command_pub
         self.dispersion = [10] * 100
 
-        self.access_threshold = 3
-        self.const = 4.0
+        self.access_threshold = 5
+        self.const = 1.5
 
 
     def kick_x(self):
