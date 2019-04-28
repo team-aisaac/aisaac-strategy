@@ -41,7 +41,7 @@ class WorldModel():
         self.devision = "B"
 
         """---味方ロボット台数と敵ロボット台数---"""
-        self.robot_num = 4
+        self.robot_num = 8
         self.enemy_num = 8
 
         """---フィールドとロボットのパラメータ---"""
@@ -179,7 +179,7 @@ class WorldModel():
         self.weight_goal_2 = 20000000.0
         self.width_enemy = 0.1
         self.width_goal = 0.1
-        self.delta_2 = 0.00001
+        self.delta_2 = 0.00001 
 
     def set_init_positions(self):
         self.robot[0].set_future_position(x=-6., y=0., theta=0.)
@@ -474,21 +474,33 @@ class WorldModel():
         robot_x = msg.pose.pose.position.x
         robot_y = msg.pose.pose.position.y
         robot_t = tf.transformations.euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))
+        robot_v_x = msg.twist.twist.linear.x;
+        robot_v_y = msg.twist.twist.linear.y;
+        robot_v_t = msg.twist.twist.linear.z;
         self.robot[id].set_current_position(x = robot_x, y = robot_y, theta=robot_t[2])
+        self.robot[id].set_current_velocity(vx = robot_v_x, vy = robot_v_y, vtheta=robot_v_t)
 
     """---Visionからenemyの現在地をもらう---"""
     def enemy_odom_callback(self, msg, id):
         enemy_x = msg.pose.pose.position.x
         enemy_y = msg.pose.pose.position.y
         enemy_t = tf.transformations.euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))
+        enemy_v_x = msg.twist.twist.linear.x;
+        enemy_v_y = msg.twist.twist.linear.y;
+        enemy_v_t = msg.twist.twist.linear.z;
         self.enemy[id].set_current_position(x = enemy_x, y = enemy_y, theta=enemy_t[2])
+        self.enemy[id].set_current_velocity(vx = enemy_v_x, vy = enemy_v_y, vtheta=enemy_v_t)
 
     """---Visionからballの現在地をもらう---"""
     def ball_odom_callback(self, msg):
         ball_x = msg.pose.pose.position.x
         ball_y = msg.pose.pose.position.y
         ball_t = tf.transformations.euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))
+        ball_v_x = msg.twist.twist.linear.x;
+        ball_v_y = msg.twist.twist.linear.y;
+        ball_v_t = msg.twist.twist.linear.z;
         self.ball.set_current_position(x = ball_x, y = ball_y, theta=ball_t[2])
+        self.ball.set_current_velocity(vx = ball_v_x, vy = ball_v_y, vtheta=ball_v_t)
         _ = self.ball_dynamics_x.pop(0)
         _ = self.ball_dynamics_x.pop(0)
         self.ball_dynamics_x.append(ball_x)
@@ -569,7 +581,6 @@ class WorldModel():
 
     def robot_status_publisher(self):
         self.robot_0_status_pub.publish(self.status[0])
-        """
         self.robot_1_status_pub.publish(self.status[1])
         self.robot_2_status_pub.publish(self.status[2])
         self.robot_3_status_pub.publish(self.status[3])
@@ -577,7 +588,6 @@ class WorldModel():
         self.robot_5_status_pub.publish(self.status[5])
         self.robot_6_status_pub.publish(self.status[6])
         self.robot_7_status_pub.publish(self.status[7])
-        """
 
     """---ベクトルをWorld座標ヵらRobot座標へ---"""
     def velocity_transformation(self, id, vx, vy):
@@ -620,6 +630,86 @@ class WorldModel():
         d = abs(a * x_0 + b * y_0 + c) / np.sqrt(a**2 + b**2)
         return d
 
+    """
+    def calculate_all_distance(self, goal_pos_x, goal_pos_y):
+        for i in range(len(self.robot_num)):
+            pos_x, pos_y = self.robot[i].get_current_position()
+            for j in range(len(goal_pos_x)):
+                distance[i][j] = np.sqrt( (goal_pos_x[j] - pos_x)**2 + (goal_pos_y[j] - pos_y)**2 )
+        return distance[i][j]
+
+    """
+
+    
+    def count_collision(self, robot_id, current_pos_x, current_pos_y, goal_pos_x, goal_pos_y):
+        counter = 0
+        a, b, c = self.line_parameters(current_pos_x, current_pos_y, goal_pos_x, goal_pos_y)
+        if a != 0 and b != 0:
+            for i in range(self.robot_num):
+                if i != robot_id:
+                    friend_pos_x, friend_pos_y, _ = self.robot[i].get_current_position()
+                    distance = self.distance_of_a_point_and_a_straight_line(friend_pos_x, friend_pos_y, a, b, c)
+                    if distance < self.robot_r * 3:
+                        x = (-friend_pos_y * b + (b**2 / a) * friend_pos_x - c) / (a + b**2 / a)
+                        y = (-a * x -c) / b
+                        if (current_pos_x < x < goal_pos_x or current_pos_x > x > goal_pos_x) and (current_pos_y < y < goal_pos_y or current_pos_y > y > goal_pos_y):
+                            counter += 1
+            for j in range(self.enemy_num):
+                enemy_pos_x, enemy_pos_y, _ = self.enemy[j].get_current_position()
+                distance = self.distance_of_a_point_and_a_straight_line(enemy_pos_x, enemy_pos_y, a, b, c)
+                if distance < self.robot_r * 3:
+                    x = (-enemy_pos_y * b + (b**2 / a) * enemy_pos_x - c) / (a + b**2 / a)
+                    y = (-a * x -c) / b
+                    if (current_pos_x < x < goal_pos_x or current_pos_x > x > goal_pos_x) and (current_pos_y < y < goal_pos_y or current_pos_y > y > goal_pos_y):
+                        counter += 1
+
+            ball_pos_x, ball_pos_y, _ = self.ball.get_current_position()
+            distance = self.distance_of_a_point_and_a_straight_line(ball_pos_x, ball_pos_y, a, b, c)
+            if distance < self.robot_r * 2:
+                x = (-ball_pos_y * b + (b**2 / a) * ball_pos_x - c) / (a + b**2 / a)
+                y = (-a * x -c) / b
+                if (current_pos_x < x < goal_pos_x or current_pos_x > x > goal_pos_x) and (current_pos_y < y < goal_pos_y or current_pos_y > y > goal_pos_y):
+                    counter += 1
+        return counter
+
+    def calculate_move_cost(self, robot_id, goal_x, goal_y):
+        current_x, current_y, _ = self.robot[robot_id].get_current_position()
+        current_vx, current_vy, _ = self.robot[robot_id].get_current_velocity()
+
+        distance = np.sqrt( (goal_x - current_x)**2 + (goal_y - current_y)**2 )
+        velocity_difference = np.sqrt( ((goal_x - current_x) - current_vx)**2 + ((goal_y - current_y) - current_vy)**2 )
+        collision = self.count_collision(robot_id, current_x, current_y, goal_x, goal_y)
+
+        if collision == 0:
+            move_cost = distance * 1 + velocity_difference * 0.1
+        else:
+            move_cost = distance * 1 + velocity_difference * 0.1 + (1 / collision) * 3
+
+        return move_cost
+
+    
+    def goal_assignment(self, assignment_x, assignment_y, assignment_theta):
+        best_cost = 100
+        best_id = 0
+        used_id = []
+        for  priority in range(len(assignment_x)):
+            for robot_id in range(self.robot_num):
+                current_cost = self.calculate_move_cost(robot_id, assignment_x[priority], assignment_y[priority])
+                if (best_cost > current_cost) and (str(robot_id) not in used_id):
+                    best_cost = current_cost
+                    best_id = robot_id
+            used_id.append(str(best_id))
+            best_cost = 100
+            self.status[best_id].pid_goal_pos_x = assignment_x[priority]
+            self.status[best_id].pid_goal_pos_y = assignment_y[priority]
+            self.status[best_id].pid_goal_theta = assignment_theta[priority]
+            self.status[best_id].status = "move_linear"
+            print best_id
+            print self.status[best_id].pid_goal_pos_x
+            print self.status[best_id].pid_goal_pos_y
+            print self.status[best_id].pid_goal_theta
+
+    
     """---2点をつなぐ直線ax+by+cのa,b,cを返す---"""
     def line_parameters(self, x_1, y_1, x_2, y_2):
         a = y_1 - y_2
@@ -910,13 +1000,14 @@ class WorldModel():
 
 
 
+
 if __name__ == "__main__":
     a = WorldModel()
     a.odom_listener()
     a.referee_listener()
     #a.kick_client()
 
-    a.set_first_positions_4robots()
+    #a.set_first_positions_4robots()
     loop_rate = rospy.Rate(WORLD_LOOP_RATE)
 
 
@@ -952,8 +1043,13 @@ if __name__ == "__main__":
         a.robot_cmd_publisher_4robots()
         sys.exit()
     """
+    assignment_x = [-1, 0, 1, -1, 1, -1, 0, 1]
+    assignment_y = [1, 1, 1, 0, 0, -1, -1, -1]
+    assignment_theta = [0, 0, 0, 0, 0, 0, 0, 0]
 
+    a.goal_assignment(assignment_x, assignment_y, assignment_theta)
 
     while not rospy.is_shutdown():
-        #a.robot_status_publisher()
+        a.robot_status_publisher()
+        #a.calculate_move_cost(goal_pos_x, goal_pos_y)
         time.sleep(0.1)
