@@ -31,6 +31,9 @@
       <param name="observe_target" type="string" value="Ball" />
     </node>
 
+
+
+
     <node name="decision_making" pkg="aisaac" type="decision_making.py" output="screen" />
       <param name="team_color" type="string" value="$(arg color)" />
 
@@ -45,6 +48,11 @@
     <!-- Run Robot -->
     <node name="robot0" pkg="aisaac" type="robot.py" output="screen">
       <param name="robot_num" type="int" value="0" />
+      <param name="robot_color" value="$(arg color)" />
+    </node>
+
+    <node name="robot1" pkg="aisaac" type="robot.py" output="screen">
+      <param name="robot_num" type="int" value="1" />
       <param name="robot_color" value="$(arg color)" />
     </node>
 
