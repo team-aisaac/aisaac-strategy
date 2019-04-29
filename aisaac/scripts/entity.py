@@ -11,9 +11,6 @@ class Entity():
         #self.current_position_x = random.uniform(-self.field_x_size/2, self.field_x_size/2)
         #self.current_position_y = random.uniform(-self.field_y_size/2, self.field_y_size/2)
         self.current_orientation = 0.
-        self.current_velocity_x = 0.
-        self.current_velocity_y = 0.
-        self.current_velocity_orientation = 0.
 
 
     def set_current_position(self, x, y, theta):
@@ -21,20 +18,12 @@ class Entity():
         self.current_position_y = y
         self.current_orientation = theta
 
-    def set_current_velocity(self, vx, vy, vtheta):
-        self.current_velocity_x = vx
-        self.current_velocity_y = vy
-        self.current_velocity_orientation = vtheta
-
     def show_current_parameters(self):
         return "size_r:{}, current_position_x:{}, current_position_y:{}, current_orientation:{}".format(
                 self.size_r, self.current_position_x, self.current_position_y, self.current_orientation)
 
     def get_current_position(self):
         return self.current_position_x, self.current_position_y, self.current_orientation
-
-    def get_current_velocity(self):
-        return self.current_velocity_x, self.current_velocity_y, self.current_velocity_orientation
 
     def get_current_parameter_xy(self):
         return self.current_position_x, self.current_position_y
@@ -51,9 +40,6 @@ class Robot(Entity):
         self.current_position_x = 0.
         self.current_position_y = 0.
         self.current_orientation = 0.
-        self.current_velocity_x = 0.
-        self.current_velocity_y = 0.
-        self.current_velocity_orientation = 0.
         self.has_a_ball = False
         self.position = ""
         self.velocity_surge = 0
@@ -77,10 +63,7 @@ class Ball(Entity):
         self.size_r = 21.5
         self.current_position_x = 0.
         self.current_position_y = 0.
-        self.current_orientation = 0.
-        self.current_velocity_x = 0.
-        self.current_velocity_y = 0.
-        self.current_velocity_orientation = 0.
+
 
 
 

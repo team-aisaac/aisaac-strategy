@@ -1,7 +1,7 @@
 #!/usr/bin/env  python
 # coding:utf-8
 import math
-import numpy as np
+import numpy as npdr
 import entity
 import time, sys
 import concurrent.futures
@@ -32,7 +32,7 @@ import functions
 class WorldModel():
     def __init__(self):
         rospy.init_node("world_model")
-        self.team_color = str(rospy.get_param("team_color"))
+        self.team_color = str(rospy.get_param("~team_color"))
 
         self.robot_total = 8
         self.enemy_total = 8
@@ -93,6 +93,9 @@ class WorldModel():
 
     """---Refereeから司令をもらうsubscriberの起動--"""
     def referee_listener(self):
+        """ rospy.Subscriber("refbox/command", Int8, self.referee.command_callback)
+        rospy.Subscriber("refbox/stage", Int8, self.referee.stage_callback)
+        rospy.Subscriber("refbox/blue_info", RefereeTeamInfo, self.referee.teaminfo_callback) """
         rospy.Subscriber("/" + self.team_color + "/refbox/command", Int8, self.referee.command_callback)
         rospy.Subscriber("/" + self.team_color + "/refbox/stage", Int8, self.referee.stage_callback)
         rospy.Subscriber("/" + self.team_color + "/refbox/blue_info", RefereeTeamInfo, self.referee.teaminfo_callback)
@@ -120,21 +123,25 @@ if __name__ == "__main__":
 
     try:
         while not rospy.is_shutdown():
+            #print("loop")
             a.referee.referee_branch_decision()
             if a.referee.referee_branch == "HALT":
-                #print("HALT")
+                print("HALT")
                 a.decision_maker.stop_all()
             elif a.referee.referee_branch == "STOP":
-                #print("STOP")
+                print("STOP")
                 a.decision_maker.leave_from_ball()
             elif a.referee.referee_branch == "NORMAL_START":
                 # ぼーるを落としてスタートする
                 a.decision_maker.who_has_a_ball()
                 a.decision_maker.update_strategy()
+                print("START")
             elif a.referee.referee_branch == "KICKOFF":
                 a.objects.set_first_position_4robots_attack()
+                print("KICKOFF")
             elif a.referee.referee_branch == "DEFENCE":
                 a.objects.set_first_positions_4robots()
+                print("DEFENCE")
 
             a.decision_maker.change_goal_status()
             a.robot_status_publisher()

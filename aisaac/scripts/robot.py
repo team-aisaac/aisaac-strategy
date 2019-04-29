@@ -56,6 +56,8 @@ class Robot():
                 self.kick.kick_x()
             if self.status.robot_status == "pass":
                 self.kick.pass_ball(self.robot_params.pass_target_pos_x, self.robot_params.pass_target_pos_y)
+            if self.status.robot_status == "receive":
+                self.kick.recieve_ball(self.robot_params.pass_target_pos_x,self.robot_params.pass_target_pos_y)
             self.loop_rate.sleep()
             
 
@@ -96,13 +98,15 @@ class Robot():
 
 if __name__ == "__main__":
     robot = Robot()
-    """
+"""    
     robot.odom_listener()
     #robot.goal_pose_listener()
     #robot.goal_pose_listener()
     robot.status_listener()
     #robot.kick_server()
     loop_rate = rospy.Rate(ROBOT_LOOP_RATE)
+
+    print("start")
 
     while not rospy.is_shutdown():
         if robot.status.robot_status == "move_linear":
@@ -118,4 +122,5 @@ if __name__ == "__main__":
 
         print(robot.status.robot_status)
         loop_rate.sleep()
-    """
+    
+"""

@@ -32,10 +32,13 @@
     </node>
 
     <!--  <node name="decision_making" pkg="aisaac" type="decision_making.py" output="screen" />  -->
-    <node name="world_model" pkg="aisaac" type="world_model.py" output="screen" />
-    <node name="launch_manager" pkg="launch_manager" type="launch_manager.py" required="true"/>
+    <node name="world_model" pkg="aisaac" type="world_model.py" >
+      <param name="team_color" value="blue" />
+    </node>
+   
 
     <!-- Visualizer -->
+    <!-- <node name="sai_visualizer" pkg="sai_visualizer" type="sai_visualizer" /> -->
     <!--<node name="sai_visualizer" pkg="sai_visualizer" type="sai_visualizer" /> -->
     <!-- <node name="rviz" pkg="rviz" type="rviz" /> -->
     <!-- <node name="rqt_console" pkg="rqt_console" type="rqt_console" /> -->
@@ -44,6 +47,7 @@
     <!-- Run Robot -->
     <node name="robot0" pkg="aisaac" type="robot.py" output="screen">
       <param name="robot_num" value="0" />
+      <param name="robot_color" value="blue" />
     </node>
     <!--
     <node name="robot1" pkg="aisaac" type="robot.py" output="screen">
@@ -69,7 +73,9 @@
       <param name="robot_num" value="0" />
     </node>
     -->
-
+    
+    <node name="launch_manager" pkg="launch_manager" type="launch_manager.py" required="true"/>
+  
   </group>
 
 </launch>
