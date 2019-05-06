@@ -34,11 +34,11 @@
 
 
 
-    <node name="decision_making" pkg="aisaac" type="decision_making.py" output="screen" />
+    <node name="decision_making" pkg="aisaac" type="world_model.py" output="screen" />
       <param name="team_color" type="string" value="$(arg color)" />
 
     <node name="launch_manager" pkg="launch_manager" type="launch_manager.py" required="true"/>
-    
+
     <!-- Visualizer -->
     <!--<node name="sai_visualizer" pkg="sai_visualizer" type="sai_visualizer" /> -->
     <!-- <node name="rviz" pkg="rviz" type="rviz" /> -->
