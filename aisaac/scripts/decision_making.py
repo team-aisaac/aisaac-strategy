@@ -620,6 +620,86 @@ class WorldModel():
     def distance_of_a_point_and_a_straight_line(self, x_0, y_0, a, b, c):
         d = abs(a * x_0 + b * y_0 + c) / np.sqrt(a**2 + b**2)
         return d
+      
+    """
+    def calculate_all_distance(self, goal_pos_x, goal_pos_y):
+        for i in range(len(self.robot_num)):
+            pos_x, pos_y = self.robot[i].get_current_position()
+            for j in range(len(goal_pos_x)):
+                distance[i][j] = np.sqrt( (goal_pos_x[j] - pos_x)**2 + (goal_pos_y[j] - pos_y)**2 )
+        return distance[i][j]
+
+    """
+
+    
+    def count_collision(self, robot_id, current_pos_x, current_pos_y, goal_pos_x, goal_pos_y):
+        counter = 0
+        a, b, c = self.line_parameters(current_pos_x, current_pos_y, goal_pos_x, goal_pos_y)
+        if a != 0 and b != 0:
+            for i in range(self.robot_num):
+                if i != robot_id:
+                    friend_pos_x, friend_pos_y, _ = self.robot[i].get_current_position()
+                    distance = self.distance_of_a_point_and_a_straight_line(friend_pos_x, friend_pos_y, a, b, c)
+                    if distance < self.robot_r * 3:
+                        x = (-friend_pos_y * b + (b**2 / a) * friend_pos_x - c) / (a + b**2 / a)
+                        y = (-a * x -c) / b
+                        if (current_pos_x < x < goal_pos_x or current_pos_x > x > goal_pos_x) and (current_pos_y < y < goal_pos_y or current_pos_y > y > goal_pos_y):
+                            counter += 1
+            for j in range(self.enemy_num):
+                enemy_pos_x, enemy_pos_y, _ = self.enemy[j].get_current_position()
+                distance = self.distance_of_a_point_and_a_straight_line(enemy_pos_x, enemy_pos_y, a, b, c)
+                if distance < self.robot_r * 3:
+                    x = (-enemy_pos_y * b + (b**2 / a) * enemy_pos_x - c) / (a + b**2 / a)
+                    y = (-a * x -c) / b
+                    if (current_pos_x < x < goal_pos_x or current_pos_x > x > goal_pos_x) and (current_pos_y < y < goal_pos_y or current_pos_y > y > goal_pos_y):
+                        counter += 1
+
+            ball_pos_x, ball_pos_y, _ = self.ball.get_current_position()
+            distance = self.distance_of_a_point_and_a_straight_line(ball_pos_x, ball_pos_y, a, b, c)
+            if distance < self.robot_r * 2:
+                x = (-ball_pos_y * b + (b**2 / a) * ball_pos_x - c) / (a + b**2 / a)
+                y = (-a * x -c) / b
+                if (current_pos_x < x < goal_pos_x or current_pos_x > x > goal_pos_x) and (current_pos_y < y < goal_pos_y or current_pos_y > y > goal_pos_y):
+                    counter += 1
+        return counter
+
+    def calculate_move_cost(self, robot_id, goal_x, goal_y):
+        current_x, current_y, _ = self.robot[robot_id].get_current_position()
+        current_vx, current_vy, _ = self.robot[robot_id].get_current_velocity()
+
+        distance = np.sqrt( (goal_x - current_x)**2 + (goal_y - current_y)**2 )
+        #velocity_difference = np.sqrt( (((goal_x - current_x) * 3.7 / distance) - current_vx)**2 + (((goal_y - current_y) * 3.7 / distance) - current_vy)**2 )
+        collision = self.count_collision(robot_id, current_x, current_y, goal_x, goal_y)
+        velocity_difference = 0
+        
+        if collision == 0:
+            move_cost = distance * 1 + velocity_difference * 0.1
+        else:
+            move_cost = distance * 1 + velocity_difference * 0.1 + (1 / collision) * 3
+
+        return move_cost
+
+    
+    def goal_assignment(self, assignment_x, assignment_y, assignment_theta):
+        best_cost = 100
+        best_id = 0
+        used_id = []
+        for  priority in range(len(assignment_x)):
+            for robot_id in range(self.robot_num):
+                current_cost = self.calculate_move_cost(robot_id, assignment_x[priority], assignment_y[priority])
+                if (best_cost > current_cost) and (str(robot_id) not in used_id):
+                    best_cost = current_cost
+                    best_id = robot_id
+            used_id.append(str(best_id))
+            best_cost = 100
+            self.status[best_id].pid_goal_pos_x = assignment_x[priority]
+            self.status[best_id].pid_goal_pos_y = assignment_y[priority]
+            self.status[best_id].pid_goal_theta = assignment_theta[priority]
+            self.status[best_id].status = "move_linear"
+            print best_id
+            print self.status[best_id].pid_goal_pos_x
+            print self.status[best_id].pid_goal_pos_y
+            print self.status[best_id].pid_goal_theta
 
     """---2点をつなぐ直線ax+by+cのa,b,cを返す---"""
     def line_parameters(self, x_1, y_1, x_2, y_2):
