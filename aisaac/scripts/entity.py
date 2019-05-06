@@ -1,7 +1,7 @@
 import numpy as np
 import random
 
-class Entity():
+class Entity(object):
     def __init__(self):
         self.field_x_size = 12000.
         self.field_y_size = 9000.
@@ -30,16 +30,13 @@ class Entity():
 
 class Robot(Entity):
     def __init__(self):
-        ###super().__init__()
+        super(Robot, self).__init__()
         self.size_r = 90.
         self.front_degree = 11.86 * 2
         self.max_velocity = 2000. #mm/s
         self.future_position_x = 0.
         self.future_position_y = 0.
         self.future_orientation = 0.
-        self.current_position_x = 0.
-        self.current_position_y = 0.
-        self.current_orientation = 0.
         self.has_a_ball = False
         self.position = ""
         self.velocity_surge = 0
@@ -59,16 +56,5 @@ class Robot(Entity):
 
 class Ball(Entity):
     def __init__(self):
-        ###super().__init__()
+        super(Ball, self).__init__()
         self.size_r = 21.5
-        self.current_position_x = 0.
-        self.current_position_y = 0.
-
-
-
-
-if __name__ == "__main__":
-    robot_0 = robot()
-    print(robot_0.show_parameters())
-    ball_ = ball()
-    print(ball_.show_parameters())

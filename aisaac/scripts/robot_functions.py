@@ -14,6 +14,7 @@ import tf
 import entity
 import matplotlib.pyplot as plt
 from matplotlib import animation
+import functions
 
 ROBOT_LOOP_RATE = 60.
 
@@ -74,7 +75,7 @@ class RobotParameters:
         """
 
 
-class RobotPid:
+class RobotPid(object):
     def __init__(self, robot_params, ball_params, cmd, command_pub):
         self.robot_params = robot_params
         self.ball_params = ball_params
@@ -89,40 +90,26 @@ class RobotPid:
         self.recursion_max = 10
         self.recursion_count = 0
 
-    """---点と直線の距離の計算---"""
-    def distance_of_a_point_and_a_straight_line(self, x_0, y_0, a, b, c):
-        d = 0
-        if a != 0 or b != 0:
-            d = abs(a * x_0 + b * y_0 + c) / math.sqrt(a**2 + b**2)
-        return d
-
-    """---2点をつなぐ直線ax+by+cのa,b,cを返す---"""
-    def line_parameters(self, x_1, y_1, x_2, y_2):
-        a = y_1 - y_2
-        b = x_2 - x_1
-        c = x_1 * y_2 - x_2 * y_1
-        return a, b, c
-
     def collision_Detection(self, goal_pos_x, goal_pos_y):
-        a, b, c = self.line_parameters(self.robot_params.current_x, self.robot_params.current_y, goal_pos_x, goal_pos_y)
+        a, b, c = functions.line_parameters(self.robot_params.current_x, self.robot_params.current_y, goal_pos_x, goal_pos_y)
         if a != 0 and b != 0:
             for i in range(self.robot_params.friend_num):
                 if i != self.robot_params.robot_num:
-                    distance = self.distance_of_a_point_and_a_straight_line(self.robot_params.friend[i].current_position_x, self.robot_params.friend[i].current_position_y, a, b, c)
+                    distance = functions.distance_of_a_point_and_a_straight_line(self.robot_params.friend[i].current_position_x, self.robot_params.friend[i].current_position_y, a, b, c)
                     if distance < self.robot_params.robot_r * 3:
                         x = (-self.robot_params.friend[i].current_position_y * b + (b**2 / a) * self.robot_params.friend[i].current_position_x - c) / (a + b**2 / a)
                         y = (-a * x -c) / b
                         if (self.robot_params.current_x < x < goal_pos_x or self.robot_params.current_x > x > goal_pos_x) and (self.robot_params.current_y < y < goal_pos_y or self.robot_params.current_y > y > goal_pos_y):
                             return True, x, y, self.robot_params.friend[i].current_position_x , self.robot_params.friend[i].current_position_y, distance
             for j in range(self.robot_params.enemy_num):
-                distance = self.distance_of_a_point_and_a_straight_line(self.robot_params.enemy[j].current_position_x, self.robot_params.enemy[j].current_position_y, a, b, c)
+                distance = functions.distance_of_a_point_and_a_straight_line(self.robot_params.enemy[j].current_position_x, self.robot_params.enemy[j].current_position_y, a, b, c)
                 if distance < self.robot_params.robot_r * 3:
                         x = (-self.robot_params.enemy[j].current_position_y * b + (b**2 / a) * self.robot_params.enemy[j].current_position_x - c) / (a + b**2 / a)
                         y = (-a * x -c) / b
                         if (self.robot_params.current_x < x < goal_pos_x or self.robot_params.current_x > x > goal_pos_x) and (self.robot_params.current_y < y < goal_pos_y or self.robot_params.current_y > y > goal_pos_y):
                             return True, x, y, self.robot_params.enemy[j].current_position_x , self.robot_params.enemy[j].current_position_y, distance
 
-            distance = self.distance_of_a_point_and_a_straight_line(self.ball_params.ball_pos_x, self.ball_params.ball_pos_y, a, b, c)
+            distance = functions.distance_of_a_point_and_a_straight_line(self.ball_params.ball_pos_x, self.ball_params.ball_pos_y, a, b, c)
             if distance < self.robot_params.robot_r * 2:
                         x = (-self.ball_params.ball_pos_y * b + (b**2 / a) * self.ball_params.ball_pos_x - c) / (a + b**2 / a)
                         y = (-a * x -c) / b
@@ -260,7 +247,7 @@ class Ball:
 class RobotStatus:
     def __init__(self, pid, robot_params):
         self.robot_status = "none"
-        
+
         self.pid = pid
 
         self.robot_params = robot_params
@@ -386,7 +373,7 @@ class RobotKick:
             self.ball_pos_y_array = np.roll(self.ball_pos_y_array,-1)
             self.ball_pos_x_array[self.ball_pos_count-1] = self.ball_params.ball_pos_x
             self.ball_pos_y_array[self.ball_pos_count-1] = self.ball_params.ball_pos_y
-        
+
         if self.ball_pos_count % 1 == 0:
             a, b = self.reg1dim(self.ball_pos_x_array, self.ball_pos_y_array)
             # 本来のパスゴール地点と実際の直線Lとの距離計算
@@ -415,7 +402,7 @@ class RobotKick:
             plt.pause(.01)
 
 
-            
+
 
 
 class RobotStrategy:
