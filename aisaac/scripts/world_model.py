@@ -113,10 +113,16 @@ if __name__ == "__main__":
     a = WorldModel()
     a.odom_listener()
     a.referee_listener()
-    a.objects.set_first_positions_4robots()
-    a.robot_status_publisher()
+    #a.objects.set_first_positions_4robots()
+    #a.robot_status_publisher()
     loop_rate = rospy.Rate(WORLD_LOOP_RATE)
     print("start")
+
+    assignment_x = [-4, -3, -2, -1, 0, 1, 2, 3]
+    assignment_y = [1, 1, 1, 1, 1, 1, 1, 1]
+    assignment_theta = [0, 0, 0, 0, 0, 0, 0, 0]
+    time.sleep(10)
+    a.decision_maker.goal_assignment(assignment_x, assignment_y, assignment_theta)
 
     try:
         while not rospy.is_shutdown():
@@ -136,7 +142,7 @@ if __name__ == "__main__":
             elif a.referee.referee_branch == "DEFENCE":
                 a.objects.set_first_positions_4robots()
 
-            a.decision_maker.change_goal_status()
+            #a.decision_maker.change_goal_status()
             a.robot_status_publisher()
             loop_rate.sleep()
     except:

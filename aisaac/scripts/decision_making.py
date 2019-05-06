@@ -677,9 +677,10 @@ class WorldModel():
         current_vx, current_vy, _ = self.robot[robot_id].get_current_velocity()
 
         distance = np.sqrt( (goal_x - current_x)**2 + (goal_y - current_y)**2 )
-        velocity_difference = np.sqrt( ((goal_x - current_x) - current_vx)**2 + ((goal_y - current_y) - current_vy)**2 )
+        #velocity_difference = np.sqrt( (((goal_x - current_x) * 3.7 / distance) - current_vx)**2 + (((goal_y - current_y) * 3.7 / distance) - current_vy)**2 )
         collision = self.count_collision(robot_id, current_x, current_y, goal_x, goal_y)
-
+        velocity_difference = 0
+        
         if collision == 0:
             move_cost = distance * 1 + velocity_difference * 0.1
         else:
