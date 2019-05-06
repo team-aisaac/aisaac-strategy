@@ -1,5 +1,6 @@
 #!/usr/bin/env  python
 # coding:utf-8
+#hello world
 import math
 import numpy as np
 import entity
@@ -41,7 +42,7 @@ class WorldModel():
         self.devision = "B"
 
         """---味方ロボット台数と敵ロボット台数---"""
-        self.robot_num = 8
+        self.robot_num = 4
         self.enemy_num = 8
 
         """---フィールドとロボットのパラメータ---"""
@@ -179,7 +180,7 @@ class WorldModel():
         self.weight_goal_2 = 20000000.0
         self.width_enemy = 0.1
         self.width_goal = 0.1
-        self.delta_2 = 0.00001 
+        self.delta_2 = 0.00001
 
     def set_init_positions(self):
         self.robot[0].set_future_position(x=-6., y=0., theta=0.)
@@ -474,33 +475,21 @@ class WorldModel():
         robot_x = msg.pose.pose.position.x
         robot_y = msg.pose.pose.position.y
         robot_t = tf.transformations.euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))
-        robot_v_x = msg.twist.twist.linear.x;
-        robot_v_y = msg.twist.twist.linear.y;
-        robot_v_t = msg.twist.twist.linear.z;
         self.robot[id].set_current_position(x = robot_x, y = robot_y, theta=robot_t[2])
-        self.robot[id].set_current_velocity(vx = robot_v_x, vy = robot_v_y, vtheta=robot_v_t)
 
     """---Visionからenemyの現在地をもらう---"""
     def enemy_odom_callback(self, msg, id):
         enemy_x = msg.pose.pose.position.x
         enemy_y = msg.pose.pose.position.y
         enemy_t = tf.transformations.euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))
-        enemy_v_x = msg.twist.twist.linear.x;
-        enemy_v_y = msg.twist.twist.linear.y;
-        enemy_v_t = msg.twist.twist.linear.z;
         self.enemy[id].set_current_position(x = enemy_x, y = enemy_y, theta=enemy_t[2])
-        self.enemy[id].set_current_velocity(vx = enemy_v_x, vy = enemy_v_y, vtheta=enemy_v_t)
 
     """---Visionからballの現在地をもらう---"""
     def ball_odom_callback(self, msg):
         ball_x = msg.pose.pose.position.x
         ball_y = msg.pose.pose.position.y
         ball_t = tf.transformations.euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))
-        ball_v_x = msg.twist.twist.linear.x;
-        ball_v_y = msg.twist.twist.linear.y;
-        ball_v_t = msg.twist.twist.linear.z;
         self.ball.set_current_position(x = ball_x, y = ball_y, theta=ball_t[2])
-        self.ball.set_current_velocity(vx = ball_v_x, vy = ball_v_y, vtheta=ball_v_t)
         _ = self.ball_dynamics_x.pop(0)
         _ = self.ball_dynamics_x.pop(0)
         self.ball_dynamics_x.append(ball_x)
@@ -581,6 +570,7 @@ class WorldModel():
 
     def robot_status_publisher(self):
         self.robot_0_status_pub.publish(self.status[0])
+        """
         self.robot_1_status_pub.publish(self.status[1])
         self.robot_2_status_pub.publish(self.status[2])
         self.robot_3_status_pub.publish(self.status[3])
@@ -588,6 +578,7 @@ class WorldModel():
         self.robot_5_status_pub.publish(self.status[5])
         self.robot_6_status_pub.publish(self.status[6])
         self.robot_7_status_pub.publish(self.status[7])
+        """
 
     """---ベクトルをWorld座標ヵらRobot座標へ---"""
     def velocity_transformation(self, id, vx, vy):
@@ -629,7 +620,7 @@ class WorldModel():
     def distance_of_a_point_and_a_straight_line(self, x_0, y_0, a, b, c):
         d = abs(a * x_0 + b * y_0 + c) / np.sqrt(a**2 + b**2)
         return d
-
+      
     """
     def calculate_all_distance(self, goal_pos_x, goal_pos_y):
         for i in range(len(self.robot_num)):
@@ -710,7 +701,6 @@ class WorldModel():
             print self.status[best_id].pid_goal_pos_y
             print self.status[best_id].pid_goal_theta
 
-    
     """---2点をつなぐ直線ax+by+cのa,b,cを返す---"""
     def line_parameters(self, x_1, y_1, x_2, y_2):
         a = y_1 - y_2
@@ -1001,14 +991,15 @@ class WorldModel():
 
 
 
-
 if __name__ == "__main__":
     a = WorldModel()
     a.odom_listener()
     a.referee_listener()
     #a.kick_client()
 
-    #a.set_first_positions_4robots()
+    print("START")
+
+    a.set_first_positions_4robots()
     loop_rate = rospy.Rate(WORLD_LOOP_RATE)
 
 
@@ -1044,13 +1035,7 @@ if __name__ == "__main__":
         a.robot_cmd_publisher_4robots()
         sys.exit()
     """
-    assignment_x = [-1, 0, 1, -1, 1, -1, 0, 1]
-    assignment_y = [1, 1, 1, 0, 0, -1, -1, -1]
-    assignment_theta = [0, 0, 0, 0, 0, 0, 0, 0]
-
-    a.goal_assignment(assignment_x, assignment_y, assignment_theta)
-
+    
     while not rospy.is_shutdown():
-        a.robot_status_publisher()
-        #a.calculate_move_cost(goal_pos_x, goal_pos_y)
+        #a.robot_status_publisher()
         time.sleep(0.1)

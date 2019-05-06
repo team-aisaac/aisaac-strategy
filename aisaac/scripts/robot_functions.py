@@ -1,7 +1,9 @@
 #!/usr/bin/env  python
 # coding:utf-8
+import itertools
 import math
 import rospy
+import numpy as np
 from consai_msgs.msg import Pose
 from consai_msgs.msg import robot_commands
 #from aisaac.srv import Kick
@@ -10,6 +12,8 @@ from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Quaternion
 import tf
 import entity
+import matplotlib.pyplot as plt
+from matplotlib import animation
 
 ROBOT_LOOP_RATE = 60.
 
@@ -125,7 +129,6 @@ class RobotPid:
                         if (self.robot_params.current_x < x < goal_pos_x or self.robot_params.current_x > x > goal_pos_x) and (self.robot_params.current_y < y < goal_pos_y or self.robot_params.current_y > y > goal_pos_y):
                             return True, x, y, self.ball_params.ball_pos_x , self.ball_params.ball_pos_y, distance
         return False, 0, 0, 0, 0, 0
-
 
     def get_sub_goal(self, x, y, obstacle_x, obstacle_y, distance):
         if distance != 0:
@@ -256,7 +259,7 @@ class Ball:
 
 class RobotStatus:
     def __init__(self, pid, robot_params):
-        self.robot_status = "pass"
+        self.robot_status = "none"
         
         self.pid = pid
 
@@ -293,6 +296,22 @@ class RobotKick:
         self.access_threshold = 5
         self.const = 1.5
 
+        self.ball_pos_x_array = np.array([0.0]*50)
+        self.ball_pos_y_array = np.array([0.0]*50)
+        self.reach_flag = False
+        self.ball_pos_count = 0
+
+        self.plot_x = np.arange(-5.0,5.0, 0.01)
+        self.plot_y = np.arange(-5.0,5.0, 0.01)
+        self.fig, self.ax = plt.subplots(1, 1)
+        # 初期化的に一度plotしなければならない
+        # そのときplotしたオブジェクトを受け取る受け取る必要がある．
+        # listが返ってくるので，注意
+        self.lines1, = self.ax.plot(self.ball_pos_x_array, self.ball_pos_y_array)
+        self.lines2, = self.ax.plot(self.plot_x, self.plot_y)
+        self.lines3, = self.ax.plot(self.plot_x, self.plot_y)
+        self.ax.set_xlim(-5, 5)
+        self.ax.set_ylim(-5, 5)
 
     def kick_x(self):
         area = 0.3
@@ -328,6 +347,76 @@ class RobotKick:
 
     def kick_z(self):
         pass
+
+    def reg1dim(self, x, y):
+        x = np.clip(x,-5,5)
+        y = np.clip(y,-5,5)
+        n = len(x)
+        a = ((np.dot(x, y)- y.sum() * x.sum()/n) / ((x ** 2).sum() - x.sum()**2 / n))
+        b = (y.sum() - a * x.sum())/n
+        a = np.clip(a,-1.0e+308,1.0e+308)
+        b = np.clip(b,-1.0e+308,1.0e+308)
+        return a, b
+
+    def recieve_ball(self, target_x, target_y):
+
+        self.reach_flag = True
+        #目標点まで移動
+        if self.reach_flag == False:
+            pose_theta = math.atan2( (self.ball_params.ball_pos_y - target_y) , (self.ball_params.ball_pos_x - target_x) )
+            self.pid.pid_linear(target_x, target_y, pose_theta)
+            distance = math.sqrt((target_x - self.robot_params.current_x)**2 + (target_y - self.robot_params.current_y)**2)
+            if distance < 0.1:
+                self.reach_flag = False
+                #print("reach")
+            #else:
+                #print(distance)
+
+        #50カウント毎の座標を取得
+        if self.ball_pos_count < 50:
+            self.ball_pos_x_array[self.ball_pos_count] = self.ball_params.ball_pos_x
+            self.ball_pos_y_array[self.ball_pos_count] = self.ball_params.ball_pos_y
+            self.ball_pos_count+=1
+        else:
+            """ for i in range(0,50):
+                self.ball_pos_x_array[ball_pos_count] = 0
+                self.ball_pos_y_array[ball_pos_count] = 0
+            ball_pos_count = 0 """
+            self.ball_pos_x_array = np.roll(self.ball_pos_x_array,-1)
+            self.ball_pos_y_array = np.roll(self.ball_pos_y_array,-1)
+            self.ball_pos_x_array[self.ball_pos_count-1] = self.ball_params.ball_pos_x
+            self.ball_pos_y_array[self.ball_pos_count-1] = self.ball_params.ball_pos_y
+        
+        if self.ball_pos_count % 1 == 0:
+            a, b = self.reg1dim(self.ball_pos_x_array, self.ball_pos_y_array)
+            # 本来のパスゴール地点と実際の直線Lとの距離計算
+            d = (abs(a*target_x-target_y+b))/((a**2+1)**(1/2)) # ヘッセの公式で距離計算
+            # 交点H(hx, hy) の座標計算
+            hx = (a*(target_y-b)+target_x)/(a**2+1)
+            hy = a*(a*(target_y-b)+target_x)/(a**2+1)+b
+
+            if d < 2:
+                pose_theta = math.atan2( (self.ball_params.ball_pos_y - hy) , (self.ball_params.ball_pos_x - hx) )
+                self.pid.pid_linear(hx, hy, pose_theta)
+            else:
+                pose_theta = math.atan2( (self.ball_params.ball_pos_y - target_y) , (self.ball_params.ball_pos_x - target_x) )
+                self.pid.pid_linear(target_x, target_y, pose_theta)
+
+            # 垂線テキスト座標
+            dx_center = (target_x + hx) / 2
+            dy_center = (target_y + hy) / 2
+            plt.axis('scaled')
+            #plt.plot([target_x, hx],[target_y, hy], color='green', linestyle='--', zorder=0)
+
+            self.plot_y = a * self.plot_x + b
+            self.lines1.set_data(self.ball_pos_x_array, self.ball_pos_y_array)
+            self.lines2.set_data(self.plot_x, self.plot_y)
+            self.lines3.set_data([target_x, hx], [target_y, hy])
+            plt.pause(.01)
+
+
+            
+
 
 class RobotStrategy:
     def __init__(self):
