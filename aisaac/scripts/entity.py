@@ -18,12 +18,20 @@ class Entity(object):
         self.current_position_y = y
         self.current_orientation = theta
 
+    def set_current_velocity(self, vx, vy, vtheta):
+        self.current_velocity_x = vx
+        self.current_velocity_y = vy
+        self.current_velocity_orientation = vtheta
+
     def show_current_parameters(self):
         return "size_r:{}, current_position_x:{}, current_position_y:{}, current_orientation:{}".format(
                 self.size_r, self.current_position_x, self.current_position_y, self.current_orientation)
 
     def get_current_position(self):
         return self.current_position_x, self.current_position_y, self.current_orientation
+
+    def get_current_velocity(self):
+        return self.current_velocity_x, self.current_velocity_y, self.current_velocity_orientation
 
     def get_current_parameter_xy(self):
         return self.current_position_x, self.current_position_y
