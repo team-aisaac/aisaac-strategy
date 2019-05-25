@@ -156,10 +156,12 @@ class Referee:
     """---Refereeから現在のstageをもらう---"""
     def stage_callback(self, msg):
         self.stage = str(msg)
+        # ハーフタイムかどうかなどの司令を受け取る。
 
     """---Refereeから現在のteaminfoをもらう---"""
     def teaminfo_callback(self, msg):
         self.teaminfo = str(msg)
+        # 各機体にイエローカード、レッドカードなどがあることをしらせる。
 
     """---Refereeからの指示にしたがって行動指針を決定する---"""
     def referee_branch_decision(self):

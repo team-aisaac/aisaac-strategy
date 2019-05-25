@@ -125,12 +125,12 @@ class RobotPid(object):
         else :
             return 0, 0
 
-    def pass_plan(self, goal_pos_x, goal_pos_y):
+    def path_plan(self, goal_pos_x, goal_pos_y):
         self.recursion_count += 1
         collision = self.collision_Detection(goal_pos_x, goal_pos_y)
         if collision[0] and self.recursion_count < self.recursion_max:
             goal_pos_x, goal_pos_y = self.get_sub_goal(collision[1], collision[2], collision[3], collision[4], collision[5])
-            self.pass_plan(goal_pos_x, goal_pos_y)
+            self.path_plan(goal_pos_x, goal_pos_y)
         return goal_pos_x, goal_pos_y
 
     def pid_linear(self, goal_pos_x, goal_pos_y, goal_pos_theta):
@@ -151,7 +151,7 @@ class RobotPid(object):
 
         if self.goal_pos_init_flag == True:
             self.recursion_count = 0
-            self.next_pos_x, self.next_pos_y = self.pass_plan(goal_pos_x, goal_pos_y)
+            self.next_pos_x, self.next_pos_y = self.path_plan(goal_pos_x, goal_pos_y)
             """
             if goal_pos_x != next_pos_x or goal_pos_y != next_pos_y:
                 goal_pos_x = next_pos_x
