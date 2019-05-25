@@ -9,7 +9,8 @@ from aisaac.msg import Status
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Quaternion
 import tf
-from robot_functions import RobotParameters, RobotPid, Ball, RobotStatus, RobotKick
+from robot_functions import RobotPid, RobotStatus, RobotKick
+from world_model_functions import Objects
 
 ROBOT_LOOP_RATE = 60.
 
@@ -17,27 +18,36 @@ class Robot():
     def __init__(self):
         rospy.init_node("robot")
         self.robot_color = str(rospy.get_param("~robot_color"))
-        self.robot_num = str(rospy.get_param("~robot_num"))
+        self.robot_id = str(rospy.get_param("~robot_num"))
 
-        self.friend_num = 8
-        self.enemy_num = 8
+        self.robot_total = 8
+        self.enemy_total = 8
 
         self.cmd = robot_commands()
         self.cmd.kick_speed_x = 0
         self.cmd.kick_speed_z = 0
         self.cmd.dribble_power = 0
 
-        self.command_pub = rospy.Publisher("/" + self.robot_color + "/robot_" + self.robot_num + "/robot_commands", robot_commands, queue_size=10)
+        self.command_pub = rospy.Publisher("/" + self.robot_color + "/robot_" + self.robot_id + "/robot_commands", robot_commands, queue_size=10)
 
         # Composition
-        self.robot_params = RobotParameters(self.robot_num,self.friend_num, self.enemy_num)
-        self.ball_params = Ball()
-        self.pid = RobotPid(self.robot_params, self.ball_params, self.cmd, self.command_pub)
+        _objects = Objects(self.robot_color, self.robot_total, self.enemy_total)
+
+        self.robot_params = _objects.robot[int(self.robot_id)]
+
+        self.robot_friend = _objects.robot
+        self.robot_enemy = _objects.enemy
+
+        self.ball_params = _objects.ball
+
+        # self.pid = RobotPid(self.robot_params, self.ball_params, self.cmd, self.command_pub)
+        self.pid = RobotPid(self.robot_id, _objects, self.cmd, self.command_pub)
+
         self.status = RobotStatus(self.pid, self.robot_params)
         self.kick = RobotKick(self.ball_params, self.robot_params, self.pid, self.cmd, self.status, self.command_pub)
 
         # listner 起動
-        self.odom_listener()
+        # self.odom_listener()
         #self.goal_pose_listener()
         #self.target_pose_listener()
         self.status_listener()
@@ -45,41 +55,44 @@ class Robot():
 
         #Loop 処理
         self.loop_rate = rospy.Rate(ROBOT_LOOP_RATE)
+        print("Robot start: "+self.robot_id)
         while not rospy.is_shutdown():
             if self.status.robot_status == "move_linear":
-                self.pid.pid_linear(self.robot_params.pid_goal_pos_x, self.robot_params.pid_goal_pos_y,
-                self.robot_params.pid_goal_theta)
+                self.pid.pid_linear(self.robot_params.get_future_position()[0], self.robot_params.get_future_position()[1],
+                self.robot_params.get_future_orientation())
             if self.status.robot_status == "move_circle":
                 self.pid.pid_circle(self.pid.pid_circle_center_x, self.pid.pid_circle_center_y,
-                self.robot_params.pid_goal_pos_x, self.robot_params.pid_goal_pos_y, self.robot_params.pid_goal_theta)
+                                    self.robot_params.get_future_position()[0], 
+                                    self.robot_params.get_future_position()[1],
+                                    self.robot_params.get_future_orientation())
             if self.status.robot_status == "kick":
                 self.kick.kick_x()
             if self.status.robot_status == "pass":
-                self.kick.pass_ball(self.robot_params.pass_target_pos_x, self.robot_params.pass_target_pos_y)
+                self.kick.pass_ball(self.robot_params.get_pass_target_position()[0], self.robot_params.get_pass_target_position()[1])
             if self.status.robot_status == "receive":
-                self.kick.recieve_ball(self.robot_params.pass_target_pos_x,self.robot_params.pass_target_pos_y)
+                self.kick.recieve_ball(self.robot_params.get_pass_target_position()[0],self.robot_params.get_pass_target_position()[1])
             self.loop_rate.sleep()
             
 
-    def odom_listener(self):
-        for i in range(self.friend_num):
-            rospy.Subscriber("/" + self.robot_color + "/robot_" + str(i) + "/odom", Odometry, self.robot_params.friend_odom_callback, callback_args=i)
-        for j in range(self.enemy_num):
-            rospy.Subscriber("/" + self.robot_color + "/enemy_" + str(j) + "/odom", Odometry, self.robot_params.enemy_odom_callback, callback_args=j)
-        rospy.Subscriber("/" + self.robot_color + "/ball_observer/estimation", Odometry, self.ball_params.odom_callback)
+    # def odom_listener(self):
+    #     for i in range(self.robot_total):
+    #         rospy.Subscriber("/" + self.robot_color + "/robot_" + str(i) + "/odom", Odometry, self.robot_params.friend_odom_callback, callback_args=i)
+    #     for j in range(self.enemy_total):
+    #         rospy.Subscriber("/" + self.robot_color + "/enemy_" + str(j) + "/odom", Odometry, self.robot_params.enemy_odom_callback, callback_args=j)
+    #     rospy.Subscriber("/" + self.robot_color + "/ball_observer/estimation", Odometry, self.ball_params.odom_callback)
 
         """
 
     def goal_pose_listener(self):
-        rospy.Subscriber("/robot_" + self.robot_num + "/goal_pose", Pose, self.robot_params.goal_pose_callback)
+        rospy.Subscriber("/robot_" + self.robot_id + "/goal_pose", Pose, self.robot_params.goal_pose_callback)
 
     def target_pose_listener(self):
-        rospy.Subscriber("/robot_" + self.robot_num + "/target_pose", Pose, self.robot_params.target_pose_callback)
+        rospy.Subscriber("/robot_" + self.robot_id + "/target_pose", Pose, self.robot_params.target_pose_callback)
 
         """
 
     def status_listener(self):
-        rospy.Subscriber("/" + self.robot_color + "/robot_" + self.robot_num + "/status", Status, self.status.status_callback)
+        rospy.Subscriber("/" + self.robot_color + "/robot_" + self.robot_id + "/status", Status, self.status.status_callback)
 
     """
     def kick(self, req):
