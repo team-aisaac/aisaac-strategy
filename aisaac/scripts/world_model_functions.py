@@ -71,17 +71,20 @@ class WorldState:
             self.robot[2].position = "CCB"
             self.robot[3].position = "RCB"
 
-class Objects:
-    def __init__(self, robot_total, enemy_total, robot, enemy, ball):
+class Objects(object):
+    def __init__(self, team_color, robot_total, enemy_total):
+        self.team_color = team_color
         self.robot_total = robot_total
         self.enemy_total = enemy_total
-        self.robot = robot
-        self.enemy = enemy
-        self.ball = ball
+        self.robot = [entity.Robot() for i in range(self.robot_total)]
+        self.enemy = [entity.Robot() for i in range(self.enemy_total)]
+        self.ball = entity.Ball()
 
         """---ボール軌道の考慮時間幅(linear Regressionで軌道予測するため)---"""
         self.ball_dynamics_window = 5
         self.ball_dynamics = [[0., 0.] for i in range(self.ball_dynamics_window)]
+
+        self.odom_listener()
 
     def set_first_positions(self):
         self.robot[0].set_future_position(x=-5.5, y=0., theta=0.)
@@ -114,6 +117,17 @@ class Objects:
         #self.robot[5].set_future_position(x=-4.5, y=5., theta=0.)
         #self.robot[6].set_future_position(x=-4., y=5., theta=0.)
         #self.robot[7].set_future_position(x=-3.5, y=5., theta=0.)
+
+    """---Visionから現在地をもらうsubscriberの起動--"""
+    def odom_listener(self):
+        for i in range(self.robot_total):
+            rospy.Subscriber("/" + self.team_color + "/robot_"+ str(i) +"/odom", Odometry, self.robot_odom_callback, callback_args=i)
+
+        for j in range(self.enemy_total):
+            rospy.Subscriber("/" + self.team_color + "/enemy_" + str(j) + "/odom", Odometry, self.enemy_odom_callback, callback_args=j)
+
+        rospy.Subscriber("/" + self.team_color + "/ball_observer/estimation", Odometry, self.ball_odom_callback)
+
 
     """---Visionからrobotの現在地をもらう---"""
     def robot_odom_callback(self, msg, id):

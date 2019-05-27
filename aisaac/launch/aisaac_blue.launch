@@ -48,7 +48,7 @@
     <!-- <node name="plot" pkg="rqt_plot" type="rqt_plot" /> -->
 
     <!-- Run Robot -->
-    <node name="robot0" pkg="aisaac" type="robot.py" output="screen">
+    <node name="robot0" pkg="aisaac" type="robot.py" output="screen"> <!-- launch-prefix="xterm -e"> -->
       <param name="robot_num" type="int" value="0" />
       <param name="robot_color" value="$(arg color)" />
     </node>
