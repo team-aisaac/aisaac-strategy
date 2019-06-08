@@ -4,15 +4,18 @@ import math
 import rospy
 from consai_msgs.msg import Pose
 from consai_msgs.msg import robot_commands
-#from aisaac.srv import Kick
 from aisaac.msg import Status
-from nav_msgs.msg import Odometry
-from geometry_msgs.msg import Quaternion
-import tf
-from robot_functions import RobotPid, RobotStatus, RobotKick
-from world_model_functions import Objects
 
-ROBOT_LOOP_RATE = 60.
+from robot_kick import RobotKick
+from robot_pid import RobotPid
+from robot_status import RobotStatus
+
+from objects import Objects
+
+import robot_utils
+
+ROBOT_LOOP_RATE = robot_utils.ROBOT_LOOP_RATE
+
 
 class Robot():
     def __init__(self):
