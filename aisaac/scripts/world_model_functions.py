@@ -1,4 +1,4 @@
-#!/usr/bin/env  python
+# !/usr/bin/env  python
 # coding:utf-8
 import math
 import numpy as np
@@ -120,14 +120,22 @@ class Objects:
         robot_x = msg.pose.pose.position.x
         robot_y = msg.pose.pose.position.y
         robot_t = tf.transformations.euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))
+        robot_v_x = msg.twist.twist.linear.x;
+        robot_v_y = msg.twist.twist.linear.y;
+        robot_v_t = msg.twist.twist.linear.z;
         self.robot[id].set_current_position(x = robot_x, y = robot_y, theta=robot_t[2])
+        self.robot[id].set_current_velocity(vx = robot_v_x, vy = robot_v_y, vtheta=robot_v_t)
 
     """---Visionからenemyの現在地をもらう---"""
     def enemy_odom_callback(self, msg, id):
         enemy_x = msg.pose.pose.position.x
         enemy_y = msg.pose.pose.position.y
         enemy_t = tf.transformations.euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))
+        enemy_v_x = msg.twist.twist.linear.x;
+        enemy_v_y = msg.twist.twist.linear.y;
+        enemy_v_t = msg.twist.twist.linear.z;
         self.enemy[id].set_current_position(x = enemy_x, y = enemy_y, theta=enemy_t[2])
+        self.enemy[id].set_current_velocity(vx = enemy_v_x, vy = enemy_v_y, vtheta=enemy_v_t)
 
     """---Visionからballの現在地をもらう---"""
     def ball_odom_callback(self, msg):
@@ -467,6 +475,82 @@ class DecisionMaker:
                 self.status[id].status = 'move_linear'
             else:
                 self.stop_all()
+
+    """---2点をつなぐ直線ax+by+cのa,b,cを返す---"""
+    def line_parameters(self, x_1, y_1, x_2, y_2):
+        a = y_1 - y_2
+        b = x_2 - x_1
+        c = x_1 * y_2 - x_2 * y_1
+        return a, b, c
+
+    """---点と直線の距離の計算---"""
+    def distance_of_a_point_and_a_straight_line(self, x_0, y_0, a, b, c):
+        d = abs(a * x_0 + b * y_0 + c) / np.sqrt(a**2 + b**2)
+        return d
+
+    def count_collision(self, robot_id, current_pos_x, current_pos_y, goal_pos_x, goal_pos_y):
+        counter = 0
+        a, b, c = self.line_parameters(current_pos_x, current_pos_y, goal_pos_x, goal_pos_y)
+        if a != 0 and b != 0:
+            for i in range(self.robot_total):
+                if i != robot_id:
+                    friend_pos_x, friend_pos_y, _ = self.robot[i].get_current_position()
+                    distance = self.distance_of_a_point_and_a_straight_line(friend_pos_x, friend_pos_y, a, b, c)
+                    if distance < self.robot_r * 3:
+                        x = (-friend_pos_y * b + (b**2 / a) * friend_pos_x - c) / (a + b**2 / a)
+                        y = (-a * x -c) / b
+                        if (current_pos_x < x < goal_pos_x or current_pos_x > x > goal_pos_x) and (current_pos_y < y < goal_pos_y or current_pos_y > y > goal_pos_y):
+                            counter += 1
+            for j in range(self.enemy_total):
+                enemy_pos_x, enemy_pos_y, _ = self.enemy[j].get_current_position()
+                distance = self.distance_of_a_point_and_a_straight_line(enemy_pos_x, enemy_pos_y, a, b, c)
+                if distance < self.robot_r * 3:
+                    x = (-enemy_pos_y * b + (b**2 / a) * enemy_pos_x - c) / (a + b**2 / a)
+                    y = (-a * x -c) / b
+                    if (current_pos_x < x < goal_pos_x or current_pos_x > x > goal_pos_x) and (current_pos_y < y < goal_pos_y or current_pos_y > y > goal_pos_y):
+                        counter += 1
+
+            ball_pos_x, ball_pos_y, _ = self.ball.get_current_position()
+            distance = self.distance_of_a_point_and_a_straight_line(ball_pos_x, ball_pos_y, a, b, c)
+            if distance < self.robot_r * 2:
+                x = (-ball_pos_y * b + (b**2 / a) * ball_pos_x - c) / (a + b**2 / a)
+                y = (-a * x -c) / b
+                if (current_pos_x < x < goal_pos_x or current_pos_x > x > goal_pos_x) and (current_pos_y < y < goal_pos_y or current_pos_y > y > goal_pos_y):
+                    counter += 1
+        return counter
+
+    def calculate_move_cost(self, robot_id, goal_x, goal_y):
+        current_x, current_y, _ = self.robot[robot_id].get_current_position()
+        current_vx, current_vy, _ = self.robot[robot_id].get_current_velocity()
+        distance = np.sqrt( (goal_x - current_x)**2. + (goal_y - current_y)**2. )
+        #velocity_difference = np.sqrt( (((goal_x - current_x) * 3.7 / distance) - current_vx)**2 + (((goal_y - current_y) * 3.7 / distance) - current_vy)**2 )
+        collision = self.count_collision(robot_id, current_x, current_y, goal_x, goal_y)
+        velocity_difference = 0.
+                
+        move_cost = distance * 1.# + velocity_difference * 0.1 + collision * 3.
+
+        return move_cost
+
+    def goal_assignment(self, assignment_x, assignment_y, assignment_theta):
+        best_cost = 100.
+        best_id = 0
+        used_id = []
+        for  priority in range(len(assignment_x)):
+            for robot_id in range(self.robot_total):
+                current_cost = self.calculate_move_cost(robot_id, assignment_x[priority], assignment_y[priority])
+                if (best_cost > current_cost) and (str(robot_id) not in used_id):
+                    best_cost = current_cost
+                    best_id = robot_id
+            used_id.append(str(best_id))
+            best_cost = 100.
+            self.status[best_id].pid_goal_pos_x = assignment_x[priority]
+            self.status[best_id].pid_goal_pos_y = assignment_y[priority]
+            self.status[best_id].pid_goal_theta = assignment_theta[priority]
+            self.status[best_id].status = "move_linear"
+            #print best_id
+            #print self.status[best_id].pid_goal_pos_x
+            #print self.status[best_id].pid_goal_pos_y
+            #print self.status[best_id].pid_goal_theta
 
 
 
