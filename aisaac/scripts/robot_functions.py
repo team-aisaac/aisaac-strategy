@@ -18,67 +18,14 @@ import functions
 
 ROBOT_LOOP_RATE = 60.
 
-class RobotParameters:
-    def __init__(self, robot_num,friend_num, enemy_num):
-        self.robot_r = 0.09 #定数はconfigからとってくるように書きたい
-
-        self.robot_num = int(robot_num)
-        self.friend_num = friend_num
-        self.enemy_num = enemy_num
-
-        self.friend = [entity.Robot() for i in range(int(self.friend_num))]
-        self.enemy = [entity.Robot() for i in range(int(self.enemy_num))]
-
-        self.current_x = 0
-        self.current_y = 0
-        self.current_theta = 0
-
-        self.pid_goal_pos_x = 0
-        self.pid_goal_pos_y = 0
-        self.pid_goal_theta = 0
-
-        self.pass_target_pos_x = 0
-        self.pass_target_pos_y = 0
-
-    def friend_odom_callback(self, msg, id):
-        friend_x = msg.pose.pose.position.x
-        friend_y = msg.pose.pose.position.y
-        friend_t = tf.transformations.euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))
-        self.friend[id].set_current_position(x = friend_x, y = friend_y, theta = friend_t[2])
-        if self.robot_num == id:
-            self.current_x = msg.pose.pose.position.x
-            self.current_y = msg.pose.pose.position.y
-            current_ori = tf.transformations.euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))
-            self.current_theta = current_ori[2]
-
-    def enemy_odom_callback(self, msg, id):
-        enemy_x = msg.pose.pose.position.x
-        enemy_y = msg.pose.pose.position.y
-        enemy_t = tf.transformations.euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))
-        self.enemy[id].set_current_position(x = enemy_x, y = enemy_y, theta = enemy_t[2])
-
-        """
-
-    def goal_pose_callback(self, msg):
-        if self.goal_pos_x != msg.x or self.goal_pos_y != msg.y or self.goal_pos_theta != msg.theta:
-           self.goal_pos_x = msg.x
-           self.goal_pos_y = msg.y
-           self.goal_pos_theta = msg.theta
-           self.pid_circle_center_x = (self.goal_pos_x + self.current_x) / 2
-           self.pid_circle_center_y = (self.goal_pos_y + self.current_y) / 2
-           self.goal_pos_init_flag = True
-
-    def target_pose_callback(self, msg):
-        self.target_pos_x = msg.x
-        self.target_pos_y = msg.y
-
-        """
-
 
 class RobotPid(object):
-    def __init__(self, robot_params, ball_params, cmd, command_pub):
-        self.robot_params = robot_params
-        self.ball_params = ball_params
+    def __init__(self, robot_id, objects, cmd, command_pub):
+        self.robot_id = int(robot_id)
+        self.ctrld_robot = objects.robot[int(robot_id)]
+        self.friend = objects.robot
+        self.enemy = objects.enemy
+        self.ball_params = objects.ball
         self.cmd = cmd
         self.command_pub = command_pub
 
@@ -90,44 +37,59 @@ class RobotPid(object):
         self.recursion_max = 10
         self.recursion_count = 0
 
-    def collision_Detection(self, goal_pos_x, goal_pos_y):
-        a, b, c = functions.line_parameters(self.robot_params.current_x, self.robot_params.current_y, goal_pos_x, goal_pos_y)
+    def collision_detection(self, goal_pos_x, goal_pos_y):
+        a, b, c = functions.line_parameters(self.ctrld_robot.get_current_position()[0], self.ctrld_robot.get_current_position()[1], goal_pos_x, goal_pos_y)
         if a != 0 and b != 0:
-            for i in range(self.robot_params.friend_num):
-                if i != self.robot_params.robot_num:
-                    distance = functions.distance_of_a_point_and_a_straight_line(self.robot_params.friend[i].current_position_x, self.robot_params.friend[i].current_position_y, a, b, c)
-                    if distance < self.robot_params.robot_r * 3:
-                        x = (-self.robot_params.friend[i].current_position_y * b + (b**2 / a) * self.robot_params.friend[i].current_position_x - c) / (a + b**2 / a)
+            for i in range(len(self.friend)):
+                if i != self.robot_id:
+                    distance = functions.distance_of_a_point_and_a_straight_line(self.friend[i].get_current_position()[0], self.friend[i].get_current_position()[1], a, b, c)
+                    if distance < self.ctrld_robot.robot_r * 3:
+                        x = (-self.friend[i].get_current_position()[1] * b + (b**2 / a) * self.friend[i].get_current_position()[0] - c) / (a + b**2 / a)
                         y = (-a * x -c) / b
-                        if (self.robot_params.current_x < x < goal_pos_x or self.robot_params.current_x > x > goal_pos_x) and (self.robot_params.current_y < y < goal_pos_y or self.robot_params.current_y > y > goal_pos_y):
-                            return True, x, y, self.robot_params.friend[i].current_position_x , self.robot_params.friend[i].current_position_y, distance
-            for j in range(self.robot_params.enemy_num):
-                distance = functions.distance_of_a_point_and_a_straight_line(self.robot_params.enemy[j].current_position_x, self.robot_params.enemy[j].current_position_y, a, b, c)
-                if distance < self.robot_params.robot_r * 3:
-                        x = (-self.robot_params.enemy[j].current_position_y * b + (b**2 / a) * self.robot_params.enemy[j].current_position_x - c) / (a + b**2 / a)
-                        y = (-a * x -c) / b
-                        if (self.robot_params.current_x < x < goal_pos_x or self.robot_params.current_x > x > goal_pos_x) and (self.robot_params.current_y < y < goal_pos_y or self.robot_params.current_y > y > goal_pos_y):
-                            return True, x, y, self.robot_params.enemy[j].current_position_x , self.robot_params.enemy[j].current_position_y, distance
+                        if (self.ctrld_robot.get_current_position()[0] < x < goal_pos_x \
+                            or self.ctrld_robot.get_current_position()[0] > x > goal_pos_x) \
+                            and (self.ctrld_robot.get_current_position()[1] < y < goal_pos_y \
+                            or self.ctrld_robot.get_current_position()[1] > y > goal_pos_y):
 
-            distance = functions.distance_of_a_point_and_a_straight_line(self.ball_params.ball_pos_x, self.ball_params.ball_pos_y, a, b, c)
-            if distance < self.robot_params.robot_r * 2:
-                        x = (-self.ball_params.ball_pos_y * b + (b**2 / a) * self.ball_params.ball_pos_x - c) / (a + b**2 / a)
+                            return True, x, y, self.friend[i].get_current_position()[0] , self.friend[i].get_current_position()[1], distance
+
+            for j in range(len(self.enemy)):
+                distance = functions.distance_of_a_point_and_a_straight_line(self.enemy[j].get_current_position()[0], self.enemy[j].get_current_position()[1], a, b, c)
+                if distance < self.ctrld_robot.robot_r * 3:
+                        x = (-self.enemy[j].get_current_position()[1] * b + (b**2 / a) * self.enemy[j].get_current_position()[0] - c) / (a + b**2 / a)
                         y = (-a * x -c) / b
-                        if (self.robot_params.current_x < x < goal_pos_x or self.robot_params.current_x > x > goal_pos_x) and (self.robot_params.current_y < y < goal_pos_y or self.robot_params.current_y > y > goal_pos_y):
-                            return True, x, y, self.ball_params.ball_pos_x , self.ball_params.ball_pos_y, distance
+                        if (self.ctrld_robot.get_current_position()[0] < x < goal_pos_x \
+                            or self.ctrld_robot.get_current_position()[0] > x > goal_pos_x) \
+                            and (self.ctrld_robot.get_current_position()[1] < y < goal_pos_y \
+                            or self.ctrld_robot.get_current_position()[1] > y > goal_pos_y):
+
+                            return True, x, y, self.enemy[j].get_current_position()[0] , self.enemy[j].get_current_position()[1], distance
+
+            distance = functions.distance_of_a_point_and_a_straight_line(self.ball_params.get_current_position()[0], self.ball_params.get_current_position()[1], a, b, c)
+
+            if distance < self.ctrld_robot.robot_r * 2:
+                        x = (-self.ball_params.get_current_position()[1] * b + (b**2 / a) * self.ball_params.get_current_position()[0] - c) / (a + b**2 / a)
+                        y = (-a * x -c) / b
+                        if (self.ctrld_robot.get_current_position()[0] < x < goal_pos_x \
+                            or self.ctrld_robot.get_current_position()[0] > x > goal_pos_x) \
+                            and (self.ctrld_robot.get_current_position()[1] < y < goal_pos_y \
+                            or self.ctrld_robot.get_current_position()[1] > y > goal_pos_y):
+
+                            return True, x, y, self.ball_params.get_current_position()[0] , self.ball_params.get_current_position()[1], distance
+
         return False, 0, 0, 0, 0, 0
 
     def get_sub_goal(self, x, y, obstacle_x, obstacle_y, distance):
         if distance != 0:
-            sub_goal_x = (-5 * self.robot_params.robot_r * obstacle_x + (distance + 5 * self.robot_params.robot_r) * x) / distance
-            sub_goal_y = (-5 * self.robot_params.robot_r * obstacle_y + (distance + 5 * self.robot_params.robot_r) * y) / distance
+            sub_goal_x = (-5 * self.ctrld_robot.robot_r * obstacle_x + (distance + 5 * self.ctrld_robot.robot_r) * x) / distance
+            sub_goal_y = (-5 * self.ctrld_robot.robot_r * obstacle_y + (distance + 5 * self.ctrld_robot.robot_r) * y) / distance
             return sub_goal_x, sub_goal_y
         else :
             return 0, 0
 
     def path_plan(self, goal_pos_x, goal_pos_y):
         self.recursion_count += 1
-        collision = self.collision_Detection(goal_pos_x, goal_pos_y)
+        collision = self.collision_detection(goal_pos_x, goal_pos_y)
         if collision[0] and self.recursion_count < self.recursion_max:
             goal_pos_x, goal_pos_y = self.get_sub_goal(collision[1], collision[2], collision[3], collision[4], collision[5])
             self.path_plan(goal_pos_x, goal_pos_y)
@@ -135,9 +97,9 @@ class RobotPid(object):
 
     def pid_linear(self, goal_pos_x, goal_pos_y, goal_pos_theta):
         self.Kpv = 2.2
-        self.Kpr = 4
-        self.Kdv = 5
-        self.Kdr = 3
+        self.Kpr = 2.0
+        self.Kdv = 3.0
+        self.Kdr = 1.0
 
         """
         self.recursion_count = 0
@@ -159,9 +121,9 @@ class RobotPid(object):
             """
 
 
-        d_x = self.next_pos_x - self.robot_params.current_x
-        d_y = self.next_pos_y - self.robot_params.current_y
-        d_theta = goal_pos_theta - self.robot_params.current_theta
+        d_x = self.next_pos_x - self.ctrld_robot.get_current_position()[0]
+        d_y = self.next_pos_y - self.ctrld_robot.get_current_position()[1]
+        d_theta = goal_pos_theta - self.ctrld_robot.get_current_orientation()
         if self.goal_pos_init_flag:
             self.goal_pos_init_flag = False
             self.pid_d_x = 0
@@ -187,8 +149,8 @@ class RobotPid(object):
         Vy = self.Kpv * self.pid_p_y + self.Kdv * self.pid_d_y / (1./ROBOT_LOOP_RATE)
         Vr = self.Kpr * self.pid_p_theta + self.Kdr * self.pid_d_theta / (1./ROBOT_LOOP_RATE)
 
-        self.cmd.vel_surge = Vx*math.cos(self.robot_params.current_theta)+Vy*math.sin(self.robot_params.current_theta)
-        self.cmd.vel_sway = -Vx*math.sin(self.robot_params.current_theta)+Vy*math.cos(self.robot_params.current_theta)
+        self.cmd.vel_surge = Vx*math.cos(self.ctrld_robot.get_current_orientation())+Vy*math.sin(self.ctrld_robot.get_current_orientation())
+        self.cmd.vel_sway = -Vx*math.sin(self.ctrld_robot.get_current_orientation())+Vy*math.cos(self.ctrld_robot.get_current_orientation())
         self.cmd.omega = Vr
         self.command_pub.publish(self.cmd)
 
@@ -196,9 +158,9 @@ class RobotPid(object):
         self.Kpv = 2
         self.Kpr = 7
         self.Kdr = 4
-        d_x = center_x - self.robot_params.current_x
-        d_y = center_y - self.robot_params.current_y
-        d_theta = theta - self.robot_params.current_theta
+        d_x = center_x - self.ctrld_robot.get_current_position()[0]
+        d_y = center_y - self.ctrld_robot.get_current_position()[1]
+        d_theta = theta - self.ctrld_robot.get_current_orientation()
         if self.goal_pos_init_flag:
             self.goal_pos_init_flag = False
             self.pid_d_theta = d_theta
@@ -225,63 +187,55 @@ class RobotPid(object):
             Vx_tangent = (-d_y / math.sqrt(d_x * d_x + d_y * d_y)) * 2
             Vy_tangent = (d_x / math.sqrt(d_x * d_x + d_y * d_y)) * 2
 
-            self.cmd.vel_surge=(Vx + Vx_tangent)*math.cos(self.robot_params.current_theta)+(Vy + Vy_tangent)*math.sin(self.robot_params.current_theta)
-            self.cmd.vel_sway=-(Vx + Vx_tangent)*math.sin(self.robot_params.current_theta)+(Vy + Vy_tangent)*math.cos(self.robot_params.current_theta)
+            self.cmd.vel_surge=(Vx + Vx_tangent)*math.cos(self.ctrld_robot.get_current_orientation())+(Vy + Vy_tangent)*math.sin(self.ctrld_robot.get_current_orientation())
+            self.cmd.vel_sway=-(Vx + Vx_tangent)*math.sin(self.ctrld_robot.get_current_orientation())+(Vy + Vy_tangent)*math.cos(self.ctrld_robot.get_current_orientation())
             self.cmd.omega=Vr
             self.command_pub.publish(self.cmd)
 
     def replan_timerCallback(self, event):
         self.goal_pos_init_flag = True
 
-class Ball:
-    def __init__(self):
-        self.ball_pos_x = 0
-        self.ball_pos_y = 0
-        self.ball_pos_theta = 0
-
-    def odom_callback(self, msg):
-        self.ball_pos_x = msg.pose.pose.position.x
-        self.ball_pos_y = msg.pose.pose.position.y
-        self.ball_pos_theta = tf.transformations.euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))
 
 class RobotStatus:
-    def __init__(self, pid, robot_params):
+    def __init__(self, pid, ctrld_robot):
         self.robot_status = "none"
 
         self.pid = pid
 
-        self.robot_params = robot_params
-        self.robot_params.pid_goal_pos_x = 0
-        self.robot_params.pid_goal_pos_y = 0
-        self.robot_params.pid_goal_theta = 0
+        self.ctrld_robot = ctrld_robot
+        self.ctrld_robot.set_future_position(0., 0., 0.)
 
     def status_callback(self, msg):
-        if msg.status == "move_linear" and (self.robot_params.pid_goal_pos_x != msg.pid_goal_pos_x or self.robot_params.pid_goal_pos_y != msg.pid_goal_pos_y or self.robot_params.pid_goal_theta != msg.pid_goal_theta):
+        if msg.status == "move_linear" and (self.ctrld_robot.get_future_position()[0] != msg.pid_goal_pos_x or self.ctrld_robot.get_future_position()[1] != msg.pid_goal_pos_y or self.ctrld_robot.get_future_orientation() != msg.pid_goal_theta):
             self.pid.goal_pos_init_flag = True
         self.robot_status = msg.status
-        self.robot_params.pid_goal_pos_x = msg.pid_goal_pos_x
-        self.robot_params.pid_goal_pos_y = msg.pid_goal_pos_y
-        self.robot_params.pid_goal_theta = msg.pid_goal_theta
+        self.ctrld_robot.set_future_position(
+            msg.pid_goal_pos_x,
+            msg.pid_goal_pos_y,
+            msg.pid_goal_theta)
+
         self.pid.pid_circle_center_x = msg.pid_circle_center_x
         self.pid.pid_circle_center_y = msg.pid_circle_center_y
-        self.robot_params.pass_target_pos_x = msg.pass_target_pos_x
-        self.robot_params.pass_target_pos_y = msg.pass_target_pos_y
+        self.ctrld_robot.set_pass_target_position(msg.pass_target_pos_x, msg.pass_target_pos_y)
 
 class RobotKick:
-    def __init__(self, ball_params, robot_params, pid, cmd, status, command_pub):
+    def __init__(self, ball_params, ctrld_robot, pid, cmd, status, command_pub):
         self.kick_power_x = 10
         self.kick_power_z = 0
 
         self.ball_params = ball_params
-        self.robot_params = robot_params
+        self.ctrld_robot = ctrld_robot
         self.pid = pid
         self.status = status
         self.cmd = cmd
         self.command_pub = command_pub
-        self.dispersion = [10] * 100
+        self.dispersion = [10] * 1
+        self.rot_dispersion = [10] * 1
 
-        self.access_threshold = 5
-        self.const = 1.5
+        self.access_threshold = 0.1
+        self.rot_access_threshold = 0.01
+
+        self.const = 1.5*2
 
         self.ball_pos_x_array = np.array([0.0]*50)
         self.ball_pos_y_array = np.array([0.0]*50)
@@ -302,7 +256,7 @@ class RobotKick:
 
     def kick_x(self):
         area = 0.3
-        if math.sqrt((self.ball_params.ball_pos_x - self.robot_params.current_x)**2 + (self.ball_params.ball_pos_y - self.robot_params.current_y)**2) > self.robot_params.robot_r + area:
+        if math.sqrt((self.ball_params.get_current_position()[0] - self.ctrld_robot.get_current_position()[0])**2 + (self.ball_params.get_current_position()[1] - self.ctrld_robot.get_current_position()[1])**2) > self.ctrld_robot.robot_r + area:
             self.cmd.vel_surge = 0
             self.cmd.vel_sway = 0
             self.cmd.omega = 0
@@ -312,21 +266,31 @@ class RobotKick:
             return
 
         self.cmd.kick_speed_x = self.kick_power_x
-        self.pid.pid_linear(self.ball_params.ball_pos_x, self.ball_params.ball_pos_y, math.atan2( (self.ball_params.ball_pos_y - self.robot_params.current_y) , (self.ball_params.ball_pos_x - self.robot_params.current_x) ))
+        self.pid.pid_linear(self.ball_params.get_current_position()[0], self.ball_params.get_current_position()[1], self.pose_theta)
 
     def pass_ball(self, target_x, target_y):
-        distance = math.sqrt((target_x - self.ball_params.ball_pos_x)**2 + (target_y - self.ball_params.ball_pos_y)**2)
+        distance = math.sqrt((target_x - self.ball_params.get_current_position()[0])**2 + (target_y - self.ball_params.get_current_position()[1])**2)
         if distance != 0:
-            pose_x = (- 0.15 * target_x + (0.15 + distance) * self.ball_params.ball_pos_x) / distance
-            pose_y = (- 0.15 * target_y + (0.15 + distance) * self.ball_params.ball_pos_y) / distance
-            pose_theta = math.atan2( (target_y - self.robot_params.current_y) , (target_x - self.robot_params.current_x) )
+            pose_x = (- 0.15 * target_x + (0.15 + distance) * self.ball_params.get_current_position()[0]) / distance
+            pose_y = (- 0.15 * target_y + (0.15 + distance) * self.ball_params.get_current_position()[1]) / distance
+            pose_theta = math.atan2( (target_y - self.ctrld_robot.get_current_position()[1]) , (target_x - self.ctrld_robot.get_current_position()[0]) )
 
-            self.dispersion.append((self.ball_params.ball_pos_x - self.robot_params.current_x)**2 + (self.ball_params.ball_pos_y - self.robot_params.current_y)**2)
+            self.dispersion.append(
+                    (pose_x - self.ctrld_robot.get_current_position()[0])**2 \
+                    + (pose_y - self.ctrld_robot.get_current_position()[1])**2)
             del self.dispersion[0]
 
+            self.rot_dispersion.append((pose_theta - self.ctrld_robot.get_current_orientation())**2)
+            del self.rot_dispersion[0]
 
-            if sum(self.dispersion) < self.access_threshold:
+            dispersion_average = sum(self.dispersion)/len(self.dispersion)
+            rot_dispersion_average = sum(self.rot_dispersion)/len(self.rot_dispersion)
+
+            # print("{} {}".format(dispersion_average, rot_dispersion_average))
+
+            if dispersion_average < self.access_threshold and rot_dispersion_average < self.rot_access_threshold:
                 self.kick_power_x = math.sqrt(distance) * self.const
+                self.pose_theta = pose_theta
                 self.status.robot_status = "kick"
                 return
 
@@ -350,9 +314,9 @@ class RobotKick:
         self.reach_flag = True
         #目標点まで移動
         if self.reach_flag == False:
-            pose_theta = math.atan2( (self.ball_params.ball_pos_y - target_y) , (self.ball_params.ball_pos_x - target_x) )
+            pose_theta = math.atan2( (self.ball_params.get_current_position()[1] - target_y) , (self.ball_params.get_current_position()[0] - target_x) )
             self.pid.pid_linear(target_x, target_y, pose_theta)
-            distance = math.sqrt((target_x - self.robot_params.current_x)**2 + (target_y - self.robot_params.current_y)**2)
+            distance = math.sqrt((target_x - self.ctrld_robot.get_current_position()[0])**2 + (target_y - self.ctrld_robot.get_current_position()[1])**2)
             if distance < 0.1:
                 self.reach_flag = False
                 #print("reach")
@@ -361,8 +325,8 @@ class RobotKick:
 
         #50カウント毎の座標を取得
         if self.ball_pos_count < 50:
-            self.ball_pos_x_array[self.ball_pos_count] = self.ball_params.ball_pos_x
-            self.ball_pos_y_array[self.ball_pos_count] = self.ball_params.ball_pos_y
+            self.ball_pos_x_array[self.ball_pos_count] = self.ball_params.get_current_position()[0]
+            self.ball_pos_y_array[self.ball_pos_count] = self.ball_params.get_current_position()[1]
             self.ball_pos_count+=1
         else:
             """ for i in range(0,50):
@@ -371,8 +335,8 @@ class RobotKick:
             ball_pos_count = 0 """
             self.ball_pos_x_array = np.roll(self.ball_pos_x_array,-1)
             self.ball_pos_y_array = np.roll(self.ball_pos_y_array,-1)
-            self.ball_pos_x_array[self.ball_pos_count-1] = self.ball_params.ball_pos_x
-            self.ball_pos_y_array[self.ball_pos_count-1] = self.ball_params.ball_pos_y
+            self.ball_pos_x_array[self.ball_pos_count-1] = self.ball_params.get_current_position()[0]
+            self.ball_pos_y_array[self.ball_pos_count-1] = self.ball_params.get_current_position()[1]
 
         if self.ball_pos_count % 1 == 0:
             a, b = self.reg1dim(self.ball_pos_x_array, self.ball_pos_y_array)
@@ -383,26 +347,23 @@ class RobotKick:
             hy = a*(a*(target_y-b)+target_x)/(a**2+1)+b
 
             if d < 2:
-                pose_theta = math.atan2( (self.ball_params.ball_pos_y - hy) , (self.ball_params.ball_pos_x - hx) )
+                pose_theta = math.atan2( (self.ball_params.get_current_position()[1] - hy) , (self.ball_params.get_current_position()[0] - hx) )
                 self.pid.pid_linear(hx, hy, pose_theta)
             else:
-                pose_theta = math.atan2( (self.ball_params.ball_pos_y - target_y) , (self.ball_params.ball_pos_x - target_x) )
+                pose_theta = math.atan2( (self.ball_params.get_current_position()[1] - target_y) , (self.ball_params.get_current_position()[0] - target_x) )
                 self.pid.pid_linear(target_x, target_y, pose_theta)
 
             # 垂線テキスト座標
             dx_center = (target_x + hx) / 2
             dy_center = (target_y + hy) / 2
-            plt.axis('scaled')
+            # plt.axis('scaled')
             #plt.plot([target_x, hx],[target_y, hy], color='green', linestyle='--', zorder=0)
 
             self.plot_y = a * self.plot_x + b
             self.lines1.set_data(self.ball_pos_x_array, self.ball_pos_y_array)
             self.lines2.set_data(self.plot_x, self.plot_y)
             self.lines3.set_data([target_x, hx], [target_y, hy])
-            plt.pause(.01)
-
-
-
+            # plt.pause(.01)
 
 
 class RobotStrategy:
