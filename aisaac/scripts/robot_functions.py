@@ -43,7 +43,7 @@ class RobotPid(object):
             for i in range(len(self.friend)):
                 if i != self.robot_id:
                     distance = functions.distance_of_a_point_and_a_straight_line(self.friend[i].get_current_position()[0], self.friend[i].get_current_position()[1], a, b, c)
-                    if distance < self.ctrld_robot.robot_r * 3:
+                    if distance < self.ctrld_robot.size_r * 3:
                         x = (-self.friend[i].get_current_position()[1] * b + (b**2 / a) * self.friend[i].get_current_position()[0] - c) / (a + b**2 / a)
                         y = (-a * x -c) / b
                         if (self.ctrld_robot.get_current_position()[0] < x < goal_pos_x \
@@ -55,7 +55,7 @@ class RobotPid(object):
 
             for j in range(len(self.enemy)):
                 distance = functions.distance_of_a_point_and_a_straight_line(self.enemy[j].get_current_position()[0], self.enemy[j].get_current_position()[1], a, b, c)
-                if distance < self.ctrld_robot.robot_r * 3:
+                if distance < self.ctrld_robot.size_r * 3:
                         x = (-self.enemy[j].get_current_position()[1] * b + (b**2 / a) * self.enemy[j].get_current_position()[0] - c) / (a + b**2 / a)
                         y = (-a * x -c) / b
                         if (self.ctrld_robot.get_current_position()[0] < x < goal_pos_x \
@@ -67,7 +67,7 @@ class RobotPid(object):
 
             distance = functions.distance_of_a_point_and_a_straight_line(self.ball_params.get_current_position()[0], self.ball_params.get_current_position()[1], a, b, c)
 
-            if distance < self.ctrld_robot.robot_r * 2:
+            if distance < self.ctrld_robot.size_r * 2:
                         x = (-self.ball_params.get_current_position()[1] * b + (b**2 / a) * self.ball_params.get_current_position()[0] - c) / (a + b**2 / a)
                         y = (-a * x -c) / b
                         if (self.ctrld_robot.get_current_position()[0] < x < goal_pos_x \
@@ -81,8 +81,8 @@ class RobotPid(object):
 
     def get_sub_goal(self, x, y, obstacle_x, obstacle_y, distance):
         if distance != 0:
-            sub_goal_x = (-5 * self.ctrld_robot.robot_r * obstacle_x + (distance + 5 * self.ctrld_robot.robot_r) * x) / distance
-            sub_goal_y = (-5 * self.ctrld_robot.robot_r * obstacle_y + (distance + 5 * self.ctrld_robot.robot_r) * y) / distance
+            sub_goal_x = (-5 * self.ctrld_robot.size_r * obstacle_x + (distance + 5 * self.ctrld_robot.size_r) * x) / distance
+            sub_goal_y = (-5 * self.ctrld_robot.size_r * obstacle_y + (distance + 5 * self.ctrld_robot.size_r) * y) / distance
             return sub_goal_x, sub_goal_y
         else :
             return 0, 0
@@ -218,6 +218,7 @@ class RobotStatus:
         self.pid.pid_circle_center_y = msg.pid_circle_center_y
         self.ctrld_robot.set_pass_target_position(msg.pass_target_pos_x, msg.pass_target_pos_y)
 
+
 class RobotKick:
     def __init__(self, ball_params, ctrld_robot, pid, cmd, status, command_pub):
         self.kick_power_x = 10
@@ -256,7 +257,7 @@ class RobotKick:
 
     def kick_x(self):
         area = 0.3
-        if math.sqrt((self.ball_params.get_current_position()[0] - self.ctrld_robot.get_current_position()[0])**2 + (self.ball_params.get_current_position()[1] - self.ctrld_robot.get_current_position()[1])**2) > self.ctrld_robot.robot_r + area:
+        if math.sqrt((self.ball_params.get_current_position()[0] - self.ctrld_robot.get_current_position()[0])**2 + (self.ball_params.get_current_position()[1] - self.ctrld_robot.get_current_position()[1])**2) > self.ctrld_robot.size_r + area:
             self.cmd.vel_surge = 0
             self.cmd.vel_sway = 0
             self.cmd.omega = 0
