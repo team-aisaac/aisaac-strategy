@@ -120,22 +120,22 @@ class Objects:
         robot_x = msg.pose.pose.position.x
         robot_y = msg.pose.pose.position.y
         robot_t = tf.transformations.euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))
-        robot_v_x = msg.twist.twist.linear.x;
-        robot_v_y = msg.twist.twist.linear.y;
-        robot_v_t = msg.twist.twist.linear.z;
-        self.robot[id].set_current_position(x = robot_x, y = robot_y, theta=robot_t[2])
-        self.robot[id].set_current_velocity(vx = robot_v_x, vy = robot_v_y, vtheta=robot_v_t)
+        robot_v_x = msg.twist.twist.linear.x
+        robot_v_y = msg.twist.twist.linear.y
+        robot_v_t = msg.twist.twist.linear.z
+        #self.robot[id].set_current_position(x = robot_x, y = robot_y, theta=robot_t[2])
+        #self.robot[id].set_current_velocity(vx = robot_v_x, vy = robot_v_y, vtheta=robot_v_t)
 
     """---Visionからenemyの現在地をもらう---"""
     def enemy_odom_callback(self, msg, id):
         enemy_x = msg.pose.pose.position.x
         enemy_y = msg.pose.pose.position.y
         enemy_t = tf.transformations.euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))
-        enemy_v_x = msg.twist.twist.linear.x;
-        enemy_v_y = msg.twist.twist.linear.y;
-        enemy_v_t = msg.twist.twist.linear.z;
-        self.enemy[id].set_current_position(x = enemy_x, y = enemy_y, theta=enemy_t[2])
-        self.enemy[id].set_current_velocity(vx = enemy_v_x, vy = enemy_v_y, vtheta=enemy_v_t)
+        enemy_v_x = msg.twist.twist.linear.x
+        enemy_v_y = msg.twist.twist.linear.y
+        enemy_v_t = msg.twist.twist.linear.z
+        #self.enemy[id].set_current_position(x = enemy_x, y = enemy_y, theta=enemy_t[2])
+        #self.enemy[id].set_current_velocity(vx = enemy_v_x, vy = enemy_v_y, vtheta=enemy_v_t)
 
     """---Visionからballの現在地をもらう---"""
     def ball_odom_callback(self, msg):
@@ -549,6 +549,9 @@ class DecisionMaker:
             #print self.status[best_id].pid_goal_pos_x
             #print self.status[best_id].pid_goal_pos_y
             #print self.status[best_id].pid_goal_theta
+
+
+"""パス関係　とりあえず移植"""
 
 
 

@@ -51,6 +51,11 @@ class Robot(Entity):
         self.future_position_y = y
         self.future_orientation = theta
 
+    def set_current_position(self, x, y, theta):
+        None
+    def set_current_velosity(self, x, y, theta):
+        None
+
     def get_future_position(self):
         return self.future_position_x, self.future_position_y, self.future_orientation
 
