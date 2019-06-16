@@ -14,12 +14,18 @@ import tf
 import entity
 import matplotlib.pyplot as plt
 from matplotlib import animation
+from statistics import mean, median,variance,stdev
 
 ROBOT_LOOP_RATE = 60.
 
 class RobotParameters:
     def __init__(self, robot_num,friend_num, enemy_num):
         self.robot_r = 0.09 #定数はconfigからとってくるように書きたい
+        
+        #最大加速度 3.8m/s^2
+        #最大速度 3.7m/s
+        self.robot_MAX_SPEED = 3.7
+        self.robot_MAX_accel = 3.8
 
         self.robot_num = int(robot_num)
         self.friend_num = friend_num
@@ -296,10 +302,15 @@ class RobotKick:
         self.access_threshold = 5
         self.const = 1.5
 
-        self.ball_pos_x_array = np.array([0.0]*50)
-        self.ball_pos_y_array = np.array([0.0]*50)
+        self.ball_frame = 60 #ボールの軌道直線フィッティングと速度の計算フレーム
+        self.ball_pos_x_array = np.array([0.0]*self.ball_frame)
+        self.ball_pos_y_array = np.array([0.0]*self.ball_frame)
         self.reach_flag = False
         self.ball_pos_count = 0
+        self.ball_speed = 0
+        self.ball_accel = 0
+        self.ball_reach_time = 0
+        self.ball_speed_calc_count = 0
 
         self.plot_x = np.arange(-5.0,5.0, 0.01)
         self.plot_y = np.arange(-5.0,5.0, 0.01)
@@ -310,6 +321,7 @@ class RobotKick:
         self.lines1, = self.ax.plot(self.ball_pos_x_array, self.ball_pos_y_array)
         self.lines2, = self.ax.plot(self.plot_x, self.plot_y)
         self.lines3, = self.ax.plot(self.plot_x, self.plot_y)
+        #self.lines4, = self.ax[1].plot(self.plot_x, self.plot_y)
         self.ax.set_xlim(-5, 5)
         self.ax.set_ylim(-5, 5)
 
@@ -348,17 +360,16 @@ class RobotKick:
     def kick_z(self):
         pass
 
-    def reg1dim(self, x, y):
+    def reg1dim(self, x, y, n):
         x = np.clip(x,-5,5)
         y = np.clip(y,-5,5)
-        n = len(x)
         a = ((np.dot(x, y)- y.sum() * x.sum()/n) / ((x ** 2).sum() - x.sum()**2 / n))
         b = (y.sum() - a * x.sum())/n
         a = np.clip(a,-1.0e+308,1.0e+308)
         b = np.clip(b,-1.0e+308,1.0e+308)
         return a, b
 
-    def recieve_ball(self, target_x, target_y):
+    def receive_ball(self, target_x, target_y):
 
         self.reach_flag = True
         #目標点まで移動
@@ -372,29 +383,58 @@ class RobotKick:
             #else:
                 #print(distance)
 
-        #50カウント毎の座標を取得
-        if self.ball_pos_count < 50:
+        #直近60フレームの座標を取得
+        if self.ball_pos_count < self.ball_frame:
             self.ball_pos_x_array[self.ball_pos_count] = self.ball_params.ball_pos_x
             self.ball_pos_y_array[self.ball_pos_count] = self.ball_params.ball_pos_y
             self.ball_pos_count+=1
         else:
-            """ for i in range(0,50):
-                self.ball_pos_x_array[ball_pos_count] = 0
-                self.ball_pos_y_array[ball_pos_count] = 0
-            ball_pos_count = 0 """
             self.ball_pos_x_array = np.roll(self.ball_pos_x_array,-1)
             self.ball_pos_y_array = np.roll(self.ball_pos_y_array,-1)
             self.ball_pos_x_array[self.ball_pos_count-1] = self.ball_params.ball_pos_x
             self.ball_pos_y_array[self.ball_pos_count-1] = self.ball_params.ball_pos_y
+            #x,y座標の分散を計算
+            x_variance = variance(self.ball_pos_x_array)
+            y_variance = variance(self.ball_pos_y_array)
+            #print(x_variance,y_variance)
+            #分散が1より大きかったらカウントリセット
+            if x_variance > 1 or y_variance > 1:
+                self.ball_pos_count = 0
+                for i in range(0,self.ball_frame):
+                    self.ball_pos_x_array[i] = 0
+                    self.ball_pos_y_array[i] = 0
         
-        if self.ball_pos_count % 1 == 0:
-            a, b = self.reg1dim(self.ball_pos_x_array, self.ball_pos_y_array)
-            # 本来のパスゴール地点と実際の直線Lとの距離計算
+        
+        
+
+        if self.ball_pos_count > 0:
+            a, b = self.reg1dim(self.ball_pos_x_array, self.ball_pos_y_array, self.ball_pos_count)
+            # 本来のパス目標地点と実際の直線Lとの距離計算
             d = (abs(a*target_x-target_y+b))/((a**2+1)**(1/2)) # ヘッセの公式で距離計算
             # 交点H(hx, hy) の座標計算
             hx = (a*(target_y-b)+target_x)/(a**2+1)
             hy = a*(a*(target_y-b)+target_x)/(a**2+1)+b
 
+            #機体の速度・加速度から間に合うかどうか判断
+            #ボールとパス目標点との距離を計算
+            ball_distance_target = math.sqrt((target_x - self.ball_params.ball_pos_x)**2 + (target_y - self.ball_params.ball_pos_y)**2)
+            #ボールのスピードを計算 計算フレーム:可変
+            ball_speed_calc_frame = 10
+            if (self.ball_pos_count%ball_speed_calc_frame) == 0 and (self.ball_pos_count-1) > 0 and self.ball_speed_calc_count >= ball_speed_calc_frame:
+                old_ball_speed = self.ball_speed
+                self.ball_speed = math.sqrt((self.ball_pos_x_array[self.ball_pos_count-1] - self.ball_pos_x_array[self.ball_pos_count-ball_speed_calc_frame-1])**2 + \
+                    (self.ball_pos_y_array[self.ball_pos_count-1] - self.ball_pos_y_array[self.ball_pos_count-ball_speed_calc_frame-1])**2) / ((1./self.ball_frame)*ball_speed_calc_frame)
+                self.ball_accel = (old_ball_speed - self.ball_speed) / ((1./self.ball_frame)*ball_speed_calc_frame)
+                self.ball_speed_calc_count = 0
+            else:
+                self.ball_speed_calc_count+=1
+            #ボールが何秒後に交点につくかを計算
+            if self.ball_accel < 0:
+                self.ball_reach_time = self.ball_speed / abs(self.ball_accel)
+            #print('{:>12.5f},{:>12.5f},{:>12.5f},{:>12.5f}'.format(self.ball_pos_count,self.ball_speed,self.ball_accel,self.ball_reach_time))
+            #print('{:>12.5f},{:>12.5f}'.format(self.ball_params.ball_pos_x,self.ball_params.ball_pos_y))
+
+            #距離だけで諦めるかどうか判断
             if d < 2:
                 pose_theta = math.atan2( (self.ball_params.ball_pos_y - hy) , (self.ball_params.ball_pos_x - hx) )
                 self.pid.pid_linear(hx, hy, pose_theta)
@@ -412,6 +452,8 @@ class RobotKick:
             self.lines1.set_data(self.ball_pos_x_array, self.ball_pos_y_array)
             self.lines2.set_data(self.plot_x, self.plot_y)
             self.lines3.set_data([target_x, hx], [target_y, hy])
+            #self.lines4.set_data(self.ball_speed)
+
             plt.pause(.01)
 
 

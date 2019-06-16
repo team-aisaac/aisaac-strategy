@@ -57,7 +57,7 @@ class Robot():
             if self.status.robot_status == "pass":
                 self.kick.pass_ball(self.robot_params.pass_target_pos_x, self.robot_params.pass_target_pos_y)
             if self.status.robot_status == "receive":
-                self.kick.recieve_ball(self.robot_params.pass_target_pos_x,self.robot_params.pass_target_pos_y)
+                self.kick.receive_ball(self.robot_params.pass_target_pos_x,self.robot_params.pass_target_pos_y)
             self.loop_rate.sleep()
             
 
