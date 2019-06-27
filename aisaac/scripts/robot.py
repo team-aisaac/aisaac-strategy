@@ -5,7 +5,7 @@ import rospy
 from consai_msgs.msg import Pose
 from consai_msgs.msg import robot_commands
 #from aisaac.srv import Kick
-from aisaac.msg import Status
+from aisaac.msg import Status, Ball_sub_params
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Quaternion
 import tf
@@ -67,6 +67,7 @@ class Robot():
         for j in range(self.enemy_num):
             rospy.Subscriber("/" + self.robot_color + "/enemy_" + str(j) + "/odom", Odometry, self.robot_params.enemy_odom_callback, callback_args=j)
         rospy.Subscriber("/" + self.robot_color + "/ball_observer/estimation", Odometry, self.ball_params.odom_callback)
+        rospy.Subscriber("/" + self.robot_color + "/ball_sub_params", Ball_sub_params, self.ball_params.sub_params_callback)
 
         """
 

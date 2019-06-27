@@ -32,7 +32,7 @@ import functions
 class WorldModel():
     def __init__(self):
         rospy.init_node("world_model")
-        self.team_color = str(rospy.get_param('/blue/team_color'))
+        self.team_color = str(rospy.get_param('team_color'))
 
         self.robot_total = 8
         self.enemy_total = 8

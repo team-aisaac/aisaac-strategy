@@ -257,11 +257,20 @@ class Ball:
         self.ball_pos_x = 0
         self.ball_pos_y = 0
         self.ball_pos_theta = 0
+        self.ball_line_a = 0
+        self.ball_line_b = 0
+        self.ball_future_x = 0
+        self.ball_future_y = 0
 
     def odom_callback(self, msg):
         self.ball_pos_x = msg.pose.pose.position.x
         self.ball_pos_y = msg.pose.pose.position.y
         self.ball_pos_theta = tf.transformations.euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))
+
+    def sub_params_callback(self, msg):
+        self.ball_line_a = msg.a
+        self.ball_line_b = msg.b
+        
 
 class RobotStatus:
     def __init__(self, pid, robot_params):
@@ -371,7 +380,7 @@ class RobotKick:
 
     def receive_ball(self, target_x, target_y):
 
-        self.reach_flag = True
+        """ self.reach_flag = True
         #目標点まで移動
         if self.reach_flag == False:
             pose_theta = math.atan2( (self.ball_params.ball_pos_y - target_y) , (self.ball_params.ball_pos_x - target_x) )
@@ -381,10 +390,10 @@ class RobotKick:
                 self.reach_flag = False
                 #print("reach")
             #else:
-                #print(distance)
+                #print(distance) """
 
         #直近60フレームの座標を取得
-        if self.ball_pos_count < self.ball_frame:
+        """ if self.ball_pos_count < self.ball_frame:
             self.ball_pos_x_array[self.ball_pos_count] = self.ball_params.ball_pos_x
             self.ball_pos_y_array[self.ball_pos_count] = self.ball_params.ball_pos_y
             self.ball_pos_count+=1
@@ -402,20 +411,20 @@ class RobotKick:
                 self.ball_pos_count = 0
                 for i in range(0,self.ball_frame):
                     self.ball_pos_x_array[i] = 0
-                    self.ball_pos_y_array[i] = 0
+                    self.ball_pos_y_array[i] = 0 """
         
         
         
 
-        if self.ball_pos_count > 0:
-            a, b = self.reg1dim(self.ball_pos_x_array, self.ball_pos_y_array, self.ball_pos_count)
+        if self.ball_pos_count == 0:
+            #a, b = self.reg1dim(self.ball_pos_x_array, self.ball_pos_y_array, self.ball_pos_count)
             # 本来のパス目標地点と実際の直線Lとの距離計算
-            d = (abs(a*target_x-target_y+b))/((a**2+1)**(1/2)) # ヘッセの公式で距離計算
+            d = (abs(self.ball_params.ball_line_a*target_x - target_y + self.ball_params.ball_line_b))/((self.ball_params.ball_line_a**2 + 1)**(1/2)) # ヘッセの公式で距離計算
             # 交点H(hx, hy) の座標計算
-            hx = (a*(target_y-b)+target_x)/(a**2+1)
-            hy = a*(a*(target_y-b)+target_x)/(a**2+1)+b
+            hx = (self.ball_params.ball_line_a*(target_y - self.ball_params.ball_line_b) + target_x)/(self.ball_params.ball_line_a**2 + 1)
+            hy = self.ball_params.ball_line_a*(self.ball_params.ball_line_a*(target_y - self.ball_params.ball_line_b) + target_x)/(self.ball_params.ball_line_a**2 + 1) + self.ball_params.ball_line_b
 
-            #機体の速度・加速度から間に合うかどうか判断
+            """ #機体の速度・加速度から間に合うかどうか判断
             #ボールとパス目標点との距離を計算
             ball_distance_target = math.sqrt((target_x - self.ball_params.ball_pos_x)**2 + (target_y - self.ball_params.ball_pos_y)**2)
             #ボールのスピードを計算 計算フレーム:可変
@@ -432,7 +441,7 @@ class RobotKick:
             if self.ball_accel < 0:
                 self.ball_reach_time = self.ball_speed / abs(self.ball_accel)
             #print('{:>12.5f},{:>12.5f},{:>12.5f},{:>12.5f}'.format(self.ball_pos_count,self.ball_speed,self.ball_accel,self.ball_reach_time))
-            #print('{:>12.5f},{:>12.5f}'.format(self.ball_params.ball_pos_x,self.ball_params.ball_pos_y))
+            #print('{:>12.5f},{:>12.5f}'.format(self.ball_params.ball_pos_x,self.ball_params.ball_pos_y)) """
 
             #距離だけで諦めるかどうか判断
             if d < 2:
@@ -448,7 +457,7 @@ class RobotKick:
             plt.axis('scaled')
             #plt.plot([target_x, hx],[target_y, hy], color='green', linestyle='--', zorder=0)
 
-            self.plot_y = a * self.plot_x + b
+            self.plot_y = self.ball_params.ball_line_a * self.plot_x + self.ball_params.ball_line_b
             self.lines1.set_data(self.ball_pos_x_array, self.ball_pos_y_array)
             self.lines2.set_data(self.plot_x, self.plot_y)
             self.lines3.set_data([target_x, hx], [target_y, hy])
