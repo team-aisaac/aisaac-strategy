@@ -65,18 +65,22 @@ class Calculation():
 
         self.ball_params = Ball()
 
-        self.ball_frame = 60 #ボールの軌道直線フィッティングと速度の計算フレーム
+        self.ball_frame = 10 #ボールの軌道直線フィッティングと速度の計算フレーム
+        self.same_pos_count = 0
         self.ball_pos_count = 0
+        self.calc_flag = False
         self.ball_pos_x_array = np.array([0.0]*self.ball_frame)
         self.ball_pos_y_array = np.array([0.0]*self.ball_frame)
         self.ball_vel_x_array = np.array([0.0]*self.ball_frame)
         self.ball_vel_y_array = np.array([0.0]*self.ball_frame)
         self.ball_vel_time_array = np.array([0.0]*self.ball_frame)
 
-        self.ball_vel_x_a = 0
-        self.ball_vel_x_b = 0
-        self.ball_vel_y_a = 0
-        self.ball_vel_y_b = 0
+        self.ball_vel_x_a = 0.
+        self.ball_vel_x_b = 0.
+        self.ball_vel_y_a = 0.
+        self.ball_vel_y_b = 0.
+        self.ball_stop_time_x = 0.
+        self.ball_stop_time_y = 0.
 
     def odom_listener(self):
         rospy.Subscriber("/" + self.robot_color + "/ball_observer/estimation", Odometry, self.ball_params.odom_callback)
@@ -90,14 +94,25 @@ class Calculation():
         return a, b
 
     def calc_ball_line(self):
-        #直近60フレームの座標を取得
+        #直近nフレームの座標を取得
         if self.ball_pos_count < self.ball_frame:
             self.ball_pos_x_array[self.ball_pos_count] = self.ball_params.ball_pos_x
             self.ball_pos_y_array[self.ball_pos_count] = self.ball_params.ball_pos_y
             self.ball_vel_x_array[self.ball_pos_count] = self.ball_params.ball_vel_x
             self.ball_vel_y_array[self.ball_pos_count] = self.ball_params.ball_vel_y
-            self.ball_vel_time_array[self.ball_pos_count] = 1./self.ball_frame * self.ball_pos_count
+            self.ball_vel_time_array[self.ball_pos_count] = 1./WORLD_LOOP_RATE * self.ball_pos_count
+            if self.ball_pos_count > 0:
+                if abs(self.ball_pos_x_array[self.ball_pos_count-1]-self.ball_pos_x_array[self.ball_pos_count]) < 0.001 and abs(self.ball_pos_y_array[self.ball_pos_count-1]-self.ball_pos_y_array[self.ball_pos_count]) < 0.001:
+                    self.same_pos_count+=1
+                    if self.same_pos_count >= self.ball_frame/2:
+                        self.same_pos_count = self.ball_frame/2
+                        self.ball_pos_count = -1
+                        self.calc_flag = False
+                else:
+                    self.same_pos_count = 0
+                    self.calc_flag = True
             self.ball_pos_count+=1
+
         else:
             self.ball_pos_x_array = np.roll(self.ball_pos_x_array,-1)
             self.ball_pos_y_array = np.roll(self.ball_pos_y_array,-1)
@@ -107,6 +122,14 @@ class Calculation():
             self.ball_pos_y_array[self.ball_pos_count-1] = self.ball_params.ball_pos_y
             self.ball_vel_x_array[self.ball_pos_count-1] = self.ball_params.ball_vel_x
             self.ball_vel_y_array[self.ball_pos_count-1] = self.ball_params.ball_vel_y
+            if abs(self.ball_pos_x_array[self.ball_pos_count-2]-self.ball_pos_x_array[self.ball_pos_count-1]) < 0.001 or abs(self.ball_pos_y_array[self.ball_pos_count-2]-self.ball_pos_y_array[self.ball_pos_count-1]) < 0.001:
+                self.same_pos_count+=1
+                if self.same_pos_count > self.ball_frame/2:
+                    self.ball_pos_count = 0
+                    self.calc_flag = False
+            else:
+                self.same_pos_count = 0
+                self.calc_flag = True
             #x,y座標の分散を計算
             x_variance = variance(self.ball_pos_x_array)
             y_variance = variance(self.ball_pos_y_array)
@@ -118,13 +141,47 @@ class Calculation():
                     self.ball_pos_x_array[i] = 0
                     self.ball_pos_y_array[i] = 0
 
-        if self.ball_pos_count > 0:
+        #print(self.ball_pos_x_array)
+        #print(self.ball_pos_count)
+        #print(self.same_pos_count)
+        if self.calc_flag == True:
             self.ball_params.ball_sub_params.a, self.ball_params.ball_sub_params.b = self.reg1dim(self.ball_pos_x_array, self.ball_pos_y_array, self.ball_pos_count)
-            #self.ball_params.ball_sub_params.a, self.ball_params.ball_sub_params.b = self.reg1dim(self.ball_vel_x_array, self.ball_vel_time_array, self.ball_pos_count)
             self.ball_vel_x_a, self.ball_vel_x_b = self.reg1dim(self.ball_vel_x_array, self.ball_vel_time_array, self.ball_pos_count)
             self.ball_vel_y_a, self.ball_vel_y_b = self.reg1dim(self.ball_vel_y_array, self.ball_vel_time_array, self.ball_pos_count)
+            #self.ball_params.ball_sub_params.a, self.ball_params.ball_sub_params.b = self.reg1dim(self.ball_vel_x_array, self.ball_vel_time_array, self.ball_pos_count)
+            """ self.ball_params.ball_sub_params.future_x = 
+            self.ball_params.ball_sub_params.future_y """
             #rospy.loginfo("vel_x_a:%f\tvel_x_b:%f",self.ball_vel_x_a, self.ball_vel_x_b)
 
+            #ボールの予想停止位置を計算
+            #x,y方向の現在の速度を最小二乗法で求めた直線から計算→式が違う、速度推定が必要
+            #ball_fit_vel_x = self.ball_vel_x_a*self.ball_vel_time_array[self.ball_pos_count-1] + self.ball_vel_x_b
+            #ball_fit_vel_y = self.ball_vel_y_a*self.ball_vel_time_array[self.ball_pos_count-1] + self.ball_vel_y_b
+            #とりあえず現在速度を使う
+            ball_fit_vel_x = self.ball_params.ball_vel_x
+            ball_fit_vel_y = self.ball_params.ball_vel_y
+            #停止するまでの時間を現在の速度と傾きから計算
+            if self.ball_vel_x_a != 0 and self.ball_vel_y_a != 0:
+                self.ball_stop_time_x = -(ball_fit_vel_x / self.ball_vel_x_a)
+                self.ball_stop_time_y = -(ball_fit_vel_y / self.ball_vel_y_a)
+                if self.ball_stop_time_x <= 0 or self.ball_stop_time_y <= 0:
+                    """ self.ball_params.ball_sub_params.future_x = 0
+                    self.ball_params.ball_sub_params.future_y = 0 """
+                else:
+                    self.ball_params.ball_sub_params.future_x = self.ball_params.ball_pos_x + ball_fit_vel_x*self.ball_stop_time_x + 1/2*self.ball_vel_x_a*self.ball_stop_time_x**2
+                    self.ball_params.ball_sub_params.future_y = self.ball_params.ball_pos_y + ball_fit_vel_y*self.ball_stop_time_y + 1/2*self.ball_vel_y_a*self.ball_stop_time_y**2
+                    self.ball_params.ball_sub_params.future_x = np.clip(self.ball_params.ball_sub_params.future_x,-5,5)
+                    self.ball_params.ball_sub_params.future_y = np.clip(self.ball_params.ball_sub_params.future_y,-5,5)
+                    #rospy.loginfo("t=(%.3f,%.3f)\t(f_x:n_x)=(%.3f:%.3f)\t(f_y:n_y)=(%.3f:%.3f)",self.ball_stop_time_x,self.ball_stop_time_y,self.ball_params.ball_sub_params.future_x, self.ball_params.ball_pos_x, self.ball_params.ball_sub_params.future_y, self.ball_params.ball_pos_y)
+        """ else:
+            for i in range(0,self.ball_frame):
+                self.ball_pos_x_array[i] = 0
+                self.ball_pos_y_array[i] = 0 
+                self.ball_vel_x_array[i] = 0
+                self.ball_vel_y_array[i] = 0 """
+        
+        #print(self.ball_stop_time_x,self.ball_stop_time_y)
+        rospy.loginfo("f=%d\tt=(%.3f,%.3f)\t(f_x:n_x)=(%.3f:%.3f)\t(f_y:n_y)=(%.3f:%.3f)",self.calc_flag,self.ball_stop_time_x,self.ball_stop_time_y,self.ball_params.ball_sub_params.future_x, self.ball_params.ball_pos_x, self.ball_params.ball_sub_params.future_y, self.ball_params.ball_pos_y)
 
 if __name__ == "__main__":
     a = Calculation()

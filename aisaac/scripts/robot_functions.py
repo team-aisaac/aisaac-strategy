@@ -270,6 +270,8 @@ class Ball:
     def sub_params_callback(self, msg):
         self.ball_line_a = msg.a
         self.ball_line_b = msg.b
+        self.ball_future_x = msg.future_x
+        self.ball_future_y = msg.future_y
         
 
 class RobotStatus:
@@ -309,7 +311,8 @@ class RobotKick:
         self.dispersion = [10] * 100
 
         self.access_threshold = 5
-        self.const = 1.5
+        #self.const = 1.5
+        self.const = 2
 
         self.ball_frame = 60 #ボールの軌道直線フィッティングと速度の計算フレーム
         self.ball_pos_x_array = np.array([0.0]*self.ball_frame)
@@ -330,7 +333,7 @@ class RobotKick:
         self.lines1, = self.ax.plot(self.ball_pos_x_array, self.ball_pos_y_array)
         self.lines2, = self.ax.plot(self.plot_x, self.plot_y)
         self.lines3, = self.ax.plot(self.plot_x, self.plot_y)
-        #self.lines4, = self.ax[1].plot(self.plot_x, self.plot_y)
+        self.lines4, = self.ax.plot(self.plot_x, self.plot_y)
         self.ax.set_xlim(-5, 5)
         self.ax.set_ylim(-5, 5)
 
@@ -444,12 +447,14 @@ class RobotKick:
             #print('{:>12.5f},{:>12.5f}'.format(self.ball_params.ball_pos_x,self.ball_params.ball_pos_y)) """
 
             #距離だけで諦めるかどうか判断
-            if d < 2:
+            pose_theta = math.atan2( (self.ball_params.ball_pos_y - target_y) , (self.ball_params.ball_pos_x - target_x) )
+            self.pid.pid_linear(self.ball_params.ball_future_x, self.ball_params.ball_future_y, pose_theta)
+            """ if d < 2:
                 pose_theta = math.atan2( (self.ball_params.ball_pos_y - hy) , (self.ball_params.ball_pos_x - hx) )
                 self.pid.pid_linear(hx, hy, pose_theta)
             else:
                 pose_theta = math.atan2( (self.ball_params.ball_pos_y - target_y) , (self.ball_params.ball_pos_x - target_x) )
-                self.pid.pid_linear(target_x, target_y, pose_theta)
+                self.pid.pid_linear(target_x, target_y, pose_theta) """
 
             # 垂線テキスト座標
             dx_center = (target_x + hx) / 2
@@ -461,7 +466,8 @@ class RobotKick:
             self.lines1.set_data(self.ball_pos_x_array, self.ball_pos_y_array)
             self.lines2.set_data(self.plot_x, self.plot_y)
             self.lines3.set_data([target_x, hx], [target_y, hy])
-            #self.lines4.set_data(self.ball_speed)
+            #self.lines3.set_data([self.ball_params.ball_future_x, hx], [self.ball_params.ball_future_y, hy])
+            self.lines4.set_data([self.ball_params.ball_future_x, target_x], [self.ball_params.ball_future_y, target_y])
 
             plt.pause(.01)
 
