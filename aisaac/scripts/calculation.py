@@ -65,15 +65,15 @@ class Calculation():
 
         self.ball_params = Ball()
 
-        self.ball_frame = 10 #ボールの軌道直線フィッティングと速度の計算フレーム
-        self.same_pos_count = 0
-        self.ball_pos_count = 0
-        self.calc_flag = False
-        self.ball_pos_x_array = np.array([0.0]*self.ball_frame)
-        self.ball_pos_y_array = np.array([0.0]*self.ball_frame)
-        self.ball_vel_x_array = np.array([0.0]*self.ball_frame)
-        self.ball_vel_y_array = np.array([0.0]*self.ball_frame)
-        self.ball_vel_time_array = np.array([0.0]*self.ball_frame)
+        self.ball_frame = 10 #ボールの軌道直線フィッティングと速度の計算フレーム数
+        self.same_pos_count = 0 #停止判定用カウント
+        self.ball_pos_count = 0 #計算用カウント、フレーム単位でカウント
+        self.calc_flag = False #計算フラグ、停止判定時は計算しない
+        self.ball_pos_x_array = np.array([0.0]*self.ball_frame) #ボールのx座標保存用配列
+        self.ball_pos_y_array = np.array([0.0]*self.ball_frame) #ボールのy座標保存用配列
+        self.ball_vel_x_array = np.array([0.0]*self.ball_frame) #ボールのx方向の速度保存用配列
+        self.ball_vel_y_array = np.array([0.0]*self.ball_frame) #ボールのy方向の速度保存用配列
+        self.ball_vel_time_array = np.array([0.0]*self.ball_frame) #加速度計算用、時間配列
 
         self.ball_vel_x_a = 0.
         self.ball_vel_x_b = 0.
@@ -181,7 +181,7 @@ class Calculation():
                 self.ball_vel_y_array[i] = 0 """
         
         #print(self.ball_stop_time_x,self.ball_stop_time_y)
-        rospy.loginfo("f=%d\tt=(%.3f,%.3f)\t(f_x:n_x)=(%.3f:%.3f)\t(f_y:n_y)=(%.3f:%.3f)",self.calc_flag,self.ball_stop_time_x,self.ball_stop_time_y,self.ball_params.ball_sub_params.future_x, self.ball_params.ball_pos_x, self.ball_params.ball_sub_params.future_y, self.ball_params.ball_pos_y)
+        rospy.loginfo("f=%d\tt=(%.2f,%.2f)\t(f_x:n_x)=(%.3f:%.3f)\t(f_y:n_y)=(%.3f:%.3f)",self.calc_flag,self.ball_stop_time_x,self.ball_stop_time_y,self.ball_params.ball_sub_params.future_x, self.ball_params.ball_pos_x, self.ball_params.ball_sub_params.future_y, self.ball_params.ball_pos_y)
 
 if __name__ == "__main__":
     a = Calculation()
