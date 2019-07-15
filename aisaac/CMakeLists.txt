@@ -22,6 +22,7 @@ add_service_files(
 add_message_files(
   FILES
   Status.msg
+  Ball_sub_params.msg
 )
 
 generate_messages(

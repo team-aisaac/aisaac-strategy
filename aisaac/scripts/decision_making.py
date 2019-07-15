@@ -992,9 +992,9 @@ class WorldModel():
 
 
 if __name__ == "__main__":
-    a = WorldModel()
-    a.odom_listener()
-    a.referee_listener()
+    #a = WorldModel()
+    #a.odom_listener()
+    #a.referee_listener()
     #a.kick_client()
 
     print("START")

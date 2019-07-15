@@ -74,18 +74,12 @@ class Robot():
             if self.status.robot_status == "pass":
                 self.kick.pass_ball(self.ctrld_robot.get_pass_target_position()[0], self.ctrld_robot.get_pass_target_position()[1])
             if self.status.robot_status == "receive":
-                self.kick.recieve_ball(self.ctrld_robot.get_pass_target_position()[0],self.ctrld_robot.get_pass_target_position()[1])
+                self.kick.receive_ball(self.ctrld_robot.get_pass_target_position()[0],self.ctrld_robot.get_pass_target_position()[1])
             self.loop_rate.sleep()
             #elapsed_time = time.time() - start
             #print ("elapsed_time:{0}".format(1./elapsed_time) + "[Hz]")
             
 
-    # def odom_listener(self):
-    #     for i in range(self.robot_total):
-    #         rospy.Subscriber("/" + self.robot_color + "/robot_" + str(i) + "/odom", Odometry, self.ctrld_robot.friend_odom_callback, callback_args=i)
-    #     for j in range(self.enemy_total):
-    #         rospy.Subscriber("/" + self.robot_color + "/enemy_" + str(j) + "/odom", Odometry, self.ctrld_robot.enemy_odom_callback, callback_args=j)
-    #     rospy.Subscriber("/" + self.robot_color + "/ball_observer/estimation", Odometry, self.ball_params.odom_callback)
 
         """
 

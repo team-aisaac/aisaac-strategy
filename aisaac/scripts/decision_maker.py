@@ -5,7 +5,6 @@ import math
 import numpy as np
 import time
 
-
 class DecisionMaker:
     def __init__(self, world_state, objects, referee, status):
         self.world_state = world_state
@@ -34,7 +33,7 @@ class DecisionMaker:
     """future positionをstatusにつめる"""
     def change_goal_status(self):
         for id in range(self.robot_total):
-            self.status[id].pid_goal_pos_x, self.status[id].pid_goal_pos_y, self.status[id].pid_goal_theta = self.robot[id].get_future_position()
+            self.status[id].pid_goal_pos_x, self.status[id].pid_goal_pos_y, self.status[id].pid_goal_theta = self.robot[id].get_future_position(theta=True)
 
 
     """誰がボールを持っているかの判定"""
@@ -205,7 +204,7 @@ class DecisionMaker:
 
     def stop_all(self):
         for id in range(self.robot_total):
-            x, y, theta = self.robot[id].get_current_position()
+            x, y, theta = self.robot[id].get_current_position(theta=True)
             self.robot[id].set_future_position(x, y, theta)
             self.status[id].status = 'stop'
 

@@ -88,6 +88,10 @@
       <param name="robot_color" value="$(arg color)" />
     </node>
 
+    <!-- <node name="calculation" pkg="aisaac" type="calculation.py" output="screen"> -->
+    <!--   <param name="robot_color" value="$(arg color)" />                          -->
+    <!-- </node>                                                                      -->
+
   </group>
 
 </launch>

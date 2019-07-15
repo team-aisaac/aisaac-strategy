@@ -25,10 +25,10 @@ class RobotPid(object):
         self.recursion_max = 10
         self.recursion_count = 0
 
-        self.Kpv = 3.0
-        self.Kpr = 6.0
+        self.Kpv = 2.2
+        self.Kpr = 2.0
         self.Kdv = 3.0
-        self.Kdr = 4.0
+        self.Kdr = 1.0
 
     def collision_detection(self, goal_pos_x, goal_pos_y):
         a, b, c = functions.line_parameters(self.ctrld_robot.get_current_position()[0], self.ctrld_robot.get_current_position()[1], goal_pos_x, goal_pos_y)
