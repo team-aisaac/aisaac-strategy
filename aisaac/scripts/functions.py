@@ -24,7 +24,8 @@ from aisaac.msg import Status
 
 WORLD_LOOP_RATE = 100.
 
-from world_model_functions import WorldState, Referee
+from world_state import WorldState
+from referee import Referee
 
 
 """---点から直線に垂線を引いた時の接点(x, y)の計算---"""

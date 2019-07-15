@@ -19,10 +19,16 @@ import serial
 #from aisaac.srv import Kick
 from aisaac.msg import Status
 
-WORLD_LOOP_RATE = 100.
 
-from world_model_functions import WorldState, Referee, Objects, DecisionMaker
+from world_state import WorldState
+from referee import Referee
+from decision_maker import DecisionMaker
+from objects import Objects
 import functions
+
+import world_model_utils
+
+WORLD_LOOP_RATE = world_model_utils.WORLD_LOOP_RATE
 
 #import physics as phy
 """

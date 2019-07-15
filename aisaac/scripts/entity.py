@@ -34,10 +34,6 @@ class Entity(object):
     def set_current_velocity_orientation(self, vtheta):
         self._current_velocity_orientation = vtheta
 
-    def show_current_parameters(self):
-        return "size_r:{}, current_position_x:{}, current_position_y:{}, current_orientation:{}".format(
-                self.size_r, self._current_position_x, self._current_position_y, self._current_orientation)
-
     def get_current_position(self):
         return self._current_position_x, self._current_position_y
 
@@ -50,14 +46,11 @@ class Entity(object):
     def get_current_velocity_orientation(self):
         return self._current_velocity_orientation
 
-    # def get_current_parameter_xy(self):
-    #     return self._current_position_x, self._current_position_y
 
 class Robot(Entity):
     def __init__(self):
         super(Robot, self).__init__()
-        self.size_r = 90.
-        self.robot_r = self.size_r / 1000
+        self.size_r = 90.0 / 1000
 
         self.front_degree = 11.86 * 2
         self.max_velocity = 2000. #mm/s
@@ -107,4 +100,4 @@ class Robot(Entity):
 class Ball(Entity):
     def __init__(self):
         super(Ball, self).__init__()
-        self.size_r = 21.5
+        self.size_r = 21.5 / 1000
