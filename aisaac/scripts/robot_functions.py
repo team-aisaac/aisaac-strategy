@@ -86,270 +86,241 @@ class RobotPid(object):
 
     def avoid_penalty_area(self, goal_pos_x, goal_pos_y):
         a, b, c = functions.line_parameters(self.ctrld_robot.get_current_position()[0], self.ctrld_robot.get_current_position()[1], goal_pos_x, goal_pos_y)
-        crossing_flag_r1 = False
-        crossing_flag_r2 = False
-        crossing_flag_r3 = False
+        goal_place_l = [-4.8, -6.0, 1.2, -1.2]
+        goal_place_r = [6.0, 4.8, 1.2, -1.2]
         crossing_flag_l1 = False
         crossing_flag_l2 = False
         crossing_flag_l3 = False
+        crossing_flag_r1 = False
+        crossing_flag_r2 = False
+        crossing_flag_r3 = False
+        sub_goal_l = [[-4.5, 1.5],
+                      [-4.5, -1.5]]
+        sub_goal_r = [[4.5, 1.5],
+                      [4.5, -1.5]]
 
         if a != 0 and b != 0:
-            if -6.0 < ((-1.2 * b - c) / a) < -4.8 \
-                and (self.ctrld_robot.get_current_position()[0] < ((-1.2 * b - c) / a) < goal_pos_x \
-                or goal_pos_x < ((-1.2 * b - c) / a) < self.ctrld_robot.get_current_position()[0]):
-
-                crossing_flag_r1 = True
-
-            if 4.8 < ((-1.2 * b - c) / a) < 6.0 \
-                and (self.ctrld_robot.get_current_position()[0] < ((-1.2 * b - c) / a) < goal_pos_x \
-                or goal_pos_x < ((-1.2 * b - c) / a) < self.ctrld_robot.get_current_position()[0]):
+            if goal_place_l[1] < ((-goal_place_l[2] * b - c) / a) < goal_place_l[0] \
+                and (self.ctrld_robot.get_current_position()[0] < ((-goal_place_l[2] * b - c) / a) < goal_pos_x \
+                or goal_pos_x < ((-goal_place_l[2] * b - c) / a) < self.ctrld_robot.get_current_position()[0]):
 
                 crossing_flag_l1 = True
 
+            if goal_place_r[1] < ((-goal_place_r[2] * b - c) / a) < goal_place_r[0] \
+                and (self.ctrld_robot.get_current_position()[0] < ((-goal_place_r[2] * b - c) / a) < goal_pos_x \
+                or goal_pos_x < ((-goal_place_r[2] * b - c) / a) < self.ctrld_robot.get_current_position()[0]):
 
-            if -1.2 < ((4.8 * a - c) / b) < 1.2 \
-                and (self.ctrld_robot.get_current_position()[1] < ((4.8 * a - c) / b) < goal_pos_y \
-                or goal_pos_y < ((4.8 * a - c) / b) < self.ctrld_robot.get_current_position()[1]):
+                crossing_flag_r1 = True
 
-                crossing_flag_r2 = True
 
-            if -1.2 < ((-4.8 * a - c) / b) < 1.2 \
-                and (self.ctrld_robot.get_current_position()[1] < ((-4.8 * a - c) / b) < goal_pos_y \
-                or goal_pos_y < ((-4.8 * a - c) / b) < self.ctrld_robot.get_current_position()[1]):
+            if goal_place_l[3] < ((-goal_place_l[0] * a - c) / b) < goal_place_l[2] \
+                and (self.ctrld_robot.get_current_position()[1] < ((-goal_place_l[0] * a - c) / b) < goal_pos_y \
+                or goal_pos_y < ((-goal_place_l[0] * a - c) / b) < self.ctrld_robot.get_current_position()[1]):
 
                 crossing_flag_l2 = True
 
+            if goal_place_r[3] < ((-goal_place_r[1] * a - c) / b) < goal_place_r[2] \
+                and (self.ctrld_robot.get_current_position()[1] < ((-goal_place_r[1] * a - c) / b) < goal_pos_y \
+                or goal_pos_y < ((-goal_place_r[1] * a - c) / b) < self.ctrld_robot.get_current_position()[1]):
 
-            if -6.0 < ((1.2 * b - c) / a) < -4.8 \
-                and (self.ctrld_robot.get_current_position()[0] < ((1.2 * b - c) / a) < goal_pos_x \
-                or goal_pos_x < ((1.2 * b - c) / a) < self.ctrld_robot.get_current_position()[0]):
+                crossing_flag_r2 = True
 
-                crossing_flag_r3 = True
 
-            if 4.8 < ((1.2 * b - c) / a) < 6.0 \
-                and (self.ctrld_robot.get_current_position()[0] < ((1.2 * b - c) / a) < goal_pos_x \
-                or goal_pos_x < ((1.2 * b - c) / a) < self.ctrld_robot.get_current_position()[0]):
+            if goal_place_l[1] < ((-goal_place_l[3] * b - c) / a) < goal_place_l[0] \
+                and (self.ctrld_robot.get_current_position()[0] < ((-goal_place_l[3] * b - c) / a) < goal_pos_x \
+                or goal_pos_x < ((-goal_place_l[3] * b - c) / a) < self.ctrld_robot.get_current_position()[0]):
 
                 crossing_flag_l3 = True
 
+            if goal_place_r[1] < ((-goal_place_r[3] * b - c) / a) < goal_place_r[0] \
+                and (self.ctrld_robot.get_current_position()[0] < ((-goal_place_r[3] * b - c) / a) < goal_pos_x \
+                or goal_pos_x < ((-goal_place_r[3] * b - c) / a) < self.ctrld_robot.get_current_position()[0]):
 
-            if (crossing_flag_r1 == True) and (crossing_flag_r2 == True):
-                goal_pos_x = -4.5
-                goal_pos_y = 1.5
-                return goal_pos_x, goal_pos_y
+                crossing_flag_r3 = True
 
-            if (crossing_flag_r2 == True) and (crossing_flag_r3 == True):
-                goal_pos_x = -4.5
-                goal_pos_y = -1.5
-                return goal_pos_x, goal_pos_y
-
-            if (crossing_flag_r1 == True) and (crossing_flag_r3 == True):
-                if self.ctrld_robot.get_current_position()[1] > 0:    
-                    goal_pos_x = -4.5
-                    goal_pos_y = 1.5
-                    return goal_pos_x, goal_pos_y
-                else:
-                    goal_pos_x = -4.5
-                    goal_pos_y = -1.5
-                    return goal_pos_x, goal_pos_y
 
             if (crossing_flag_l1 == True) and (crossing_flag_l2 == True):
-                goal_pos_x = 4.5
-                goal_pos_y = 1.5
-                return goal_pos_x, goal_pos_y
+                return sub_goal_l[0][0], sub_goal_l[0][1]
 
-            if (crossing_flag_l2 == True) and (crossing_flag_l3 == True):
-                goal_pos_x = 4.5
-                goal_pos_y = -1.5
-                return goal_pos_x, goal_pos_y
+            elif (crossing_flag_l2 == True) and (crossing_flag_l3 == True):
+                return sub_goal_l[1][0], sub_goal_l[1][1]
 
-            if (crossing_flag_l1 == True) and (crossing_flag_l3 == True):
+            elif (crossing_flag_l1 == True) and (crossing_flag_l3 == True):
                 if self.ctrld_robot.get_current_position()[1] > 0:    
-                    goal_pos_x = 4.5
-                    goal_pos_y = 1.5
-                    return goal_pos_x, goal_pos_y
+                    return sub_goal_l[0][0], sub_goal_l[0][1]
                 else:
-                    goal_pos_x = 4.5
-                    goal_pos_y = -1.5
-                    return goal_pos_x, goal_pos_y
+                    return sub_goal_l[1][0], sub_goal_l[1][1]
+
+            if (crossing_flag_r1 == True) and (crossing_flag_r2 == True):
+                return sub_goal_r[0][0], sub_goal_r[0][1]
+
+            elif (crossing_flag_r2 == True) and (crossing_flag_r3 == True):
+                return sub_goal_r[1][0], sub_goal_r[1][1]
+
+            elif (crossing_flag_r1 == True) and (crossing_flag_r3 == True):
+                if self.ctrld_robot.get_current_position()[1] > 0:    
+                    return sub_goal_r[0][0], sub_goal_r[0][1]
+                else:
+                    return sub_goal_r[1][0], sub_goal_r[1][1]
 
         return goal_pos_x, goal_pos_y
 
     def avoid_goal(self, goal_pos_x, goal_pos_y):
         a, b, c = functions.line_parameters(self.ctrld_robot.get_current_position()[0], self.ctrld_robot.get_current_position()[1], goal_pos_x, goal_pos_y)
-        crossing_flag_r1 = False
-        crossing_flag_r2 = False
-        crossing_flag_r3 = False
-        crossing_flag_r4 = False
+        goal_place_l = [-5.9, -6.3, 0.72, -0.72]
+        goal_place_r = [6.3, 5.9, 0.72, -0.72]
         crossing_flag_l1 = False
         crossing_flag_l2 = False
         crossing_flag_l3 = False
         crossing_flag_l4 = False
+        crossing_flag_r1 = False
+        crossing_flag_r2 = False
+        crossing_flag_r3 = False
+        crossing_flag_r4 = False
+        within_goal_flag_l = False
+        within_goal_flag_r = False
+        sub_goal_l = [[-5.7, 0.92],
+                      [-5.7, -0.92],
+                      [-6.5, -0.92],
+                      [-6.5, 0.92]]
+        sub_goal_r = [[5.7, 0.92],
+                      [5.7, -0.92],
+                      [6.5, -0.92],
+                      [6.5, 0.92]]
 
         if a != 0 and b != 0:
-            if -6.3 < ((-0.72 * b - c) / a) < -5.9 \
-                and (self.ctrld_robot.get_current_position()[0] < ((-0.72 * b - c) / a) < goal_pos_x \
-                or goal_pos_x < ((-0.72 * b - c) / a) < self.ctrld_robot.get_current_position()[0]):
-
-                crossing_flag_r1 = True
-
-            if 5.9 < ((-0.72 * b - c) / a) < 6.3 \
-                and (self.ctrld_robot.get_current_position()[0] < ((-0.72 * b - c) / a) < goal_pos_x \
-                or goal_pos_x < ((-0.72 * b - c) / a) < self.ctrld_robot.get_current_position()[0]):
+            if goal_place_l[1] < ((-goal_place_l[2] * b - c) / a) < goal_place_l[0] \
+                and (self.ctrld_robot.get_current_position()[0] < ((-goal_place_l[2] * b - c) / a) < goal_pos_x \
+                or goal_pos_x < ((-goal_place_l[2] * b - c) / a) < self.ctrld_robot.get_current_position()[0]):
 
                 crossing_flag_l1 = True
 
+            if goal_place_r[1] < ((-goal_place_r[2] * b - c) / a) < goal_place_r[0] \
+                and (self.ctrld_robot.get_current_position()[0] < ((-goal_place_r[2] * b - c) / a) < goal_pos_x \
+                or goal_pos_x < ((-goal_place_r[2] * b - c) / a) < self.ctrld_robot.get_current_position()[0]):
 
-            if -0.72 < ((5.9 * a - c) / b) < 0.72 \
-                and (self.ctrld_robot.get_current_position()[1] < ((5.9 * a - c) / b) < goal_pos_y \
-                or goal_pos_y < ((5.9 * a - c) / b) < self.ctrld_robot.get_current_position()[1]):
+                crossing_flag_r1 = True
 
-                crossing_flag_r2 = True
 
-            if -0.72 < ((-5.9 * a - c) / b) < 0.72 \
-                and (self.ctrld_robot.get_current_position()[1] < ((-5.9 * a - c) / b) < goal_pos_y \
-                or goal_pos_y < ((-5.9 * a - c) / b) < self.ctrld_robot.get_current_position()[1]):
+            if goal_place_l[3] < ((-goal_place_l[0] * a - c) / b) < goal_place_l[2] \
+                and (self.ctrld_robot.get_current_position()[1] < ((-goal_place_l[0] * a - c) / b) < goal_pos_y \
+                or goal_pos_y < ((-goal_place_l[0] * a - c) / b) < self.ctrld_robot.get_current_position()[1]):
 
                 crossing_flag_l2 = True
 
+            if goal_place_r[3] < ((-goal_place_r[1] * a - c) / b) < goal_place_r[2] \
+                and (self.ctrld_robot.get_current_position()[1] < ((-goal_place_r[1] * a - c) / b) < goal_pos_y \
+                or goal_pos_y < ((-goal_place_r[1] * a - c) / b) < self.ctrld_robot.get_current_position()[1]):
 
-            if -6.3 < ((0.72 * b - c) / a) < -5.9 \
-                and (self.ctrld_robot.get_current_position()[0] < ((0.72 * b - c) / a) < goal_pos_x \
-                or goal_pos_x < ((0.72 * b - c) / a) < self.ctrld_robot.get_current_position()[0]):
+                crossing_flag_r2 = True
 
-                crossing_flag_r3 = True
 
-            if 5.9 < ((0.72 * b - c) / a) < 6.3 \
-                and (self.ctrld_robot.get_current_position()[0] < ((0.72 * b - c) / a) < goal_pos_x \
-                or goal_pos_x < ((0.72 * b - c) / a) < self.ctrld_robot.get_current_position()[0]):
+            if goal_place_l[1] < ((-goal_place_l[3] * b - c) / a) < goal_place_l[0] \
+                and (self.ctrld_robot.get_current_position()[0] < ((-goal_place_l[3] * b - c) / a) < goal_pos_x \
+                or goal_pos_x < ((-goal_place_l[3] * b - c) / a) < self.ctrld_robot.get_current_position()[0]):
 
                 crossing_flag_l3 = True
 
-            if -0.72 < ((6.3 * a - c) / b) < 0.72 \
-                and (self.ctrld_robot.get_current_position()[1] < ((6.3 * a - c) / b) < goal_pos_y \
-                or goal_pos_y < ((6.3 * a - c) / b) < self.ctrld_robot.get_current_position()[1]):
+            if goal_place_r[1] < ((-goal_place_r[3] * b - c) / a) < goal_place_r[0] \
+                and (self.ctrld_robot.get_current_position()[0] < ((-goal_place_r[3] * b - c) / a) < goal_pos_x \
+                or goal_pos_x < ((-goal_place_r[3] * b - c) / a) < self.ctrld_robot.get_current_position()[0]):
 
-                crossing_flag_r4 = True
+                crossing_flag_r3 = True
 
-            if -0.72 < ((-6.3 * a - c) / b) < 0.72 \
-                and (self.ctrld_robot.get_current_position()[1] < ((-6.3 * a - c) / b) < goal_pos_y \
-                or goal_pos_y < ((-6.3 * a - c) / b) < self.ctrld_robot.get_current_position()[1]):
+            if goal_place_l[3] < ((-goal_place_l[1] * a - c) / b) < goal_place_l[2] \
+                and (self.ctrld_robot.get_current_position()[1] < ((-goal_place_l[1] * a - c) / b) < goal_pos_y \
+                or goal_pos_y < ((-goal_place_l[1] * a - c) / b) < self.ctrld_robot.get_current_position()[1]):
 
                 crossing_flag_l4 = True
 
+            if goal_place_r[3] < ((-goal_place_r[0] * a - c) / b) < goal_place_r[2] \
+                and (self.ctrld_robot.get_current_position()[1] < ((-goal_place_r[0] * a - c) / b) < goal_pos_y \
+                or goal_pos_y < ((-goal_place_r[0] * a - c) / b) < self.ctrld_robot.get_current_position()[1]):
+
+                crossing_flag_r4 = True
+
+            if goal_place_l[1] < self.ctrld_robot.get_current_position()[0] < goal_place_l[0] \
+                and goal_place_l[3] < self.ctrld_robot.get_current_position()[1] < goal_place_l[2]:
+
+                within_goal_flag_l = True
+
+            if goal_place_r[1] < self.ctrld_robot.get_current_position()[0] < goal_place_r[0] \
+                and goal_place_r[3] < self.ctrld_robot.get_current_position()[1] < goal_place_r[2]:
+
+                within_goal_flag_r = True
 
 
-            if (crossing_flag_r1 == True) and (crossing_flag_r2 == True):
-                goal_pos_x = -5.7
-                goal_pos_y = 0.92
-                return goal_pos_x, goal_pos_y
 
-            if (crossing_flag_r1 == True) and (crossing_flag_r4 == True):
-                goal_pos_x = -6.5
-                goal_pos_y = 0.92
-                return goal_pos_x, goal_pos_y
-
-            if (crossing_flag_r2 == True) and (crossing_flag_r3 == True):
-                goal_pos_x = -5.7
-                goal_pos_y = -0.92
-                return goal_pos_x, goal_pos_y
-
-            if (crossing_flag_r3 == True) and (crossing_flag_r4 == True):
-                goal_pos_x = -6.5
-                goal_pos_y = -0.92
-                return goal_pos_x, goal_pos_y
-            
-            if (crossing_flag_r1 == True) and (crossing_flag_r3 == True):
-                if  goal_pos_x >= -6.07 and goal_pos_y >= 0:    
-                    goal_pos_x = -5.7
-                    goal_pos_y = -1.2
-                    return goal_pos_x, goal_pos_y
-                elif goal_pos_x < -6.07 and goal_pos_y >= 0:
-                    goal_pos_x = -6.5
-                    goal_pos_y = -1.2
-                    return goal_pos_x, goal_pos_y
-                elif goal_pos_x >= -6.07 and goal_pos_y < 0:
-                    goal_pos_x = -5.7
-                    goal_pos_y = 1.2
-                    return goal_pos_x, goal_pos_y
-                elif goal_pos_x < -6.07 and goal_pos_y < 0:
-                    goal_pos_x = -6.5
-                    goal_pos_y = 1.2
-                    return goal_pos_x, goal_pos_y
-
-            if (crossing_flag_r2 == True) and (crossing_flag_r4 == True):
-                if  goal_pos_x >= -6.07 and goal_pos_y >= 0:    
-                    goal_pos_x = -6.5
-                    goal_pos_y = 1.2
-                    return goal_pos_x, goal_pos_y
-                elif goal_pos_x < -6.07 and goal_pos_y >= 0:
-                    goal_pos_x = -5.7
-                    goal_pos_y = 1.2
-                    return goal_pos_x, goal_pos_y
-                elif goal_pos_x >= -6.07 and goal_pos_y < 0:
-                    goal_pos_x = -6.5
-                    goal_pos_y = -1.2
-                    return goal_pos_x, goal_pos_y
-                elif goal_pos_x < -6.07 and goal_pos_y < 0:
-                    goal_pos_x = -5.7
-                    goal_pos_y = -1.2
-                    return goal_pos_x, goal_pos_y
-            
             if (crossing_flag_l1 == True) and (crossing_flag_l2 == True):
-                goal_pos_x = 5.7
-                goal_pos_y = 0.92
-                return goal_pos_x, goal_pos_y
+                return sub_goal_l[0][0], sub_goal_l[0][1]
 
-            if (crossing_flag_l1 == True) and (crossing_flag_l4 == True):
-                goal_pos_x = 6.5
-                goal_pos_y = 0.92
-                return goal_pos_x, goal_pos_y
+            elif (crossing_flag_l1 == True) and (crossing_flag_l4 == True):
+                return sub_goal_l[3][0], sub_goal_l[3][1]
 
-            if (crossing_flag_l2 == True) and (crossing_flag_l3 == True):
-                goal_pos_x = 5.7
-                goal_pos_y = -0.92
-                return goal_pos_x, goal_pos_y
+            elif (crossing_flag_l2 == True) and (crossing_flag_l3 == True):
+                return sub_goal_l[1][0], sub_goal_l[1][1]
 
-            if (crossing_flag_l3 == True) and (crossing_flag_l4 == True):
-                goal_pos_x = 6.5
-                goal_pos_y = -0.92
-                return goal_pos_x, goal_pos_y
+            elif (crossing_flag_l3 == True) and (crossing_flag_l4 == True):
+                return sub_goal_l[2][0], sub_goal_l[2][1]
+            
+            elif (crossing_flag_l1 == True) and (crossing_flag_l3 == True):
+                if  goal_pos_x >= (goal_place_l[0] + goal_place_l[1]) / 2. and goal_pos_y >= 0:    
+                    return sub_goal_l[1][0], sub_goal_l[1][1] - 0.3
+                elif goal_pos_x < (goal_place_l[0] + goal_place_l[1]) / 2. and goal_pos_y >= 0:
+                    return sub_goal_l[2][0], sub_goal_l[2][1] - 0.3
+                elif goal_pos_x >= (goal_place_l[0] + goal_place_l[1]) / 2. and goal_pos_y < 0:
+                    return sub_goal_l[0][0], sub_goal_l[0][1] + 0.3
+                elif goal_pos_x < (goal_place_l[0] + goal_place_l[1]) / 2. and goal_pos_y < 0:
+                    return sub_goal_l[3][0], sub_goal_l[3][1] + 0.3
 
-            if (crossing_flag_l1 == True) and (crossing_flag_l3 == True):
-                if  goal_pos_x <= 6.07 and goal_pos_y >= 0:    
-                    goal_pos_x = 5.7
-                    goal_pos_y = -1.2
-                    return goal_pos_x, goal_pos_y
-                elif goal_pos_x > 6.07 and goal_pos_y >= 0:
-                    goal_pos_x = 6.5
-                    goal_pos_y = -1.2
-                    return goal_pos_x, goal_pos_y
-                elif goal_pos_x <= 6.07 and goal_pos_y < 0:
-                    goal_pos_x = 5.7
-                    goal_pos_y = 1.2
-                    return goal_pos_x, goal_pos_y
-                elif goal_pos_x > 6.07 and goal_pos_y < 0:
-                    goal_pos_x = 6.5
-                    goal_pos_y = 1.2
-                    return goal_pos_x, goal_pos_y
+            elif (crossing_flag_l2 == True) and (crossing_flag_l4 == True):
+                if  goal_pos_x >= (goal_place_l[0] + goal_place_l[1]) / 2. and goal_pos_y >= 0:    
+                    return sub_goal_l[3][0], sub_goal_l[3][1] + 0.3
+                elif goal_pos_x < (goal_place_l[0] + goal_place_l[1]) / 2. and goal_pos_y >= 0:
+                    return sub_goal_l[0][0], sub_goal_l[0][1] + 0.3
+                elif goal_pos_x >= (goal_place_l[0] + goal_place_l[1]) / 2. and goal_pos_y < 0:
+                    return sub_goal_l[2][0], sub_goal_l[2][1] - 0.3
+                elif goal_pos_x < (goal_place_l[0] + goal_place_l[1]) / 2. and goal_pos_y < 0:
+                    return sub_goal_l[1][0], sub_goal_l[1][1] - 0.3
 
-            if (crossing_flag_l2 == True) and (crossing_flag_l4 == True):
-                if  goal_pos_x <= 6.07 and goal_pos_y >= 0:    
-                    goal_pos_x = 6.5
-                    goal_pos_y = 1.2
-                    return goal_pos_x, goal_pos_y
-                elif goal_pos_x > 6.07 and goal_pos_y >= 0:
-                    goal_pos_x = 5.7
-                    goal_pos_y = 1.2
-                    return goal_pos_x, goal_pos_y
-                elif goal_pos_x <= 6.07 and goal_pos_y < 0:
-                    goal_pos_x = 6.5
-                    goal_pos_y = -1.2
-                    return goal_pos_x, goal_pos_y
-                elif goal_pos_x > 6.07 and goal_pos_y < 0:
-                    goal_pos_x = 5.7
-                    goal_pos_y = -1.2
-                    return goal_pos_x, goal_pos_y
+            elif (within_goal_flag_l == True) and ((crossing_flag_l1 == True) or (crossing_flag_l3 == True) or (crossing_flag_l4 == True)):
+                return sub_goal_l[0][0], 0
+            
+            if (crossing_flag_r1 == True) and (crossing_flag_r2 == True):
+                return sub_goal_r[0][0], sub_goal_r[0][1]
+
+            elif (crossing_flag_r1 == True) and (crossing_flag_r4 == True):
+                return sub_goal_r[3][0], sub_goal_r[3][1]
+
+            elif (crossing_flag_r2 == True) and (crossing_flag_r3 == True):
+                return sub_goal_r[1][0], sub_goal_r[1][1]
+
+            elif (crossing_flag_r3 == True) and (crossing_flag_r4 == True):
+                return sub_goal_r[2][0], sub_goal_r[2][1]
+
+            elif (crossing_flag_r1 == True) and (crossing_flag_r3 == True):
+                if  goal_pos_x <= (goal_place_r[0] + goal_place_r[1]) / 2. and goal_pos_y >= 0:    
+                    return sub_goal_r[1][0], sub_goal_r[1][1] - 0.3
+                elif goal_pos_x > (goal_place_r[0] + goal_place_r[1]) / 2. and goal_pos_y >= 0:
+                    return sub_goal_r[2][0], sub_goal_r[2][1] - 0.3
+                elif goal_pos_x <= (goal_place_r[0] + goal_place_r[1]) / 2. and goal_pos_y < 0:
+                    return sub_goal_r[0][0], sub_goal_r[0][1] + 0.3
+                elif goal_pos_x > (goal_place_r[0] + goal_place_r[1]) / 2. and goal_pos_y < 0:
+                    return sub_goal_r[3][0], sub_goal_r[3][1] + 0.3
+
+            elif (crossing_flag_r2 == True) and (crossing_flag_r4 == True):
+                if  goal_pos_x <= (goal_place_r[0] + goal_place_r[1]) / 2. and goal_pos_y >= 0:    
+                    return sub_goal_r[3][0], sub_goal_r[3][1] + 0.3
+                elif goal_pos_x > (goal_place_r[0] + goal_place_r[1]) / 2. and goal_pos_y >= 0:
+                    return sub_goal_r[0][0], sub_goal_r[0][1] + 0.3
+                elif goal_pos_x <= (goal_place_r[0] + goal_place_r[1]) / 2. and goal_pos_y < 0:
+                    return sub_goal_r[2][0], sub_goal_r[2][1] - 0.3
+                elif goal_pos_x > (goal_place_r[0] + goal_place_r[1]) / 2. and goal_pos_y < 0:
+                    return sub_goal_r[1][0], sub_goal_r[1][1] - 0.3
+
+            elif (within_goal_flag_r == True) and ((crossing_flag_r1 == True) or (crossing_flag_r3 == True) or (crossing_flag_r4 == True)):
+                return sub_goal_r[0][0], 0
+
         return goal_pos_x, goal_pos_y
 
     def get_sub_goal(self, x, y, obstacle_x, obstacle_y, distance):
