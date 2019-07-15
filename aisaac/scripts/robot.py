@@ -1,10 +1,9 @@
 #!/usr/bin/env  python
 # coding:utf-8
-import math
 import rospy
-from consai_msgs.msg import Pose
 from consai_msgs.msg import robot_commands
 from aisaac.msg import Status
+from aisaac.srv import pid
 
 from robot_kick import RobotKick
 from robot_pid import RobotPid
@@ -54,12 +53,14 @@ class Robot():
         #self.goal_pose_listener()
         #self.target_pose_listener()
         self.status_listener()
+        self.set_pid_server()
         rospy.Timer(rospy.Duration(0.1), self.pid.replan_timerCallback)
 
         #Loop 処理
         self.loop_rate = rospy.Rate(ROBOT_LOOP_RATE)
         print("Robot start: "+self.robot_id)
         while not rospy.is_shutdown():
+            #start = time.time()
             if self.status.robot_status == "move_linear":
                 self.pid.pid_linear(self.ctrld_robot.get_future_position()[0], self.ctrld_robot.get_future_position()[1],
                 self.ctrld_robot.get_future_orientation())
@@ -75,6 +76,8 @@ class Robot():
             if self.status.robot_status == "receive":
                 self.kick.recieve_ball(self.ctrld_robot.get_pass_target_position()[0],self.ctrld_robot.get_pass_target_position()[1])
             self.loop_rate.sleep()
+            #elapsed_time = time.time() - start
+            #print ("elapsed_time:{0}".format(1./elapsed_time) + "[Hz]")
             
 
     # def odom_listener(self):
@@ -96,6 +99,9 @@ class Robot():
 
     def status_listener(self):
         rospy.Subscriber("/" + self.robot_color + "/robot_" + self.robot_id + "/status", Status, self.status.status_callback)
+
+    def set_pid_server(self):
+        rospy.Service("/" + self.robot_color + "/robot_" + self.robot_id + "/set_pid", pid, self.pid.set_pid_callback)
 
     """
     def kick(self, req):
