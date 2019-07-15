@@ -23,6 +23,7 @@ add_message_files(
   FILES
   Status.msg
   Ball_sub_params.msg
+  Def_pos.msg
 )
 
 generate_messages(

@@ -1,0 +1,4 @@
+float32 def1_pos_x
+float32 def1_pos_y
+float32 def2_pos_x
+float32 def2_pos_y

@@ -5,11 +5,11 @@ import rospy
 from consai_msgs.msg import Pose
 from consai_msgs.msg import robot_commands
 #from aisaac.srv import Kick
-from aisaac.msg import Status, Ball_sub_params
+from aisaac.msg import Status, Ball_sub_params, Def_pos
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Quaternion
 import tf
-from robot_functions import RobotParameters, RobotPid, Ball, RobotStatus, RobotKick
+from robot_functions import RobotParameters, RobotPid, Ball, RobotStatus, RobotKick, RobotDefence
 
 ROBOT_LOOP_RATE = 60.
 
@@ -35,12 +35,14 @@ class Robot():
         self.pid = RobotPid(self.robot_params, self.ball_params, self.cmd, self.command_pub)
         self.status = RobotStatus(self.pid, self.robot_params)
         self.kick = RobotKick(self.ball_params, self.robot_params, self.pid, self.cmd, self.status, self.command_pub)
+        self.defence = RobotDefence(self.ball_params, self.robot_params, self.pid, self.cmd, self.status, self.command_pub)
 
         # listner 起動
         self.odom_listener()
         #self.goal_pose_listener()
         #self.target_pose_listener()
         self.status_listener()
+        self.def_pos_listener()
         rospy.Timer(rospy.Duration(0.1), self.pid.replan_timerCallback)
 
         #Loop 処理
@@ -58,6 +60,10 @@ class Robot():
                 self.kick.pass_ball(self.robot_params.pass_target_pos_x, self.robot_params.pass_target_pos_y)
             if self.status.robot_status == "receive":
                 self.kick.receive_ball(self.robot_params.pass_target_pos_x,self.robot_params.pass_target_pos_y)
+            if self.status.robot_status == "defence1":
+                self.defence.defence1()
+            if self.status.robot_status == "defence2":
+                self.defence.defence2()
             self.loop_rate.sleep()
             
 
@@ -96,6 +102,8 @@ class Robot():
         rospy.Service("/robot_0/kick_end", Kick, self.kick_end)
     """
 
+    def def_pos_listener(self):
+        rospy.Subscriber("/" + self.robot_color + "/def_pos", Def_pos, self.defence.def_pos_callback)
 
 if __name__ == "__main__":
     robot = Robot()

@@ -79,7 +79,6 @@ class RobotParameters:
 
         """
 
-
 class RobotPid:
     def __init__(self, robot_params, ball_params, cmd, command_pub):
         self.robot_params = robot_params
@@ -157,6 +156,10 @@ class RobotPid:
         self.Kpr = 4
         self.Kdv = 5
         self.Kdr = 3
+        # self.Kpv = 3.8
+        # self.Kpr = 4
+        # self.Kdv = 12
+        # self.Kdr = 3
 
         """
         self.recursion_count = 0
@@ -272,7 +275,6 @@ class Ball:
         self.ball_line_b = msg.b
         self.ball_future_x = msg.future_x
         self.ball_future_y = msg.future_y
-        
 
 class RobotStatus:
     def __init__(self, pid, robot_params):
@@ -312,21 +314,16 @@ class RobotKick:
 
         self.access_threshold = 5
         #self.const = 1.5
-        self.const = 2
+        self.const = 3
 
-        self.ball_frame = 60 #ボールの軌道直線フィッティングと速度の計算フレーム
-        self.ball_pos_x_array = np.array([0.0]*self.ball_frame)
-        self.ball_pos_y_array = np.array([0.0]*self.ball_frame)
-        self.reach_flag = False
-        self.ball_pos_count = 0
-        self.ball_speed = 0
-        self.ball_accel = 0
-        self.ball_reach_time = 0
-        self.ball_speed_calc_count = 0
+        self.ball_frame = 60 #ボールの軌道の直線フィッティングと速度の計算フレーム数、使ってない
+        self.ball_pos_x_array = np.array([0.0]*self.ball_frame) #グラフ描画用配列
+        self.ball_pos_y_array = np.array([0.0]*self.ball_frame) #グラフ描画用配列
+        #self.reach_flag = False #到達フラグ、使ってない
 
-        self.plot_x = np.arange(-5.0,5.0, 0.01)
-        self.plot_y = np.arange(-5.0,5.0, 0.01)
-        self.fig, self.ax = plt.subplots(1, 1)
+        self.plot_x = np.arange(-7.0,7.0, 0.01) #グラフ描画用配列
+        self.plot_y = np.arange(-7.0,7.0, 0.01) #グラフ描画用配列
+        self.fig, self.ax = plt.subplots(1, 1) #グラフ描画用
         # 初期化的に一度plotしなければならない
         # そのときplotしたオブジェクトを受け取る受け取る必要がある．
         # listが返ってくるので，注意
@@ -334,8 +331,8 @@ class RobotKick:
         self.lines2, = self.ax.plot(self.plot_x, self.plot_y)
         self.lines3, = self.ax.plot(self.plot_x, self.plot_y)
         self.lines4, = self.ax.plot(self.plot_x, self.plot_y)
-        self.ax.set_xlim(-5, 5)
-        self.ax.set_ylim(-5, 5)
+        self.ax.set_xlim(-7, 7)
+        self.ax.set_ylim(-7, 7)
 
     def kick_x(self):
         area = 0.3
@@ -373,107 +370,76 @@ class RobotKick:
         pass
 
     def reg1dim(self, x, y, n):
-        x = np.clip(x,-5,5)
-        y = np.clip(y,-5,5)
+        x = np.clip(x,-6.5,6.5)
+        y = np.clip(y,-5.5,5.5)
         a = ((np.dot(x, y)- y.sum() * x.sum()/n) / ((x ** 2).sum() - x.sum()**2 / n))
         b = (y.sum() - a * x.sum())/n
         a = np.clip(a,-1.0e+308,1.0e+308)
         b = np.clip(b,-1.0e+308,1.0e+308)
         return a, b
 
-    def receive_ball(self, target_x, target_y):
+    def receive_ball(self, target_x, target_y):     
+        # 本来のパス目標地点とフィッティング直線Lとの距離計算
+        d = (abs(self.ball_params.ball_line_a*target_x - target_y + self.ball_params.ball_line_b))/((self.ball_params.ball_line_a**2 + 1)**(1/2)) # ヘッセの公式で距離計算
+        # 交点H(hx, hy) の座標計算
+        hx = (self.ball_params.ball_line_a*(target_y - self.ball_params.ball_line_b) + target_x)/(self.ball_params.ball_line_a**2 + 1)
+        hy = self.ball_params.ball_line_a*(self.ball_params.ball_line_a*(target_y - self.ball_params.ball_line_b) + target_x)/(self.ball_params.ball_line_a**2 + 1) + self.ball_params.ball_line_b
 
-        """ self.reach_flag = True
-        #目標点まで移動
-        if self.reach_flag == False:
-            pose_theta = math.atan2( (self.ball_params.ball_pos_y - target_y) , (self.ball_params.ball_pos_x - target_x) )
-            self.pid.pid_linear(target_x, target_y, pose_theta)
-            distance = math.sqrt((target_x - self.robot_params.current_x)**2 + (target_y - self.robot_params.current_y)**2)
-            if distance < 0.1:
-                self.reach_flag = False
-                #print("reach")
-            #else:
-                #print(distance) """
+        # 機体の速度・加速度から間に合うかどうか判断
+        # 未実装
 
-        #直近60フレームの座標を取得
-        """ if self.ball_pos_count < self.ball_frame:
-            self.ball_pos_x_array[self.ball_pos_count] = self.ball_params.ball_pos_x
-            self.ball_pos_y_array[self.ball_pos_count] = self.ball_params.ball_pos_y
-            self.ball_pos_count+=1
+        # 距離だけで諦めるかどうか判断
+        if d < 1:
+            #pose_theta = math.atan2( (self.ball_params.ball_pos_y - hy) , (self.ball_params.ball_pos_x - hx) )
+            pose_theta = math.atan2( (self.ball_params.ball_pos_y) , (self.ball_params.ball_pos_x) )
+            self.pid.pid_linear(hx, hy, pose_theta)
         else:
-            self.ball_pos_x_array = np.roll(self.ball_pos_x_array,-1)
-            self.ball_pos_y_array = np.roll(self.ball_pos_y_array,-1)
-            self.ball_pos_x_array[self.ball_pos_count-1] = self.ball_params.ball_pos_x
-            self.ball_pos_y_array[self.ball_pos_count-1] = self.ball_params.ball_pos_y
-            #x,y座標の分散を計算
-            x_variance = variance(self.ball_pos_x_array)
-            y_variance = variance(self.ball_pos_y_array)
-            #print(x_variance,y_variance)
-            #分散が1より大きかったらカウントリセット
-            if x_variance > 1 or y_variance > 1:
-                self.ball_pos_count = 0
-                for i in range(0,self.ball_frame):
-                    self.ball_pos_x_array[i] = 0
-                    self.ball_pos_y_array[i] = 0 """
-        
-        
-        
+            #pose_theta = math.atan2( (self.ball_params.ball_pos_y - target_y) , (self.ball_params.ball_pos_x - target_x) )
+            pose_theta = math.atan2( (self.ball_params.ball_pos_y) , (self.ball_params.ball_pos_x) )
+            self.pid.pid_linear(target_x, target_y, pose_theta)
 
-        if self.ball_pos_count == 0:
-            #a, b = self.reg1dim(self.ball_pos_x_array, self.ball_pos_y_array, self.ball_pos_count)
-            # 本来のパス目標地点と実際の直線Lとの距離計算
-            d = (abs(self.ball_params.ball_line_a*target_x - target_y + self.ball_params.ball_line_b))/((self.ball_params.ball_line_a**2 + 1)**(1/2)) # ヘッセの公式で距離計算
-            # 交点H(hx, hy) の座標計算
-            hx = (self.ball_params.ball_line_a*(target_y - self.ball_params.ball_line_b) + target_x)/(self.ball_params.ball_line_a**2 + 1)
-            hy = self.ball_params.ball_line_a*(self.ball_params.ball_line_a*(target_y - self.ball_params.ball_line_b) + target_x)/(self.ball_params.ball_line_a**2 + 1) + self.ball_params.ball_line_b
+        """ # 垂線テキスト座標
+        dx_center = (target_x + hx) / 2
+        dy_center = (target_y + hy) / 2
+        plt.axis('scaled')
+        #plt.plot([target_x, hx],[target_y, hy], color='green', linestyle='--', zorder=0)
 
-            """ #機体の速度・加速度から間に合うかどうか判断
-            #ボールとパス目標点との距離を計算
-            ball_distance_target = math.sqrt((target_x - self.ball_params.ball_pos_x)**2 + (target_y - self.ball_params.ball_pos_y)**2)
-            #ボールのスピードを計算 計算フレーム:可変
-            ball_speed_calc_frame = 10
-            if (self.ball_pos_count%ball_speed_calc_frame) == 0 and (self.ball_pos_count-1) > 0 and self.ball_speed_calc_count >= ball_speed_calc_frame:
-                old_ball_speed = self.ball_speed
-                self.ball_speed = math.sqrt((self.ball_pos_x_array[self.ball_pos_count-1] - self.ball_pos_x_array[self.ball_pos_count-ball_speed_calc_frame-1])**2 + \
-                    (self.ball_pos_y_array[self.ball_pos_count-1] - self.ball_pos_y_array[self.ball_pos_count-ball_speed_calc_frame-1])**2) / ((1./self.ball_frame)*ball_speed_calc_frame)
-                self.ball_accel = (old_ball_speed - self.ball_speed) / ((1./self.ball_frame)*ball_speed_calc_frame)
-                self.ball_speed_calc_count = 0
-            else:
-                self.ball_speed_calc_count+=1
-            #ボールが何秒後に交点につくかを計算
-            if self.ball_accel < 0:
-                self.ball_reach_time = self.ball_speed / abs(self.ball_accel)
-            #print('{:>12.5f},{:>12.5f},{:>12.5f},{:>12.5f}'.format(self.ball_pos_count,self.ball_speed,self.ball_accel,self.ball_reach_time))
-            #print('{:>12.5f},{:>12.5f}'.format(self.ball_params.ball_pos_x,self.ball_params.ball_pos_y)) """
+        self.plot_y = self.ball_params.ball_line_a * self.plot_x + self.ball_params.ball_line_b
+        self.lines1.set_data(self.ball_pos_x_array, self.ball_pos_y_array)
+        self.lines2.set_data(self.plot_x, self.plot_y)
+        self.lines3.set_data([target_x, hx], [target_y, hy])
+        #self.lines3.set_data([self.ball_params.ball_future_x, hx], [self.ball_params.ball_future_y, hy])
+        #self.lines4.set_data([self.ball_params.ball_future_x, target_x], [self.ball_params.ball_future_y, target_y])
 
-            #距離だけで諦めるかどうか判断
-            pose_theta = math.atan2( (self.ball_params.ball_pos_y - target_y) , (self.ball_params.ball_pos_x - target_x) )
-            self.pid.pid_linear(self.ball_params.ball_future_x, self.ball_params.ball_future_y, pose_theta)
-            """ if d < 2:
-                pose_theta = math.atan2( (self.ball_params.ball_pos_y - hy) , (self.ball_params.ball_pos_x - hx) )
-                self.pid.pid_linear(hx, hy, pose_theta)
-            else:
-                pose_theta = math.atan2( (self.ball_params.ball_pos_y - target_y) , (self.ball_params.ball_pos_x - target_x) )
-                self.pid.pid_linear(target_x, target_y, pose_theta) """
+        plt.pause(.01) """
 
-            # 垂線テキスト座標
-            dx_center = (target_x + hx) / 2
-            dy_center = (target_y + hy) / 2
-            plt.axis('scaled')
-            #plt.plot([target_x, hx],[target_y, hy], color='green', linestyle='--', zorder=0)
+class RobotDefence:
+    def __init__(self, ball_params, robot_params, pid, cmd, status, command_pub):
+        self.ball_params = ball_params
+        self.robot_params = robot_params
+        self.pid = pid
+        self.status = status
+        self.cmd = cmd
+        self.command_pub = command_pub
 
-            self.plot_y = self.ball_params.ball_line_a * self.plot_x + self.ball_params.ball_line_b
-            self.lines1.set_data(self.ball_pos_x_array, self.ball_pos_y_array)
-            self.lines2.set_data(self.plot_x, self.plot_y)
-            self.lines3.set_data([target_x, hx], [target_y, hy])
-            #self.lines3.set_data([self.ball_params.ball_future_x, hx], [self.ball_params.ball_future_y, hy])
-            self.lines4.set_data([self.ball_params.ball_future_x, target_x], [self.ball_params.ball_future_y, target_y])
+        self.def1_pos_x = 0.0
+        self.def1_pos_y = 0.0
+        self.def2_pos_x = 0.0
+        self.def2_pos_y = 0.0
 
-            plt.pause(.01)
+    def def_pos_callback(self, msg):
+        self.def1_pos_x = msg.def1_pos_x
+        self.def1_pos_y = msg.def1_pos_y
+        self.def2_pos_x = msg.def2_pos_x
+        self.def2_pos_y = msg.def2_pos_y
 
+    def defence1(self):
+        pose_theta = math.atan2( (self.ball_params.ball_pos_y - self.def1_pos_y) , (self.ball_params.ball_pos_x - self.def1_pos_x) )
+        self.pid.pid_linear(self.def1_pos_x, self.def1_pos_y, pose_theta)
 
-            
-
+    def defence2(self):
+        pose_theta = math.atan2( (self.ball_params.ball_pos_y - self.def2_pos_y) , (self.ball_params.ball_pos_x - self.def2_pos_x) )
+        self.pid.pid_linear(self.def2_pos_x, self.def2_pos_y, pose_theta)
 
 class RobotStrategy:
     def __init__(self):
