@@ -2,6 +2,8 @@
 # coding:utf-8
 import numpy as np
 import math
+import matplotlib.pyplot as plt
+import functions
 
 class RobotKick:
     def __init__(self, ball_params, ctrld_robot, pid, cmd, status, command_pub):

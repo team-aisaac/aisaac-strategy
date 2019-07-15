@@ -3,6 +3,7 @@
 import math
 import functions
 import robot_utils
+import numpy as np
 
 ROBOT_LOOP_RATE = robot_utils.ROBOT_LOOP_RATE
 
