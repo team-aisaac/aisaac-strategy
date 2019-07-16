@@ -1,3 +1,5 @@
+#!/usr/bin/env  python
+# coding:utf-8
 import numpy as np
 import random
 
@@ -8,14 +10,14 @@ class Entity(object):
         self.size_r = 0.
         self._current_position_x = 0.
         self._current_position_y = 0.
-        #self._current_position_x = random.uniform(-self.field_x_size/2, self.field_x_size/2)
-        #self._current_position_y = random.uniform(-self.field_y_size/2, self.field_y_size/2)
         self._current_orientation = 0.
 
-
-    def set_current_position(self, x, y):
-        self._current_position_x = x
-        self._current_position_y = y
+        # カルマンフィルタ用にcurrent_positionの信用度(分散行列の対角成分をもたせる)
+        # パラメータは修正の必要あり
+        # 初期値は小さいほうがよい（更新で利用するVisionデータを優先する）
+        self._current_position_x_sigma_square = self.field_x_size / 1000.
+        self._current_position_y_sigma_square = self.field_y_size / 1000.
+        self._current_orientation_sigma_square = np.pi
 
     def set_current_position(self, x, y, theta=None):
         self._current_position_x = x
@@ -23,6 +25,15 @@ class Entity(object):
 
         if theta:
             self._current_orientation = theta
+
+    # カルマンフィルタ用のセッター
+    def set_current_position_through_filter(self, x, y, theta, x_sigma_square, y_sigma_square, theta_sigma_square):
+        self._current_position_x = x
+        self._current_position_y = y
+        self._current_orientation = theta
+        self._current_position_x_sigma_square = x_sigma_square
+        self._current_position_y_sigma_square = y_sigma_square
+        self._current_orientation_sigma_square = theta_sigma_square
 
     def set_current_velocity(self, vx, vy, vtheta=None):
         self._current_velocity_x = vx
@@ -45,6 +56,12 @@ class Entity(object):
 
     def get_current_velocity_orientation(self):
         return self._current_velocity_orientation
+
+    # カルマンフィルタ用のゲッター
+    def get_current_position_through_filter(self):
+        return self._current_position_x, self._current_position_y, self._current_orientation, \
+                self._current_position_x_sigma_square, self._current_position_y_sigma_square, self._current_orientation_sigma_square
+
 
 
 class Robot(Entity):
