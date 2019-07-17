@@ -61,9 +61,9 @@ class Entity(object):
 
     def get_future_position(self, theta=None):
         if theta:
-            return self._current_position_x, self._current_position_y, self._current_orientation
+            return self._future_position_x, self._future_position_y, self._future_orientation
         else:
-            return self._current_position_x, self._current_position_y
+            return self._future_position_x, self._future_position_y
 
     def get_future_orientation(self):
         return self._future_orientation

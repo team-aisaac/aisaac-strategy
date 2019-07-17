@@ -13,6 +13,7 @@ class RobotStatus:
     def status_callback(self, msg):
         if msg.status == "move_linear" and (self.ctrld_robot.get_future_position()[0] != msg.pid_goal_pos_x or self.ctrld_robot.get_future_position()[1] != msg.pid_goal_pos_y or self.ctrld_robot.get_future_orientation() != msg.pid_goal_theta):
             self.pid.goal_pos_init_flag = True
+
         self.robot_status = msg.status
         self.ctrld_robot.set_future_position(
             msg.pid_goal_pos_x,
