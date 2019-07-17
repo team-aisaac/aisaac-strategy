@@ -22,8 +22,9 @@ import serial
 import time
 #from aisaac.srv import Kick
 from aisaac.msg import Status
+import config
 
-WORLD_LOOP_RATE = 100.
+WORLD_LOOP_RATE = config.WORLD_LOOP_RATE
 
 #import physics as phy
 """

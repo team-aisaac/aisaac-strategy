@@ -11,8 +11,9 @@ from aisaac.msg import Ball_sub_params, Def_pos
 import tf
 import time
 from statistics import mean, median,variance,stdev
+import config
 
-WORLD_LOOP_RATE = 60.
+WORLD_LOOP_RATE = config.WORLD_LOOP_RATE
 
 """
 主に共通した計算処理などを担当する

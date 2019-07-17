@@ -26,9 +26,8 @@ from decision_maker import DecisionMaker
 from objects import Objects
 import functions
 
-import world_model_utils
-
-WORLD_LOOP_RATE = world_model_utils.WORLD_LOOP_RATE
+import config
+WORLD_LOOP_RATE = config.WORLD_LOOP_RATE
 
 #import physics as phy
 """

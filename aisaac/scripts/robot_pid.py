@@ -2,11 +2,11 @@
 # coding:utf-8
 import math
 import functions
-import robot_utils
+import config
 import numpy as np
 import rospy
 
-ROBOT_LOOP_RATE = robot_utils.ROBOT_LOOP_RATE
+ROBOT_LOOP_RATE = config.ROBOT_LOOP_RATE
 
 class RobotPid(object):
     def __init__(self, robot_id, objects, cmd, command_pub):

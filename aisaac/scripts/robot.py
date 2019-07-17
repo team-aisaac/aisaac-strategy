@@ -12,12 +12,9 @@ from robot_defence import RobotDefence
 
 from objects import Objects
 
-import robot_utils
+import config
 
-ROBOT_LOOP_RATE = robot_utils.ROBOT_LOOP_RATE
-
-
-
+ROBOT_LOOP_RATE = config.ROBOT_LOOP_RATE
 
 class Robot():
     def __init__(self):
@@ -50,7 +47,7 @@ class Robot():
 
         self.status = RobotStatus(self.pid, self.ctrld_robot)
         self.kick = RobotKick(self.ball_params, self.ctrld_robot, self.pid, self.cmd, self.status, self.command_pub)
-        self.defence = RobotDefence(self.ball_params, self.robot_params, self.pid, self.cmd, self.status, self.command_pub)
+        self.defence = RobotDefence(self.ball_params, self.pid, self.cmd, self.status, self.command_pub)
 
         # listner 起動
         # self.odom_listener()
