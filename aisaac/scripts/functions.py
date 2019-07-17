@@ -22,10 +22,11 @@ import time
 #from aisaac.srv import Kick
 from aisaac.msg import Status
 
-WORLD_LOOP_RATE = 100.
+from world_state import WorldState
+from referee import Referee
+import config
 
-from world_model_functions import WorldState, Referee
-
+WORLD_LOOP_RATE = config.WORLD_LOOP_RATE
 
 """---点から直線に垂線を引いた時の接点(x, y)の計算---"""
 def calculate_contact(a, b, c, x_0, y_0):

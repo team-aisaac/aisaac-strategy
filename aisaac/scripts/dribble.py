@@ -15,8 +15,9 @@ import entity
 import matplotlib.pyplot as plt
 from matplotlib import animation
 import functions
-from robot_functions import RobotPid
-ROBOT_LOOP_RATE = 60.
+from robot_pid import RobotPid
+import config
+ROBOT_LOOP_RATE = config.ROBOT_LOOP_RATE
 
 
 class dribble(RobotPid):
