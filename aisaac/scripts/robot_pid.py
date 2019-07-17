@@ -34,6 +34,10 @@ class RobotPid(object):
         self.Kpr = 6.0
         self.Kdv = 3.0
         self.Kdr = 4.0
+        # self.Kpv = 3.8
+        # self.Kpr = 4
+        # self.Kdv = 12
+        # self.Kdr = 3
 
     def collision_detection(self, goal_pos_x, goal_pos_y):
         a, b, c = functions.line_parameters(self.ctrld_robot.get_current_position()[0], self.ctrld_robot.get_current_position()[1], goal_pos_x, goal_pos_y)

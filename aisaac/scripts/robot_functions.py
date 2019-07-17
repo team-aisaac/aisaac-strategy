@@ -19,5 +19,3 @@ from statistics import mean, median,variance,stdev
 
 ROBOT_LOOP_RATE = 60.
 
-
-

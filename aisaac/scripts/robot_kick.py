@@ -36,21 +36,16 @@ class RobotKick:
 
         self.access_threshold = 5
         #self.const = 1.5
-        self.const = 2
+        self.const = 3
 
-        self.ball_frame = 60 #ボールの軌道直線フィッティングと速度の計算フレーム
-        self.ball_pos_x_array = np.array([0.0]*self.ball_frame)
-        self.ball_pos_y_array = np.array([0.0]*self.ball_frame)
-        self.reach_flag = False
-        self.ball_pos_count = 0
-        self.ball_speed = 0
-        self.ball_accel = 0
-        self.ball_reach_time = 0
-        self.ball_speed_calc_count = 0
+        self.ball_frame = 60 #ボールの軌道の直線フィッティングと速度の計算フレーム数、使ってない
+        self.ball_pos_x_array = np.array([0.0]*self.ball_frame) #グラフ描画用配列
+        self.ball_pos_y_array = np.array([0.0]*self.ball_frame) #グラフ描画用配列
+        #self.reach_flag = False #到達フラグ、使ってない
 
-        self.plot_x = np.arange(-5.0,5.0, 0.01)
-        self.plot_y = np.arange(-5.0,5.0, 0.01)
-        self.fig, self.ax = plt.subplots(1, 1)
+        self.plot_x = np.arange(-7.0,7.0, 0.01) #グラフ描画用配列
+        self.plot_y = np.arange(-7.0,7.0, 0.01) #グラフ描画用配列
+        self.fig, self.ax = plt.subplots(1, 1) #グラフ描画用
         # 初期化的に一度plotしなければならない
         # そのときplotしたオブジェクトを受け取る受け取る必要がある．
         # listが返ってくるので，注意
@@ -58,8 +53,8 @@ class RobotKick:
         self.lines2, = self.ax.plot(self.plot_x, self.plot_y)
         self.lines3, = self.ax.plot(self.plot_x, self.plot_y)
         self.lines4, = self.ax.plot(self.plot_x, self.plot_y)
-        self.ax.set_xlim(-5, 5)
-        self.ax.set_ylim(-5, 5)
+        self.ax.set_xlim(-7, 7)
+        self.ax.set_ylim(-7, 7)
 
     def kick_x(self):
         area = 0.5
@@ -132,8 +127,9 @@ class RobotKick:
         pass
 
     def reg1dim(self, x, y, n):
-        x = np.clip(x,-5,5)
-        y = np.clip(y,-5,5)
+        x = np.clip(x,-6.5,6.5)
+        y = np.clip(y,-5.5,5.5)
+
         a = ((np.dot(x, y)- y.sum() * x.sum()/n) / ((x ** 2).sum() - x.sum()**2 / n))
         b = (y.sum() - a * x.sum())/n
         a = np.clip(a,-1.0e+308,1.0e+308)
