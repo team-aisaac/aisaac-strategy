@@ -42,7 +42,7 @@ class dribble(RobotPid):
 
         if self.goal_pos_init_flag == True:
             self.recursion_count = 0
-            self.next_pos_x, self.next_pos_y = self.pass_plan(goal_pos_x, goal_pos_y)
+            self.next_pos_x, self.next_pos_y = self.path_plan(goal_pos_x, goal_pos_y)
 
         d_x = self.next_pos_x - self.robot_params.current_x
         d_y = self.next_pos_y - self.robot_params.current_y

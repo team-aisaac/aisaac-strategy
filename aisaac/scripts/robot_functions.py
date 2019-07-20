@@ -86,8 +86,8 @@ class RobotPid(object):
 
     def avoid_penalty_area(self, goal_pos_x, goal_pos_y):
         a, b, c = functions.line_parameters(self.ctrld_robot.get_current_position()[0], self.ctrld_robot.get_current_position()[1], goal_pos_x, goal_pos_y)
-        goal_place_l = [-4.8, -6.0, 1.2, -1.2]
-        goal_place_r = [6.0, 4.8, 1.2, -1.2]
+        penalty_area_l = [-4.8, -6.0, 1.2, -1.2]
+        penalty_area_r = [6.0, 4.8, 1.2, -1.2]
         crossing_flag_l1 = False
         crossing_flag_l2 = False
         crossing_flag_l3 = False
@@ -100,41 +100,41 @@ class RobotPid(object):
                       [4.5, -1.5]]
 
         if a != 0 and b != 0:
-            if goal_place_l[1] < ((-goal_place_l[2] * b - c) / a) < goal_place_l[0] \
-                and (self.ctrld_robot.get_current_position()[0] < ((-goal_place_l[2] * b - c) / a) < goal_pos_x \
-                or goal_pos_x < ((-goal_place_l[2] * b - c) / a) < self.ctrld_robot.get_current_position()[0]):
+            if penalty_area_l[1] < ((-penalty_area_l[2] * b - c) / a) < penalty_area_l[0] \
+                and (self.ctrld_robot.get_current_position()[0] < ((-penalty_area_l[2] * b - c) / a) < goal_pos_x \
+                or goal_pos_x < ((-penalty_area_l[2] * b - c) / a) < self.ctrld_robot.get_current_position()[0]):
 
                 crossing_flag_l1 = True
 
-            if goal_place_r[1] < ((-goal_place_r[2] * b - c) / a) < goal_place_r[0] \
-                and (self.ctrld_robot.get_current_position()[0] < ((-goal_place_r[2] * b - c) / a) < goal_pos_x \
-                or goal_pos_x < ((-goal_place_r[2] * b - c) / a) < self.ctrld_robot.get_current_position()[0]):
+            if penalty_area_r[1] < ((-penalty_area_r[2] * b - c) / a) < penalty_area_r[0] \
+                and (self.ctrld_robot.get_current_position()[0] < ((-penalty_area_r[2] * b - c) / a) < goal_pos_x \
+                or goal_pos_x < ((-penalty_area_r[2] * b - c) / a) < self.ctrld_robot.get_current_position()[0]):
 
                 crossing_flag_r1 = True
 
 
-            if goal_place_l[3] < ((-goal_place_l[0] * a - c) / b) < goal_place_l[2] \
-                and (self.ctrld_robot.get_current_position()[1] < ((-goal_place_l[0] * a - c) / b) < goal_pos_y \
-                or goal_pos_y < ((-goal_place_l[0] * a - c) / b) < self.ctrld_robot.get_current_position()[1]):
+            if penalty_area_l[3] < ((-penalty_area_l[0] * a - c) / b) < penalty_area_l[2] \
+                and (self.ctrld_robot.get_current_position()[1] < ((-penalty_area_l[0] * a - c) / b) < goal_pos_y \
+                or goal_pos_y < ((-penalty_area_l[0] * a - c) / b) < self.ctrld_robot.get_current_position()[1]):
 
                 crossing_flag_l2 = True
 
-            if goal_place_r[3] < ((-goal_place_r[1] * a - c) / b) < goal_place_r[2] \
-                and (self.ctrld_robot.get_current_position()[1] < ((-goal_place_r[1] * a - c) / b) < goal_pos_y \
-                or goal_pos_y < ((-goal_place_r[1] * a - c) / b) < self.ctrld_robot.get_current_position()[1]):
+            if penalty_area_r[3] < ((-penalty_area_r[1] * a - c) / b) < penalty_area_r[2] \
+                and (self.ctrld_robot.get_current_position()[1] < ((-penalty_area_r[1] * a - c) / b) < goal_pos_y \
+                or goal_pos_y < ((-penalty_area_r[1] * a - c) / b) < self.ctrld_robot.get_current_position()[1]):
 
                 crossing_flag_r2 = True
 
 
-            if goal_place_l[1] < ((-goal_place_l[3] * b - c) / a) < goal_place_l[0] \
-                and (self.ctrld_robot.get_current_position()[0] < ((-goal_place_l[3] * b - c) / a) < goal_pos_x \
-                or goal_pos_x < ((-goal_place_l[3] * b - c) / a) < self.ctrld_robot.get_current_position()[0]):
+            if penalty_area_l[1] < ((-penalty_area_l[3] * b - c) / a) < penalty_area_l[0] \
+                and (self.ctrld_robot.get_current_position()[0] < ((-penalty_area_l[3] * b - c) / a) < goal_pos_x \
+                or goal_pos_x < ((-penalty_area_l[3] * b - c) / a) < self.ctrld_robot.get_current_position()[0]):
 
                 crossing_flag_l3 = True
 
-            if goal_place_r[1] < ((-goal_place_r[3] * b - c) / a) < goal_place_r[0] \
-                and (self.ctrld_robot.get_current_position()[0] < ((-goal_place_r[3] * b - c) / a) < goal_pos_x \
-                or goal_pos_x < ((-goal_place_r[3] * b - c) / a) < self.ctrld_robot.get_current_position()[0]):
+            if penalty_area_r[1] < ((-penalty_area_r[3] * b - c) / a) < penalty_area_r[0] \
+                and (self.ctrld_robot.get_current_position()[0] < ((-penalty_area_r[3] * b - c) / a) < goal_pos_x \
+                or goal_pos_x < ((-penalty_area_r[3] * b - c) / a) < self.ctrld_robot.get_current_position()[0]):
 
                 crossing_flag_r3 = True
 
@@ -331,12 +331,12 @@ class RobotPid(object):
         else :
             return 0, 0
 
-    def pass_plan(self, goal_pos_x, goal_pos_y):
+    def path_plan(self, goal_pos_x, goal_pos_y):
         self.recursion_count += 1
         collision = self.collision_detection(goal_pos_x, goal_pos_y)
         if collision[0] and self.recursion_count < self.recursion_max:
             goal_pos_x, goal_pos_y = self.get_sub_goal(collision[1], collision[2], collision[3], collision[4], collision[5])
-            self.pass_plan(goal_pos_x, goal_pos_y)
+            self.path_plan(goal_pos_x, goal_pos_y)
         return goal_pos_x, goal_pos_y
 
     def set_pid_callback(self, msg):
@@ -351,7 +351,7 @@ class RobotPid(object):
 
         """
         self.recursion_count = 0
-        next_pos_x, next_pos_y = self.pass_plan(goal_pos_x, goal_pos_y)
+        next_pos_x, next_pos_y = self.path_plan(goal_pos_x, goal_pos_y)
         if goal_pos_x != next_pos_x or goal_pos_y != next_pos_y:
             self.goal_pos_init_flag = True
             goal_pos_x = next_pos_x
@@ -364,7 +364,7 @@ class RobotPid(object):
             
             self.next_pos_x, self.next_pos_y = self.avoid_penalty_area(goal_pos_x, goal_pos_y)
             self.next_pos_x, self.next_pos_y = self.avoid_goal(self.next_pos_x, self.next_pos_y)
-            self.next_pos_x, self.next_pos_y = self.pass_plan(self.next_pos_x, self.next_pos_y)
+            self.next_pos_x, self.next_pos_y = self.path_plan(self.next_pos_x, self.next_pos_y)
             """
             if goal_pos_x != next_pos_x or goal_pos_y != next_pos_y:
                 goal_pos_x = next_pos_x
