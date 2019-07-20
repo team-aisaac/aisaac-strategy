@@ -2,10 +2,11 @@
 # coding:utf-8
 import math
 import functions
-import robot_utils
+import config
 import numpy as np
+import rospy
 
-ROBOT_LOOP_RATE = robot_utils.ROBOT_LOOP_RATE
+ROBOT_LOOP_RATE = config.ROBOT_LOOP_RATE
 
 class RobotPid(object):
     def __init__(self, robot_id, objects, cmd, command_pub):
@@ -25,10 +26,18 @@ class RobotPid(object):
         self.recursion_max = 10
         self.recursion_count = 0
 
+        # self.Kpv = 2.2
+        # self.Kpr = 2.0
+        # self.Kdv = 3.0
+        # self.Kdr = 1.0
         self.Kpv = 3.0
         self.Kpr = 6.0
         self.Kdv = 3.0
         self.Kdr = 4.0
+        # self.Kpv = 3.8
+        # self.Kpr = 4
+        # self.Kdv = 12
+        # self.Kdr = 3
 
     def collision_detection(self, goal_pos_x, goal_pos_y):
         a, b, c = functions.line_parameters(self.ctrld_robot.get_current_position()[0], self.ctrld_robot.get_current_position()[1], goal_pos_x, goal_pos_y)
@@ -74,8 +83,13 @@ class RobotPid(object):
 
     def avoid_penalty_area(self, goal_pos_x, goal_pos_y):
         a, b, c = functions.line_parameters(self.ctrld_robot.get_current_position()[0], self.ctrld_robot.get_current_position()[1], goal_pos_x, goal_pos_y)
+<<<<<<< HEAD
         penalty_area_l = [-4.8, -6.0, 1.2, -1.2]
         penalty_area_r = [6.0, 4.8, 1.2, -1.2]
+=======
+        goal_place_l = [-4.8, -6.0, 1.2, -1.2]
+        goal_place_r = [6.0, 4.8, 1.2, -1.2]
+>>>>>>> 0f2e8f14a81c67018e5828149e07e3c774e92822
         crossing_flag_l1 = False
         crossing_flag_l2 = False
         crossing_flag_l3 = False
@@ -88,6 +102,7 @@ class RobotPid(object):
                       [4.5, -1.5]]
 
         if a != 0 and b != 0:
+<<<<<<< HEAD
             if penalty_area_l[1] < ((-penalty_area_l[2] * b - c) / a) < penalty_area_l[0] \
                 and (self.ctrld_robot.get_current_position()[0] < ((-penalty_area_l[2] * b - c) / a) < goal_pos_x \
                 or goal_pos_x < ((-penalty_area_l[2] * b - c) / a) < self.ctrld_robot.get_current_position()[0]):
@@ -97,10 +112,22 @@ class RobotPid(object):
             if penalty_area_r[1] < ((-penalty_area_r[2] * b - c) / a) < penalty_area_r[0] \
                 and (self.ctrld_robot.get_current_position()[0] < ((-penalty_area_r[2] * b - c) / a) < goal_pos_x \
                 or goal_pos_x < ((-penalty_area_r[2] * b - c) / a) < self.ctrld_robot.get_current_position()[0]):
+=======
+            if goal_place_l[1] < ((-goal_place_l[2] * b - c) / a) < goal_place_l[0] \
+                and (self.ctrld_robot.get_current_position()[0] < ((-goal_place_l[2] * b - c) / a) < goal_pos_x \
+                or goal_pos_x < ((-goal_place_l[2] * b - c) / a) < self.ctrld_robot.get_current_position()[0]):
+
+                crossing_flag_l1 = True
+
+            if goal_place_r[1] < ((-goal_place_r[2] * b - c) / a) < goal_place_r[0] \
+                and (self.ctrld_robot.get_current_position()[0] < ((-goal_place_r[2] * b - c) / a) < goal_pos_x \
+                or goal_pos_x < ((-goal_place_r[2] * b - c) / a) < self.ctrld_robot.get_current_position()[0]):
+>>>>>>> 0f2e8f14a81c67018e5828149e07e3c774e92822
 
                 crossing_flag_r1 = True
 
 
+<<<<<<< HEAD
             if penalty_area_l[3] < ((-penalty_area_l[0] * a - c) / b) < penalty_area_l[2] \
                 and (self.ctrld_robot.get_current_position()[1] < ((-penalty_area_l[0] * a - c) / b) < goal_pos_y \
                 or goal_pos_y < ((-penalty_area_l[0] * a - c) / b) < self.ctrld_robot.get_current_position()[1]):
@@ -110,10 +137,22 @@ class RobotPid(object):
             if penalty_area_r[3] < ((-penalty_area_r[1] * a - c) / b) < penalty_area_r[2] \
                 and (self.ctrld_robot.get_current_position()[1] < ((-penalty_area_r[1] * a - c) / b) < goal_pos_y \
                 or goal_pos_y < ((-penalty_area_r[1] * a - c) / b) < self.ctrld_robot.get_current_position()[1]):
+=======
+            if goal_place_l[3] < ((-goal_place_l[0] * a - c) / b) < goal_place_l[2] \
+                and (self.ctrld_robot.get_current_position()[1] < ((-goal_place_l[0] * a - c) / b) < goal_pos_y \
+                or goal_pos_y < ((-goal_place_l[0] * a - c) / b) < self.ctrld_robot.get_current_position()[1]):
+
+                crossing_flag_l2 = True
+
+            if goal_place_r[3] < ((-goal_place_r[1] * a - c) / b) < goal_place_r[2] \
+                and (self.ctrld_robot.get_current_position()[1] < ((-goal_place_r[1] * a - c) / b) < goal_pos_y \
+                or goal_pos_y < ((-goal_place_r[1] * a - c) / b) < self.ctrld_robot.get_current_position()[1]):
+>>>>>>> 0f2e8f14a81c67018e5828149e07e3c774e92822
 
                 crossing_flag_r2 = True
 
 
+<<<<<<< HEAD
             if penalty_area_l[1] < ((-penalty_area_l[3] * b - c) / a) < penalty_area_l[0] \
                 and (self.ctrld_robot.get_current_position()[0] < ((-penalty_area_l[3] * b - c) / a) < goal_pos_x \
                 or goal_pos_x < ((-penalty_area_l[3] * b - c) / a) < self.ctrld_robot.get_current_position()[0]):
@@ -133,6 +172,27 @@ class RobotPid(object):
             elif (crossing_flag_l2 == True) and (crossing_flag_l3 == True):
                 return sub_goal_l[1][0], sub_goal_l[1][1]
 
+=======
+            if goal_place_l[1] < ((-goal_place_l[3] * b - c) / a) < goal_place_l[0] \
+                and (self.ctrld_robot.get_current_position()[0] < ((-goal_place_l[3] * b - c) / a) < goal_pos_x \
+                or goal_pos_x < ((-goal_place_l[3] * b - c) / a) < self.ctrld_robot.get_current_position()[0]):
+
+                crossing_flag_l3 = True
+
+            if goal_place_r[1] < ((-goal_place_r[3] * b - c) / a) < goal_place_r[0] \
+                and (self.ctrld_robot.get_current_position()[0] < ((-goal_place_r[3] * b - c) / a) < goal_pos_x \
+                or goal_pos_x < ((-goal_place_r[3] * b - c) / a) < self.ctrld_robot.get_current_position()[0]):
+
+                crossing_flag_r3 = True
+
+
+            if (crossing_flag_l1 == True) and (crossing_flag_l2 == True):
+                return sub_goal_l[0][0], sub_goal_l[0][1]
+
+            elif (crossing_flag_l2 == True) and (crossing_flag_l3 == True):
+                return sub_goal_l[1][0], sub_goal_l[1][1]
+
+>>>>>>> 0f2e8f14a81c67018e5828149e07e3c774e92822
             elif (crossing_flag_l1 == True) and (crossing_flag_l3 == True):
                 if self.ctrld_robot.get_current_position()[1] > 0:    
                     return sub_goal_l[0][0], sub_goal_l[0][1]
@@ -454,5 +514,3 @@ class RobotPid(object):
 
     def replan_timerCallback(self, event):
         self.goal_pos_init_flag = True
-
-

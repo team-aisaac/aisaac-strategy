@@ -31,7 +31,10 @@
       <param name="observe_target" type="string" value="Ball" />
     </node>
 
-    <node name="decision_making" pkg="aisaac" type="decision_making.py" output="screen" />
+    <!-- <node name="decision_making" pkg="aisaac" type="decision_making.py" output="screen" /> -->
+      <!-- <param name="team_color" type="string" value="$(arg color)" /> -->
+
+    <node name="world_model" pkg="aisaac" type="world_model.py" output="screen" />
       <param name="team_color" type="string" value="$(arg color)" />
 
     <node name="launch_manager" pkg="launch_manager" type="launch_manager.py" required="true"/>
@@ -80,6 +83,10 @@
 
     <node name="robot7" pkg="aisaac" type="robot.py" output="screen">
       <param name="robot_num" type="int" value="7" />
+      <param name="robot_color" value="$(arg color)" />
+    </node>
+
+    <node name="calculation" pkg="aisaac" type="calculation.py" output="screen">
       <param name="robot_color" value="$(arg color)" />
     </node>
 
