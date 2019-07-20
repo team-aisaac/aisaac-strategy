@@ -19,10 +19,15 @@ import serial
 #from aisaac.srv import Kick
 from aisaac.msg import Status
 
-WORLD_LOOP_RATE = 100.
 
-from world_model_functions import WorldState, Referee, Objects, DecisionMaker
+from world_state import WorldState
+from referee import Referee
+from decision_maker import DecisionMaker
+from objects import Objects
 import functions
+
+import config
+WORLD_LOOP_RATE = config.WORLD_LOOP_RATE
 
 #import physics as phy
 """
@@ -32,15 +37,10 @@ import functions
 class WorldModel():
     def __init__(self):
         rospy.init_node("world_model")
-        self.team_color = str(rospy.get_param("~team_color"))
+        self.team_color = str(rospy.get_param('team_color'))
 
         self.robot_total = 8
         self.enemy_total = 8
-
-        """---robot、ballオブジェクトのインスタンス---"""
-        self.robot = [entity.Robot() for i in range(self.robot_total)]
-        self.enemy = [entity.Robot() for i in range(self.enemy_total)]
-        self.ball = entity.Ball()
 
         """statusの立ち上げ msg"""
         self.status = [Status() for i in range(self.robot_total)]
@@ -59,7 +59,7 @@ class WorldModel():
         #print(self.status)
 
         """----上の5つの変数、インスタンスをまとめたもの、callbackをもつ---"""
-        self.objects = Objects(self.robot_total, self.enemy_total, self.robot, self.enemy, self.ball)
+        self.objects = Objects(self.team_color, self.robot_total, self.enemy_total)
 
         """---World State(固定パラが多い)---"""
         self.world_state = WorldState(self.objects)
@@ -79,17 +79,6 @@ class WorldModel():
         self.robot_5_status_pub = rospy.Publisher("/" + self.team_color + "/robot_5/status", Status, queue_size=10)
         self.robot_6_status_pub = rospy.Publisher("/" + self.team_color + "/robot_6/status", Status, queue_size=10)
         self.robot_7_status_pub = rospy.Publisher("/" + self.team_color + "/robot_7/status", Status, queue_size=10)
-
-
-    """---Visionから現在地をもらうsubscriberの起動--"""
-    def odom_listener(self):
-        for i in range(self.robot_total):
-            rospy.Subscriber("/" + self.team_color + "/robot_"+ str(i) +"/odom", Odometry, self.objects.robot_odom_callback, callback_args=i)
-
-        for j in range(self.enemy_total):
-            rospy.Subscriber("/" + self.team_color + "/enemy_" + str(j) + "/odom", Odometry, self.objects.enemy_odom_callback, callback_args=j)
-
-        rospy.Subscriber("/" + self.team_color + "/ball_observer/estimation", Odometry, self.objects.ball_odom_callback)
 
     """---Refereeから司令をもらうsubscriberの起動--"""
     def referee_listener(self):
@@ -114,18 +103,18 @@ class WorldModel():
 
 if __name__ == "__main__":
     a = WorldModel()
-    a.odom_listener()
+    # a.odom_listener()
     a.referee_listener()
-    #a.objects.set_first_positions_4robots()
-    #a.robot_status_publisher()
+    a.objects.set_first_positions_4robots()
+    a.robot_status_publisher()
     loop_rate = rospy.Rate(WORLD_LOOP_RATE)
-    print("start")
+    print("start world model node")
 
     assignment_x = [-4, -3, -2, -1, 0, 1, 2, 3]
     assignment_y = [1, 1, 1, 1, 1, 1, 1, 1]
     assignment_theta = [0, 0, 0, 0, 0, 0, 0, 0]
     time.sleep(10)
-    a.decision_maker.goal_assignment(assignment_x, assignment_y, assignment_theta)
+    #a.decision_maker.goal_assignment(assignment_x, assignment_y, assignment_theta)
 
     try:
         while not rospy.is_shutdown():
@@ -149,9 +138,9 @@ if __name__ == "__main__":
                 a.objects.set_first_positions_4robots()
                 print("DEFENCE")
 
-            #a.decision_maker.change_goal_status()
-            a.robot_status_publisher()
+            a.decision_maker.change_goal_status()
+            #a.robot_status_publisher()
             loop_rate.sleep()
     except:
-        print("error")
-        a.stop_all()
+        import traceback; traceback.print_exc()
+        a.decision_maker.stop_all()
