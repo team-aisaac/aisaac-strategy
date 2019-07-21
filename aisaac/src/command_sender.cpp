@@ -32,7 +32,7 @@
 const uint8_t HEAD_BYTE   = 0x7D;
 const uint8_t ESCAPE_BYTE = 0x7E;
 const uint8_t ESCAPE_MASK = 0x20;
-#define SERIAL_PORT "/dev/ttyS16" // SDevice file corrensponding to serial interface
+#define SERIAL_PORT "/dev/ttyUSB0" // SDevice file corrensponding to serial interface
 #define MAX_DATA_TYPE 3
 
 #define ENABLE_DBG             // Toggle when using printf() function
@@ -92,6 +92,15 @@ public:
   void command_callback(const consai_msgs::robot_commandsConstPtr& msg) {
     for(int i = 0; i < MAX_DATA_TYPE; i++){
       // get sending data from ROS bus
+
+      /*
+      float x = -1.5;
+      float y = -1.5;
+      float th = 1.57;
+      float calib = 3.14;
+      */
+
+      
       x_vector = int16_t(msg->vel_surge * 1000);
       y_vector = int16_t(msg->vel_sway * 1000);
 
@@ -103,6 +112,20 @@ public:
               theta_deg -= 360;
           }
       }
+      
+      /*
+      x_vector = int16_t(x * 1000);
+      y_vector = int16_t(y * 1000);
+
+      float theta_deg = th * (180 / M_PI);
+      while(!(0 <= theta_deg && theta_deg < 360)){
+          if(theta_deg < 0){
+              theta_deg += 360;
+          }else{
+              theta_deg -= 360;
+          }
+      }
+      */
 
       double current_orientation_deg = current_orientation[2] * (180 / M_PI);
       while(!(0 <= current_orientation_deg && current_orientation_deg < 360)){
@@ -174,22 +197,19 @@ public:
     uint8_t tmp = 0;
     switch(datatype)
     {
+
       case 0:
-        if(x_vector < 0){
-            x_vector = (~x_vector + 0x1) & 0x7FF;
-        }
-        if(y_vector < 0){
-            y_vector = (~y_vector + 0x1) & 0x7FF;
-        }
-        tmp = ((datatype & 0x7) << 5) | (x_vector >> 7);
+        tmp = ((datatype & 0x7) << 5) | (x_vector >> 11);
         buf->push_back(tmp);
-        tmp = ((x_vector&0x7F) << 1) | (y_vector >> 11);
+        tmp = (x_vector >> 3) & 0xFF;
         buf->push_back(tmp);
-        tmp = ((y_vector >> 3) & 0xFF);
+        tmp = (x_vector & 0x7) << 5 | (y_vector >> 11);
         buf->push_back(tmp);
-        tmp = ((y_vector & 0x3F) << 5) | (th_vector >> 8);
+        tmp = (y_vector >> 3) & 0xFF;
         buf->push_back(tmp);
-        tmp = (th_vector & 0xFF);
+        tmp = (y_vector & 0x7) << 5 | (th_vector >> 7);
+        buf->push_back(tmp);
+        tmp = (th_vector & 0x7F ) << 1;
         buf->push_back(tmp);
         break;
       case 1:
