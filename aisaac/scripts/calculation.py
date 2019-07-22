@@ -138,7 +138,7 @@ class Calculation():
         self.line_down_r_x = 0.0    # ロボットの半径を考慮した補正後の座標:y_LR'
         self.line_down_r_y = 0.0    # ロボットの半径を考慮した補正後の座標:x_LR'
 
-        self.robot_r = 0.1          # ロボットの半径
+        self.offset_r = 0.          # オフセット値
 
     # x,yの配列とデータ数を指定して、最小二乗法を行い、傾きと切片を返す
     def reg1dim(self, x, y, n):
@@ -268,7 +268,7 @@ class Calculation():
         #各パラメータ計算
         a_1 = ball_y - self.g_center_y
         b_1 = ball_x - self.g_center_x
-        c_1 = self.line_down_y*(self.g_center_y - ball_y) + self.line_down_x*(self.g_center_x - ball_x)
+        #c_1 = self.line_down_y*(self.g_center_y - ball_y) + self.line_down_x*(self.g_center_x - ball_x)
         a_3 = self.g_center_y - ball_y
         b_3 = self.g_center_x - ball_x
         c_3 = self.p_area_down_y*(ball_y - self.g_center_y) + self.p_area_down_x*(ball_x - self.g_center_x)
@@ -278,7 +278,7 @@ class Calculation():
         a_5 = ball_x - self.g_down_x
         b_5 = self.g_down_y - ball_y
         c_5 = ball_y*(self.g_down_x - ball_x) + ball_x*(ball_y - self.g_down_y)
-        t = self.robot_r/math.sqrt((self.g_center_y - ball_y)**2 + (self.g_center_x - ball_x)**2)
+        t = self.offset_r/math.sqrt((self.g_center_y - ball_y)**2 + (self.g_center_x - ball_x)**2)
         #防御ラインの計算
         #最上部
         if ball_x <= (self.g_down_x - self.p_area_down_x)/(self.g_down_y - self.p_area_down_y)*(ball_y - self.g_down_y) + self.g_down_x:
@@ -287,11 +287,15 @@ class Calculation():
             self.line_down_r_y = (b_3*c_5 - b_5*c_3)/(a_3*b_5 - a_5*b_3) + (ball_y - self.g_center_y)*t
             self.line_down_r_x = (a_3*c_5 - a_5*c_3)/(a_5*b_3 - a_3*b_5) + (ball_x - self.g_center_x)*t
 
-        elif (ball_x >= (self.g_down_x - self.p_area_down_x)/(self.g_down_y - self.p_area_down_y)*(ball_y - self.g_center_y) + self.g_down_x) and (ball_x >= self.g_center_x):
+        """ elif (ball_x >= (self.g_down_x - self.p_area_down_x)/(self.g_down_y - self.p_area_down_y)*(ball_y - self.g_center_y) + self.g_down_x) and (ball_x >= self.g_center_x):
             self.line_down_r_y = (self.p_area_down_y + (ball_y - self.g_center_y)*t)
-            self.line_down_r_x = (self.g_down_x - ball_x)/(self.g_down_y - ball_y)*(self.p_area_down_y - ball_y) + ball_x + (ball_y - self.g_center_y)*t
+            self.line_down_r_x = (self.g_down_x - ball_x)/(self.g_down_y - ball_y)*(self.p_area_down_y) + ball_x + (ball_y - self.g_center_y)*t
+            #self.line_down_r_x = (self.g_down_x - ball_x)/(self.g_down_y - ball_y)*(self.p_area_down_y - ball_y) + ball_x + (ball_y - self.g_center_y)*t
+            self.line_down_y = self.p_area_down_y
+            self.line_down_x = (self.g_down_x - ball_x)/(self.g_down_y - ball_y)*(self.p_area_down_y - ball_y) + ball_x
+            c_1 = self.line_down_y*(self.g_center_y - ball_y) + self.line_down_x*(self.g_center_x - ball_x)
             self.line_up_r_y = (b_1*c_4 - b_4*c_1)/(a_1*b_4 - a_4*b_1) + (ball_y - self.g_center_y)*t
-            self.line_up_r_x = (a_1*c_4 - a_4*c_1)/(a_4*b_1 - a_1*b_4) + (ball_x - self.g_center_x)*t 
+            self.line_up_r_x = (a_1*c_4 - a_4*c_1)/(a_4*b_1 - a_1*b_4) + (ball_x - self.g_center_x)*t  """
 
 
 
@@ -302,7 +306,7 @@ class Calculation():
         self.def_pos.def2_pos_y = self.line_down_r_y
             
 
-        #rospy.loginfo("(x_LL':y_LL') = (%.3f:%.3f)",self.line_up_r_x,self.line_up_r_y)
+        rospy.loginfo("(x_LL':y_LL') = (%.3f:%.3f)",self.line_down_r_x,self.line_down_r_y)
 
 if __name__ == "__main__":
     a = Calculation()
