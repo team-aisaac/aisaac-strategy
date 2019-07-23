@@ -9,6 +9,7 @@ from robot_kick import RobotKick
 from robot_pid import RobotPid
 from robot_status import RobotStatus
 from robot_defence import RobotDefence
+from robot_keeper import RobotKeeper
 
 from objects import Objects
 
@@ -48,6 +49,7 @@ class Robot():
         self.status = RobotStatus(self.pid, self.ctrld_robot)
         self.kick = RobotKick(self.ball_params, self.ctrld_robot, self.pid, self.cmd, self.status, self.command_pub)
         self.defence = RobotDefence(self.ball_params, self.pid, self.cmd, self.status, self.command_pub)
+        self.keeper = RobotKeeper(self.ball_params, self.ctrld_robot, self.pid, self.cmd, self.status, self.command_pub)
 
         # listner 起動
         # self.odom_listener()
@@ -81,6 +83,9 @@ class Robot():
                 self.defence.defence1()
             if self.status.robot_status == "defence2":
                 self.defence.defence2()
+
+            if self.status.robot_status == "keeper":
+                self.keeper.keeper()
             self.loop_rate.sleep()
             #elapsed_time = time.time() - start
             #print ("elapsed_time:{0}".format(1./elapsed_time) + "[Hz]")
