@@ -36,7 +36,7 @@ class RobotKick:
 
         self.access_threshold = 5
         #self.const = 1.5
-        self.const = 3
+        self.const = 4
 
         self.ball_frame = 60 #ボールの軌道の直線フィッティングと速度の計算フレーム数、使ってない
         self.ball_pos_x_array = np.array([0.0]*self.ball_frame) #グラフ描画用配列
