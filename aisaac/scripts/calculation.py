@@ -77,14 +77,14 @@ class Calculation():
         rospy.init_node("Calculation_node")
         
         self.robot_color = str(rospy.get_param("~robot_color"))
-        self.robot_id = str(rospy.get_param("~robot_num"))
+        # self.robot_id = str(rospy.get_param("~robot_num"))
         self.robot_total = 8
         self.enemy_total = 8
 
         # Composition
         self.objects = Objects(self.robot_color, self.robot_total, self.enemy_total)
 
-        self.ctrld_robot = self.objects.robot[int(self.robot_id)]
+        # self.ctrld_robot = self.objects.robot[int(self.robot_id)]
 
         self.robot_friend = self.objects.robot
         self.robot_enemy = self.objects.enemy
@@ -263,8 +263,8 @@ class Calculation():
 
     def calc_def_pos(self):
         # 見づらいのでボールの座標を再代入
-        ball_x = self.ball_params.get_current_position()[0]
-        ball_y = self.ball_params.get_current_position()[1]
+        ball_x = self.ball_params.get_current_position()[0] # y_B
+        ball_y = self.ball_params.get_current_position()[1] # x_B
         # 各パラメータ計算
         a_1 = ball_y - self.g_center_y
         b_1 = ball_x - self.g_center_x
@@ -295,31 +295,31 @@ class Calculation():
             self.line_down_r_x = (a_3*c_5 - a_5*c_3)/(a_5*b_3 - a_3*b_5) + (ball_x - self.g_center_x)*t
 
         # 下部
-        # elif (ball_x >= (self.g_down_x - self.p_area_down_x)/(self.g_down_y - self.p_area_down_y)*(ball_y - self.g_center_y) + self.g_down_x) and (ball_x >= self.g_center_x):
-        #     self.line_down_r_y = (self.p_area_down_y + (ball_y - self.g_center_y)*t)
-        #     self.line_down_r_x = (self.g_down_x - ball_x)/(self.g_down_y - ball_y)*(self.p_area_down_y - ball_y) + ball_x + (ball_y - self.g_center_y)*t
-        #     self.line_down_y = self.p_area_down_y
-        #     self.line_down_x = (self.g_down_x - ball_x)/(self.g_down_y - ball_y)*(self.p_area_down_y - ball_y) + ball_x
-        #     c_1 = self.line_down_y*(self.g_center_y - ball_y) + self.line_down_x*(self.g_center_x - ball_x)
-        #     self.line_up_r_y = (b_1*c_4 - b_4*c_1)/(a_1*b_4 - a_4*b_1) + (ball_y - self.g_center_y)*t
-        #     self.line_up_r_x = (a_1*c_4 - a_4*c_1)/(a_4*b_1 - a_1*b_4) + (ball_x - self.g_center_x)*t
+        elif (ball_x >= (self.g_down_x - self.p_area_down_x)/(self.g_down_y - self.p_area_down_y)*(ball_y - self.g_down_y) + self.g_down_x) and (ball_y <= self.g_center_y):
+            self.line_down_r_y = (self.g_down_y - ball_y)/(self.g_down_x - ball_x)*(self.p_area_down_x - ball_x) + ball_y + (ball_y - self.g_center_y)*t
+            self.line_down_r_x = self.p_area_down_x + (ball_x - self.g_center_x)*t
+            self.line_down_y = (self.g_down_y - ball_y)/(self.g_down_x - ball_x)*(self.p_area_down_x - ball_x) + ball_y
+            self.line_down_x = self.p_area_down_x
+            c_1 = self.line_down_y*(self.g_center_y - ball_y) + self.line_down_x*(self.g_center_x - ball_x)
+            self.line_up_r_y = (b_1*c_4 - b_4*c_1)/(a_1*b_4 - a_4*b_1) + (ball_y - self.g_center_y)*t
+            self.line_up_r_x = (a_1*c_4 - a_4*c_1)/(a_4*b_1 - a_1*b_4) + (ball_x - self.g_center_x)*t
 
         # 上部
-        # elif (ball_x <= (self.g_up_x - self.p_area_up_x)/(self.g_up_y - self.p_area_up_x)*(ball_y - self.g_up_y) + self.g_up_x) and (ball_x <= self.g_center_x):
-        #     self.line_up_r_y = (self.p_area_up_y + (ball_y - self.g_center_y)*t)
-        #     self.line_up_r_x = (self.g_up_x - ball_x)/(self.g_up_y - ball_y)*(self.p_area_up_y - ball_y) + ball_x + (ball_y - self.g_center_y)*t
-        #     self.line_up_y = self.p_area_up_y
-        #     self.line_up_x = (self.g_up_x - ball_x)/(self.g_up_y - ball_y)*(self.p_area_up_y - ball_y) + ball_x
-        #     c_2 = self.line_up_y*(self.g_center_y - ball_y) + self.line_up_x*(self.g_center_x - ball_x)
-        #     self.line_down_r_y = (b_2*c_5 - b_5*c_2)/(a_2*b_5 - a_5*b_2) + (ball_y - self.g_center_y)*t
-        #     self.line_down_r_x = (a_2*c_5 - a_5*c_2)/(a_5*b_2 - a_2*b_5) + (ball_x - self.g_center_x)*t
+        elif (ball_x >= (self.g_up_x - self.p_area_up_x)/(self.g_up_y - self.p_area_up_y)*(ball_y - self.g_up_y) + self.g_up_x) and (ball_y > self.g_center_y):
+            self.line_up_r_y = (self.g_up_y - ball_y)/(self.g_up_x - ball_x)*(self.p_area_up_x - ball_x) + ball_y + (ball_y - self.g_center_y)*t
+            self.line_up_r_x = self.p_area_up_x + (ball_x - self.g_center_x)*t
+            self.line_up_y = (self.g_up_y - ball_y)/(self.g_up_x - ball_x)*(self.p_area_up_x - ball_x) + ball_y
+            self.line_up_x = self.p_area_up_x
+            c_2 = self.line_up_y*(self.g_center_y - ball_y) + self.line_up_x*(self.g_center_x - ball_x)
+            self.line_down_r_y = (b_2*c_5 - b_5*c_2)/(a_2*b_5 - a_5*b_2) + (ball_y - self.g_center_y)*t
+            self.line_down_r_x = (a_2*c_5 - a_5*c_2)/(a_5*b_2 - a_2*b_5) + (ball_x - self.g_center_x)*t
 
         # # 最上部
-        # elif ball_x >= (self.g_up_x - self.p_area_up_x)/(self.g_up_y - self.p_area_up_x)*(ball_y - self.g_up_y) + self.g_up_x:
-        #     self.line_up_r_y = (b_4*c_6 - b_6*c_4)/(a_4*b_6 - a_6*b_4) + (ball_y - self.g_center_y)*t
-        #     self.line_up_r_x = (a_4*c_6 - a_6*c_4)/(a_6*b_4 - a_4*b_6) + (ball_x - self.g_center_x)*t
-        #     self.line_down_r_y = (b_5*c_6 - b_6*c_5)/(a_5*b_6 - a_6*b_5) + (ball_y - self.g_center_y)*t
-        #     self.line_down_r_x = (a_5*c_6 - a_6*c_5)/(a_6*b_5 - a_5*b_6) + (ball_x - self.g_center_x)*t
+        elif ball_x >= (self.g_up_x - self.p_area_up_x)/(self.g_up_y - self.p_area_up_x)*(ball_y - self.g_up_y) + self.g_up_x:
+            self.line_up_r_y = (b_4*c_6 - b_6*c_4)/(a_4*b_6 - a_6*b_4) + (ball_y - self.g_center_y)*t
+            self.line_up_r_x = (a_4*c_6 - a_6*c_4)/(a_6*b_4 - a_4*b_6) + (ball_x - self.g_center_x)*t
+            self.line_down_r_y = (b_5*c_6 - b_6*c_5)/(a_5*b_6 - a_6*b_5) + (ball_y - self.g_center_y)*t
+            self.line_down_r_x = (a_5*c_6 - a_6*c_5)/(a_6*b_5 - a_5*b_6) + (ball_x - self.g_center_x)*t
 
         # その他
         else:
