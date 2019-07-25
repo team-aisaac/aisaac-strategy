@@ -26,6 +26,8 @@ from decision_maker import DecisionMaker
 from objects import Objects
 import functions
 
+import strategy_calcurator as stcalc
+
 import config
 WORLD_LOOP_RATE = config.WORLD_LOOP_RATE
 
@@ -61,11 +63,8 @@ class WorldModel():
         """----上の5つの変数、インスタンスをまとめたもの、callbackをもつ---"""
         self.objects = Objects(self.team_color, self.robot_total, self.enemy_total)
 
-        """---World State(固定パラが多い)---"""
-        self.world_state = WorldState(self.objects)
-
         """---Referee---"""
-        self.referee = Referee(self.world_state)
+        self.referee = Referee(self.objects)
 
         """---DecisionMaker---"""
         self.decision_maker = DecisionMaker(self.world_state, self.objects, self.referee, self.status)
@@ -80,14 +79,7 @@ class WorldModel():
         self.robot_6_status_pub = rospy.Publisher("/" + self.team_color + "/robot_6/status", Status, queue_size=10)
         self.robot_7_status_pub = rospy.Publisher("/" + self.team_color + "/robot_7/status", Status, queue_size=10)
 
-    """---Refereeから司令をもらうsubscriberの起動--"""
-    def referee_listener(self):
-        """ rospy.Subscriber("refbox/command", Int8, self.referee.command_callback)
-        rospy.Subscriber("refbox/stage", Int8, self.referee.stage_callback)
-        rospy.Subscriber("refbox/blue_info", RefereeTeamInfo, self.referee.teaminfo_callback) """
-        rospy.Subscriber("/" + self.team_color + "/refbox/command", Int8, self.referee.command_callback)
-        rospy.Subscriber("/" + self.team_color + "/refbox/stage", Int8, self.referee.stage_callback)
-        rospy.Subscriber("/" + self.team_color + "/refbox/blue_info", RefereeTeamInfo, self.referee.teaminfo_callback)
+        stcalcurator = stcalc.StrategyCalcurator()
 
     """---robotのstatusのPubliber---"""
     def robot_status_publisher(self):
@@ -128,8 +120,11 @@ if __name__ == "__main__":
                 a.decision_maker.leave_from_ball()
             elif a.referee.referee_branch == "NORMAL_START":
                 # ぼーるを落としてスタートする
+
+                strategy = self.stcalcurator.calcurate()
                 a.decision_maker.who_has_a_ball()
                 a.decision_maker.update_strategy()
+
                 print("START")
             elif a.referee.referee_branch == "KICKOFF":
                 a.objects.set_first_position_4robots_attack()

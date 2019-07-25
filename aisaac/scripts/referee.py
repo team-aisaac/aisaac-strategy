@@ -1,10 +1,15 @@
 # !/usr/bin/env  python
 # coding:utf-8
 
+from world_state import WorldState
+from objects import Objects
+
 
 class Referee:
-    def __init__(self, world_state):
-        self.world_state = world_state
+    def __init__(self, objects):
+        self.team_color = objects.team_color
+        self.world_state = WorldState(objects)
+
         """---refereeからの指示をもとにどのループを回すかの指標---"""
         self.referee_branch = None
 
@@ -12,8 +17,21 @@ class Referee:
         self.command = None
         self.stage = None
         self.teaminfo = None
+        self.referee_msg = {
+            'command': None,
+            'stage': None,
+            'teaminfo': None,
+        }
 
-    """---Refereeから現在のcommandをもらう---"""
+        """---Refereeから司令をもらうsubscriberの起動--"""
+        """ rospy.Subscriber("refbox/command", Int8, self.referee.command_callback)
+        rospy.Subscriber("refbox/stage", Int8, self.referee.stage_callback)
+        rospy.Subscriber("refbox/blue_info", RefereeTeamInfo, self.referee.teaminfo_callback) """
+        rospy.Subscriber("/" + self.team_color + "/refbox/command", Int8, self.referee.command_callback)
+        rospy.Subscriber("/" + self.team_color + "/refbox/stage", Int8, self.referee.stage_callback)
+        rospy.Subscriber("/" + self.team_color + "/refbox/blue_info", RefereeTeamInfo, self.referee.teaminfo_callback)
+
+    """---Refereeからommandをもらう---"""
     def command_callback(self, msg):
         self.command = str(msg)
 

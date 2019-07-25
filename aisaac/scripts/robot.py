@@ -22,8 +22,8 @@ class Robot():
         self.robot_color = str(rospy.get_param("~robot_color"))
         self.robot_id = str(rospy.get_param("~robot_num"))
 
-        self.robot_total = 8
-        self.enemy_total = 8
+        self.robot_total = config.NUM_FRIEND_ROBOT
+        self.enemy_total = config.NUM_ENEMY_ROBOT
 
         self.cmd = robot_commands()
         self.cmd.kick_speed_x = 0
