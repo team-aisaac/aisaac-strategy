@@ -93,27 +93,25 @@ public:
     for(int i = 0; i < MAX_DATA_TYPE; i++){
       // get sending data from ROS bus
 
-      /*
-      float x = -1.5;
-      float y = -1.5;
+      
+      float x = 1.5;
+      float y = 1.5;
       float th = 1.57;
       float calib = 3.14;
-      */
+
+//      x_vector = int16_t(msg->vel_surge * 1000);
+//      y_vector = int16_t(msg->vel_sway * 1000);
+//
+//      float theta_deg = msg->theta * (180 / M_PI);
+//      while(!(0 <= theta_deg && theta_deg < 360)){
+//          if(theta_deg < 0){
+//              theta_deg += 360;
+//          }else{
+//              theta_deg -= 360;
+//          }
+//      }
 
       
-      x_vector = int16_t(msg->vel_surge * 1000);
-      y_vector = int16_t(msg->vel_sway * 1000);
-
-      float theta_deg = msg->theta * (180 / M_PI);
-      while(!(0 <= theta_deg && theta_deg < 360)){
-          if(theta_deg < 0){
-              theta_deg += 360;
-          }else{
-              theta_deg -= 360;
-          }
-      }
-      
-      /*
       x_vector = int16_t(x * 1000);
       y_vector = int16_t(y * 1000);
 
@@ -125,7 +123,7 @@ public:
               theta_deg -= 360;
           }
       }
-      */
+      
 
       double current_orientation_deg = current_orientation[2] * (180 / M_PI);
       while(!(0 <= current_orientation_deg && current_orientation_deg < 360)){
@@ -199,7 +197,7 @@ public:
     {
 
       case 0:
-        tmp = ((datatype & 0x7) << 5) | (x_vector >> 11);
+        tmp = ((0x7 & 0x7) << 5) | (x_vector >> 11);
         buf->push_back(tmp);
         tmp = (x_vector >> 3) & 0xFF;
         buf->push_back(tmp);
