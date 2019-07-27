@@ -19,9 +19,9 @@ class RobotDefence:
         self.def2_pos_x = msg.def2_pos_x
         self.def2_pos_y = msg.def2_pos_y
 
-    def defence1(self):
-        pose_theta = math.atan2( (self.ball_params.get_current_position()[1] - self.def1_pos_y) , (self.ball_params.get_current_position()[0] - self.def1_pos_x) )
-        self.pid.pid_linear(self.def1_pos_x, self.def1_pos_y, pose_theta)
+    def move_defence(self, x, y):
+        pose_theta = math.atan2( (self.ball_params.get_current_position()[1] - y) , (self.ball_params.get_current_position()[0] - x) )
+        self.pid.pid_linear(x, y, pose_theta)
 
     def defence2(self):
         pose_theta = math.atan2( (self.ball_params.get_current_position()[1] - self.def2_pos_y) , (self.ball_params.get_current_position()[0] - self.def2_pos_x) )
