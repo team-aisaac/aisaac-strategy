@@ -26,14 +26,17 @@ class RobotPid(object):
         self.recursion_max = 10
         self.recursion_count = 0
 
-        # self.Kpv = 2.2
-        # self.Kpr = 2.0
-        # self.Kdv = 3.0
-        # self.Kdr = 1.0
-        self.Kpv = 3.0
-        self.Kpr = 6.0
+        self.Kpv = 2.2
+        self.Kpr = 2.0
         self.Kdv = 3.0
-        self.Kdr = 4.0
+        self.Kdr = 1.0
+        
+        # 壁用
+        # self.Kpv = 3.0
+        # self.Kpr = 6.0
+        # self.Kdv = 3.0
+        # self.Kdr = 4.0
+        
         # self.Kpv = 3.8
         # self.Kpr = 4
         # self.Kdv = 12
