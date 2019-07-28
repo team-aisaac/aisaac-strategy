@@ -49,7 +49,7 @@ class Robot():
         self.status = RobotStatus(self.pid, self.ctrld_robot)
         self.kick = RobotKick(self.ball_params, self.ctrld_robot, self.pid, self.cmd, self.status, self.command_pub)
         self.defence = RobotDefence(self.ball_params, self.pid, self.cmd, self.status, self.command_pub)
-        self.keeper = RobotKeeper(self.ball_params, self.ctrld_robot, self.pid, self.cmd, self.status, self.command_pub)
+        self.keeper = RobotKeeper(self.robot_id, self.objects, self.ball_params, self.pid, self.cmd, self.status)
 
         # listner 起動
         # self.odom_listener()
@@ -80,10 +80,13 @@ class Robot():
             if self.status.robot_status == "receive":
                 self.kick.receive_ball(self.ctrld_robot.get_pass_target_position()[0],self.ctrld_robot.get_pass_target_position()[1])
             if self.status.robot_status == "defence1":
-                self.defence.defence1()
+                self.defence.move_defence(self.defence.def1_pos_x,self.defence.def1_pos_y)
             if self.status.robot_status == "defence2":
-                self.defence.defence2()
-
+                self.defence.move_defence(self.defence.def2_pos_x,self.defence.def2_pos_y)
+            if self.status.robot_status == "defence3":
+                self.kick.receive_ball(self.defence.def1_pos_x,self.defence.def1_pos_y)
+            if self.status.robot_status == "defence4":
+                self.kick.receive_ball(self.defence.def2_pos_x,self.defence.def2_pos_y)
             if self.status.robot_status == "keeper":
                 self.keeper.keeper()
             self.loop_rate.sleep()
