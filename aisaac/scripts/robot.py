@@ -23,8 +23,8 @@ class Robot():
         self.robot_color = str(rospy.get_param("~robot_color"))
         self.robot_id = str(rospy.get_param("~robot_num"))
 
-        self.robot_total = 8
-        self.enemy_total = 8
+        self.robot_total = config.NUM_FRIEND_ROBOT
+        self.enemy_total = config.NUM_ENEMY_ROBOT
 
         self.cmd = robot_commands()
         self.cmd.kick_speed_x = 0
@@ -62,32 +62,33 @@ class Robot():
 
         #Loop 処理
         self.loop_rate = rospy.Rate(ROBOT_LOOP_RATE)
-        print("Robot start: "+self.robot_id)
+        rospy.loginfo("Robot start: "+self.robot_id)
         while not rospy.is_shutdown():
             #start = time.time()
             if self.status.robot_status == "move_linear":
-                self.pid.pid_linear(self.ctrld_robot.get_future_position()[0], self.ctrld_robot.get_future_position()[1],
-                self.ctrld_robot.get_future_orientation())
-            if self.status.robot_status == "move_circle":
+                self.pid.pid_linear(self.ctrld_robot.get_future_position()[0],
+                                    self.ctrld_robot.get_future_position()[1],
+                                    self.ctrld_robot.get_future_orientation())
+            elif self.status.robot_status == "move_circle":
                 self.pid.pid_circle(self.pid.pid_circle_center_x, self.pid.pid_circle_center_y,
                                     self.ctrld_robot.get_future_position()[0], 
                                     self.ctrld_robot.get_future_position()[1],
                                     self.ctrld_robot.get_future_orientation())
-            if self.status.robot_status == "kick":
+            elif self.status.robot_status == "kick":
                 self.kick.kick_x()
-            if self.status.robot_status == "pass":
+            elif self.status.robot_status == "pass":
                 self.kick.pass_ball(self.ctrld_robot.get_pass_target_position()[0], self.ctrld_robot.get_pass_target_position()[1])
-            if self.status.robot_status == "receive":
+            elif self.status.robot_status == "receive":
                 self.kick.receive_ball(self.ctrld_robot.get_pass_target_position()[0],self.ctrld_robot.get_pass_target_position()[1])
-            if self.status.robot_status == "defence1":
+            elif self.status.robot_status == "defence1":
                 self.defence.move_defence(self.defence.def1_pos_x,self.defence.def1_pos_y)
-            if self.status.robot_status == "defence2":
+            elif self.status.robot_status == "defence2":
                 self.defence.move_defence(self.defence.def2_pos_x,self.defence.def2_pos_y)
-            if self.status.robot_status == "defence3":
+            elif self.status.robot_status == "defence3":
                 self.kick.receive_ball(self.defence.def1_pos_x,self.defence.def1_pos_y)
-            if self.status.robot_status == "defence4":
+            elif self.status.robot_status == "defence4":
                 self.kick.receive_ball(self.defence.def2_pos_x,self.defence.def2_pos_y)
-            if self.status.robot_status == "keeper":
+            elif self.status.robot_status == "keeper":
                 self.keeper.keeper()
             self.loop_rate.sleep()
             #elapsed_time = time.time() - start
