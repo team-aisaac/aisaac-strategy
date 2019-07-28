@@ -5,8 +5,13 @@ import config
 from aisaac.msg import Status
 import copy
 
+try:
+    from typing import Dict, List
+except:
+    print("Module: typing (for better completion) not found. You can ignore this.")
 
 def _get_default_status():
+    # type: () -> Status
     status = Status()
     status.status = "None"
     status.pid_goal_pos_x = 0.
@@ -21,50 +26,26 @@ def _get_default_status():
 
 
 class StrategyBase(object):
-    """
-    Methods
-    ----------
-    get_all_robot_status()
-        Get all robot status as dict
-
-    get_robot_status(robot_id)
-        Get robot status for robot_id
-
-    """
-
     def __init__(self, robot_ids=range(config.NUM_FRIEND_ROBOT)):
-        self._all_robot_status = {}
+        # type: (List[int]) -> None
+        self._all_robot_status = {}  # type: (Dict[int, Status])
         status = _get_default_status()
 
         for i in robot_ids:
             self._all_robot_status[i] = copy.deepcopy(status)
 
     def get_all_robot_status(self):
-        """
-        Returns
-        ----------
-        all_robot_status : dict of Status
-
-        """
+        # type: () -> Dict[int, Status]
         return self._all_robot_status
 
     def get_robot_status(self, robot_id):
-        """
-        Parameters
-        ----------
-        robot_id : int
-            id of robot
-
-        Returns
-        ----------
-        robot_status : Status
-
-        """
+        # type: (int) -> Status
         return self._all_robot_status[robot_id]
 
 
 class InitialStrategy(StrategyBase):
     def __init__(self, robot_ids=range(config.NUM_FRIEND_ROBOT)):
+        # type: (List[int]) -> None
         super(InitialStrategy, self).__init__(robot_ids)
 
         status = _get_default_status()
@@ -105,6 +86,7 @@ class InitialStrategy(StrategyBase):
 
 class StopStrategy(StrategyBase):
     def __init__(self, robot_ids=range(config.NUM_FRIEND_ROBOT)):
+        # type: (List[int]) -> None
         super(StopStrategy, self).__init__(robot_ids)
 
         status = _get_default_status()

@@ -396,7 +396,7 @@ if __name__ == "__main__":
 
     loop_rate = rospy.Rate(WORLD_LOOP_RATE)
 
-    print("start calculation node")
+    rospy.loginfo("start calculation node")
 
     while not rospy.is_shutdown():
 

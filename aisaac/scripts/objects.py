@@ -12,8 +12,13 @@ class Objects(object):
         self.team_color = team_color
         self.robot_total = robot_total
         self.enemy_total = enemy_total
-        self.robot = [entity.Robot() for i in range(self.robot_total)]
-        self.enemy = [entity.Robot() for i in range(self.enemy_total)]
+
+        self._robot_ids = range(self.robot_total)
+        self._enemy_ids = range(self.enemy_total)
+
+        self.robot = [entity.Robot() for i in self._robot_ids]
+        self.enemy = [entity.Robot() for i in self._enemy_ids]
+
         self.ball = entity.Ball()
 
         """---ボール軌道の考慮時間幅(linear Regressionで軌道予測するため)---"""
@@ -21,6 +26,12 @@ class Objects(object):
         self.ball_dynamics = [[0., 0.] for i in range(self.ball_dynamics_window)]
 
         self.odom_listener()
+
+    def get_robot_ids(self):
+        return self._robot_ids
+
+    def get_enemy_ids(self):
+        return self._enemy_ids
 
     def set_first_positions(self):
         self.robot[0].set_future_position(x=-5.5, y=0., theta=0.)

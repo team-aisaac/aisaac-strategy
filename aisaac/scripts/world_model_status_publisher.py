@@ -1,23 +1,23 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import rospy
 from aisaac.msg import Status
+import rospy
 import config
+from strategy import StrategyBase
+
+try:
+    from typing import Dict, List
+except:
+    print("Module: typing (for better completion) not found. You can ignore this.")
 
 
 class StatusPublisher(object):
-    """
-    Methods
-    ----------
-    publish_all(strategy)
-        publish strategy to all robots in the strategy
-    """
-
     def __init__(self, team_color, robot_ids=range(config.NUM_FRIEND_ROBOT)):
+        # type: (str, List[int]) -> None
         self._team_color = team_color
         self._robot_ids = robot_ids
-        self._status_publishers = {}
+        self._status_publishers = {}  # type: Dict[int, rospy.Publisher]
 
         for i in self._robot_ids:
             publisher = rospy.Publisher(
@@ -26,15 +26,9 @@ class StatusPublisher(object):
                 queue_size=10)
             self._status_publishers[i] = publisher
 
-    def publish_all(self, strategy):
-        """
-        Parameters
-        ----------
-        strategy : strategy_calcurtor.StrategyBase
-
-        """
-
-        all_robot_status = strategy.get_all_robot_status()
+    def publish_all(self, strat):
+        # type: (StrategyBase) -> None
+        all_robot_status = strat.get_all_robot_status()
 
         for robot_id in all_robot_status.keys():
             self._status_publishers[robot_id].publish(

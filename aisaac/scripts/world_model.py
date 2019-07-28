@@ -15,7 +15,8 @@ import config
 主にフィールドの情報の取得、物理的な衝突の確認をするコード
 """
 
-class WorldModel():
+
+class WorldModel(object):
     def __init__(self):
         rospy.init_node("world_model")
         self._team_color = str(rospy.get_param('team_color'))
@@ -27,27 +28,32 @@ class WorldModel():
         """---Referee---"""
         self._referee = Referee(self._objects)
         self._stcalcurator = StrategyCalcurator(self._objects)
-        self._status_publisher = StatusPublisher(self._team_color)
+        self._status_publisher = StatusPublisher(
+            self._team_color, robot_ids=self._objects.get_robot_ids())
 
     def get_referee(self):
+        # type: () -> Referee
         return self._referee
 
     def get_status_publisher(self):
+        # type: () -> StatusPublisher
         return self._status_publisher
 
     def get_strategy_calcurator(self):
+        # type: () -> StrategyCalcurator
         return self._stcalcurator
 
 
 if __name__ == "__main__":
     world_model = WorldModel()
     loop_rate = rospy.Rate(config.WORLD_LOOP_RATE)
-    print("start world model node")
+    rospy.loginfo("start world model node")
     # assignment_x = [-4, -3, -2, -1, 0, 1, 2, 3]
     # assignment_y = [1, 1, 1, 1, 1, 1, 1, 1]
     # assignment_theta = [0, 0, 0, 0, 0, 0, 0, 0]
     # time.sleep(10)
-    # world_model.decision_maker.goal_assignment(assignment_x, assignment_y, assignment_theta)
+    # world_model.decision_maker.goal_assignment(
+    #   assignment_x, assignment_y, assignment_theta)
 
     status_publisher = world_model.get_status_publisher()
     try:
@@ -69,10 +75,9 @@ if __name__ == "__main__":
             elif referee_branch == "DEFENCE":
                 strat = strategy.DefenceStrategy()
 
-            # world_model.decision_maker.change_goal_status()
             # status_publisher.publish_all(strat)
             loop_rate.sleep()
-    except:
+    except Exception as e:
         import traceback
         traceback.print_exc()
         status_publisher.publish_all(strategy.StopStrategy())

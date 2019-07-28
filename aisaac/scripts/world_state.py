@@ -1,9 +1,12 @@
 # !/usr/bin/env  python
 # coding:utf-8
 
+from objects import Objects
+
 
 class WorldState:
     def __init__(self, objects):
+        # type: (Objects) -> None
         self.robot = objects.robot
         self.robot_total = objects.robot_total
 
