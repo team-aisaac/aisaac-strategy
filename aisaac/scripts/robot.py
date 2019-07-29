@@ -49,7 +49,7 @@ class Robot():
         self.status = RobotStatus(self.pid, self.ctrld_robot)
         self.kick = RobotKick(self.ball_params, self.ctrld_robot, self.pid, self.cmd, self.status, self.command_pub)
         self.defence = RobotDefence(self.ball_params, self.pid, self.cmd, self.status, self.command_pub)
-        self.keeper = RobotKeeper(self.robot_id, self.objects, self.ball_params, self.pid, self.cmd, self.status)
+        self.keeper = RobotKeeper(self.robot_id, self.objects, self.ball_params, self.pid, self.status, self.kick)
 
         # listner 起動
         # self.odom_listener()

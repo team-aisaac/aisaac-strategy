@@ -1,9 +1,10 @@
 #!/usr/bin/env  python
 # coding:utf-8
 import numpy as np
+import rospy
 
 class RobotKeeper:
-    def __init__(self, robot_id, objects, ball_params, pid, cmd, status):
+    def __init__(self, robot_id, objects, ball_params, pid, status, kick):
         self.robot_id = int(robot_id)
         self.ctrld_robot = objects.robot[int(robot_id)]
         self.friend = objects.robot
@@ -11,9 +12,8 @@ class RobotKeeper:
         self.ball_params = ball_params
         self.pid = pid
         self.status = status
-        self.cmd = cmd
-        self.team_side = "left"
-
+        self.kick = kick
+        self.team_side =  str(rospy.get_param("team_side"))
         self.goal_right = [6, -0.620]
         self.goal_left = [6, 0.620]
         self.r_offset = self.ctrld_robot.size_r
@@ -230,28 +230,130 @@ class RobotKeeper:
         return shel_r, shel_l
 
     def sort_sheltered_area(self, shel_r, shel_l):
-        shel_area = dict(zip(shel_r, shel_l))
-        shel_area = sorted(shel_area.items(), key=lambda x:x[0])
-        print shel_area
+        if self.team_side == "right":
+            shel_area = sorted(dict(zip(shel_l, shel_r)).items(), key=lambda x:-x[0])
+        else:
+            shel_area = sorted(dict(zip(shel_l, shel_r)).items(), key=lambda x:x[0])
 
-    def culc_defense_point(self, shel_r, shel_l):
-        print shel_r, shel_l
+        sort_area = []
+        while(len(shel_area) != 0):
+            comb_shel, shel_area = self.combine_sheltered_area(shel_area, shel_area[0])
+            sort_area.append(comb_shel)
+
+        return sort_area
+
+    def combine_sheltered_area(self, shel_area, shel):
+        if self.team_side == "right":
+            comb_shel = [shel[0], shel[1]]
+            for i in reversed(range(len(shel_area))):
+                if shel[1] <= shel_area[i][1]:
+                    del shel_area[i]
+
+            shel_r_min = shel[1]
+            for i in range(len(shel_area)):
+                if shel[0] > shel_area[i][0] > shel[1]:
+                    comb_shel[0] = shel[0]
+                    if shel_area[i][1] < shel_r_min:
+                        shel_r_min = shel_area[i][1]
+            if shel_r_min != shel[1]:
+                comb_shel[1] = shel_r_min
+                comb_shel, shel_area = self.combine_sheltered_area(shel_area, comb_shel)
+        else:
+            comb_shel = [shel[0], shel[1]]
+            for i in reversed(range(len(shel_area))):
+                if shel[1] >= shel_area[i][1]:
+                    del shel_area[i]
+
+            shel_r_min = shel[1]
+            for i in range(len(shel_area)):
+                if shel[0] < shel_area[i][0] < shel[1]:
+                    comb_shel[0] = shel[0]
+                    if shel_area[i][1] > shel_r_min:
+                        shel_r_min = shel_area[i][1]
+            if shel_r_min != shel[1]:
+                comb_shel[1] = shel_r_min
+                comb_shel, shel_area = self.combine_sheltered_area(shel_area, comb_shel)
+
+        return comb_shel, shel_area
+
+
+
+    def culc_defense_point(self, shel):
+        defense_area_r = []
+        defense_area_l = []
+        defense_point_x = 0
+        defense_point_y = 0
+
+        if self.team_side == "right":
+            if shel == [[]]:
+                return self.goal_left[0], 0
+            defense_area_array = np.append(np.ravel(shel), [self.goal_left[1], self.goal_right[1]])
+            defense_area_array.sort()
+            defense_area_array = defense_area_array[::-1]
+            defense_area = []
+            for i in range(len(defense_area_array) - 1):
+                for j in range(len(shel)):
+                    if (not(shel[j][0] >= defense_area_array[i] >= shel[j][1]) \
+                        or not(shel[j][0] >= defense_area_array[i + 1] >= shel[j][1])) \
+                        and (self.goal_left[1] >= defense_area_array[i] >= self.goal_right[1]) \
+                        and (self.goal_left[1] >= defense_area_array[i + 1] >= self.goal_right[1]):
+                        defense_area.append([defense_area_array[i], defense_area_array[i+1]])
+
+            defense_area_max = 0
+            for i in range(len(defense_area)):
+                if defense_area[i][0] - defense_area[i][1] > defense_area_max:
+                    defense_area_max = defense_area[i][0] - defense_area[i][1]
+                    defense_point_y = (defense_area[i][0] + defense_area[i][1]) / 2.
+            defense_point_x = self.goal_left[0]
+
+        else:
+            if shel == [[]]:
+                return -self.goal_left[0], 0
+            defense_area_array = np.append(np.ravel(shel), [-self.goal_left[1], -self.goal_right[1]])
+            defense_area_array.sort()
+            defense_area_array = defense_area_array[::-1]
+            defense_area = []
+            for i in range(len(defense_area_array) - 1):
+                for j in range(len(shel)):
+                    if (not(shel[j][0] >= defense_area_array[i] >= shel[j][1]) \
+                        or not(shel[j][0] >= defense_area_array[i + 1] >= shel[j][1])) \
+                        and (self.goal_left[1] >= defense_area_array[i] >= self.goal_right[1]) \
+                        and (self.goal_left[1] >= defense_area_array[i + 1] >= self.goal_right[1]):
+                        defense_area.append([defense_area_array[i], defense_area_array[i+1]])
+
+            defense_area_max = 0
+            for i in range(len(defense_area)):
+                if defense_area[i][0] - defense_area[i][1] > defense_area_max:
+                    defense_area_max = defense_area[i][0] - defense_area[i][1]
+                    defense_point_y = (defense_area[i][0] + defense_area[i][1]) / 2.
+            defense_point_x = -self.goal_left[0]
+
+        return defense_point_x, defense_point_y
+
+
 
 
     def keeper(self):
         shel_r = []
         shel_l = []
+        if self.team_side == "right":
+            defense_point_x = self.goal_left[0]
+        else:
+            defense_point_x = -self.goal_left[0]
+        defense_point_y = 0
         friend_obstacle, enemy_obstacle = self.detect_obstacle()
-        #print friend_obstacle
         if friend_obstacle != [] or enemy_obstacle != []:
             for i in friend_obstacle:
                 shel_r.append(self.culc_sheltered_area(self.friend[i].get_current_position())[0])
                 shel_l.append(self.culc_sheltered_area(self.friend[i].get_current_position())[1])
+            """
             for i in enemy_obstacle:
                 shel_r.append(self.culc_sheltered_area(self.enemy[i].get_current_position())[0])
                 shel_l.append(self.culc_sheltered_area(self.enemy[i].get_current_position())[1])
-            self.sort_sheltered_area(shel_r, shel_l)
-        x, y, theta = self.calc_keeper_position(-6., 0.)
-        self.pid.pid_linear(x, y, theta)
-
+            """
+            shel = self.sort_sheltered_area(shel_r, shel_l)
+            defense_point_x, defense_point_y = self.culc_defense_point(shel)
+        x, y, theta = self.calc_keeper_position(defense_point_x, defense_point_y)
+        #self.pid.pid_linear(x, y, theta)
+        self.kick.receive_ball(x, y)
 
