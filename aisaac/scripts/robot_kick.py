@@ -147,13 +147,13 @@ class RobotKick:
         # 未実装
 
         # 距離だけで諦めるかどうか判断
-        if d < 1:
-            #pose_theta = math.atan2( (self.ball_params.get_current_position()[1] - hy) , (self.ball_params.get_current_position()[0] - hx) )
-            pose_theta = math.atan2( (self.ball_params.get_current_position()[1]) , (self.ball_params.get_current_position()[0]) )
+        if (d < 1) and  (self.ball_params.get_line_a() != 0):
+            pose_theta = math.atan2( (self.ball_params.get_current_position()[1] - hy) , (self.ball_params.get_current_position()[0] - hx) )
+            # pose_theta = math.atan2( (self.ball_params.get_current_position()[1]) , (self.ball_params.get_current_position()[0]) )
             self.pid.pid_linear(hx, hy, pose_theta)
         else:
-            #pose_theta = math.atan2( (self.ball_params.get_current_position()[1] - target_y) , (self.ball_params.get_current_position()[0] - target_x) )
-            pose_theta = math.atan2( (self.ball_params.get_current_position()[1]) , (self.ball_params.get_current_position()[0]) )
+            pose_theta = math.atan2( (self.ball_params.get_current_position()[1] - target_y) , (self.ball_params.get_current_position()[0] - target_x) )
+            # pose_theta = math.atan2( (self.ball_params.get_current_position()[1]) , (self.ball_params.get_current_position()[0]) )
             self.pid.pid_linear(target_x, target_y, pose_theta)
 
         """ # 垂線テキスト座標

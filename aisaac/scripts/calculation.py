@@ -18,46 +18,6 @@ WORLD_LOOP_RATE = config.WORLD_LOOP_RATE
 """
 主に共通した計算処理などを担当する
 """
-# ボールクラスは統一20190720
-""" class Ball():
-    def __init__(self):
-        self.ball_pos_x = 0.
-        self.ball_pos_y = 0.
-        self.ball_pos_theta = 0.
-        self.ball_vel_x = 0.
-        self.ball_vel_y = 0.
-        
-        self.team_color = str(rospy.get_param('/blue/team_color'))
-        
-        self.ball_sub_params = Ball_sub_params()
-        
-        self.time1 = 0.
-        self.time2 = 0.
-        self.time_duration = 0.
-        self.hz1 = 0.
-
-        self.ball_sub_params_pub = rospy.Publisher("/" + self.team_color + "/ball_sub_params", Ball_sub_params, queue_size=10)
-
-    def odom_callback(self, msg):
-        #self.time2 = self.time1
-        #self.time1 = msg.header.stamp
-        #self.time_duration = rospy.Duration()
-        #self.time_duration = self.time1 - self.time2
-        #self.hz1 = 1. / (self.time_duration.nsecs/100000000)
-        #rospy.loginfo(self.time_duration.nsecs)
-
-        self.time2 = self.time1
-        self.time1 = time.time()
-        self.time_duration = self.time1 - self.time2
-        self.ball_pos_x = msg.pose.pose.position.x
-        self.ball_pos_y = msg.pose.pose.position.y
-        self.ball_pos_theta = tf.transformations.euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))
-        self.ball_vel_x = msg.twist.twist.linear.x
-        self.ball_vel_y = msg.twist.twist.linear.y
-
-    def ball_params_publisher(self):
-        self.ball_sub_params_pub.publish(self.ball_sub_params) """
-
 # Publisher用クラス
 class Publisher():
     def __init__(self):
@@ -139,6 +99,13 @@ class Calculation():
         self.line_down_r_y = 0.0    # ロボットの半径を考慮した補正後の座標:x_LR'
 
         self.offset_r = 0.          # オフセット値
+        self.robot_r = 90.0/1000.0  # ロボット半径
+        self.robot_a = 1.0          # ロボットの加速度
+        self.ball_MAX_SPEED = 6.5   # ボールの最大速度
+        self.delay_time_ms = 100.0  # 遅延時間[ms]
+
+        self.L_a = 0.0              # 壁のラインとボールまでの距離
+        self.L_G = 0.0              # ボール到達までに移動可能な距離
 
     # x,yの配列とデータ数を指定して、最小二乗法を行い、傾きと切片を返す
     def reg1dim(self, x, y, n):
@@ -265,6 +232,11 @@ class Calculation():
         # 見づらいのでボールの座標を再代入
         ball_x = self.ball_params.get_current_position()[0] # y_B
         ball_y = self.ball_params.get_current_position()[1] # x_B
+        # 壁の座標
+        def1_pos_x = 0.0
+        def1_pos_y = 0.0
+        def2_pos_x = 0.0
+        def2_pos_y = 0.0
         # 各パラメータ計算
         a_1 = ball_y - self.g_center_y
         b_1 = ball_x - self.g_center_x
@@ -283,7 +255,7 @@ class Calculation():
         c_5 = ball_y*(self.g_down_x - ball_x) + ball_x*(ball_y - self.g_down_y)
         a_6 = self.g_center_y - ball_y
         b_6 = self.g_center_x - ball_x
-        c_6 = self.p_area_up_y*(ball_y - self.g_center_y) + self.p_area_up_x*(ball_x - self.g_center_y)
+        c_6 = self.p_area_up_y*(ball_y - self.g_center_y) + self.p_area_up_x*(ball_x - self.g_center_x)
 
         t = self.offset_r/math.sqrt((self.g_center_y - ball_y)**2 + (self.g_center_x - ball_x)**2)
         # 防御ラインの計算
@@ -293,6 +265,7 @@ class Calculation():
             self.line_up_r_x = (a_3*c_4 - a_4*c_3)/(a_4*b_3 - a_3*b_4) + (ball_x - self.g_center_x)*t
             self.line_down_r_y = (b_3*c_5 - b_5*c_3)/(a_3*b_5 - a_5*b_3) + (ball_y - self.g_center_y)*t
             self.line_down_r_x = (a_3*c_5 - a_5*c_3)/(a_5*b_3 - a_3*b_5) + (ball_x - self.g_center_x)*t
+            self.L_a = abs(a_3*ball_y + b_3*ball_x + c_3)/math.sqrt(a_3**2 + b_3**2)
 
         # 下部
         elif (ball_x >= (self.g_down_x - self.p_area_down_x)/(self.g_down_y - self.p_area_down_y)*(ball_y - self.g_down_y) + self.g_down_x) and (ball_y <= self.g_center_y):
@@ -303,6 +276,7 @@ class Calculation():
             c_1 = self.line_down_y*(self.g_center_y - ball_y) + self.line_down_x*(self.g_center_x - ball_x)
             self.line_up_r_y = (b_1*c_4 - b_4*c_1)/(a_1*b_4 - a_4*b_1) + (ball_y - self.g_center_y)*t
             self.line_up_r_x = (a_1*c_4 - a_4*c_1)/(a_4*b_1 - a_1*b_4) + (ball_x - self.g_center_x)*t
+            self.L_a = abs(a_1*ball_y + b_1*ball_x + c_1)/math.sqrt(a_1**2 + b_1**2)
 
         # 上部
         elif (ball_x >= (self.g_up_x - self.p_area_up_x)/(self.g_up_y - self.p_area_up_y)*(ball_y - self.g_up_y) + self.g_up_x) and (ball_y > self.g_center_y):
@@ -313,13 +287,15 @@ class Calculation():
             c_2 = self.line_up_y*(self.g_center_y - ball_y) + self.line_up_x*(self.g_center_x - ball_x)
             self.line_down_r_y = (b_2*c_5 - b_5*c_2)/(a_2*b_5 - a_5*b_2) + (ball_y - self.g_center_y)*t
             self.line_down_r_x = (a_2*c_5 - a_5*c_2)/(a_5*b_2 - a_2*b_5) + (ball_x - self.g_center_x)*t
+            self.L_a = abs(a_2*ball_y + b_2*ball_x + c_2)/math.sqrt(a_2**2 + b_2**2)
 
         # # 最上部
         elif ball_x >= (self.g_up_x - self.p_area_up_x)/(self.g_up_y - self.p_area_up_x)*(ball_y - self.g_up_y) + self.g_up_x:
-            self.line_up_r_y = (b_4*c_6 - b_6*c_4)/(a_4*b_6 - a_6*b_4) + (ball_y - self.g_center_y)*t
-            self.line_up_r_x = (a_4*c_6 - a_6*c_4)/(a_6*b_4 - a_4*b_6) + (ball_x - self.g_center_x)*t
-            self.line_down_r_y = (b_5*c_6 - b_6*c_5)/(a_5*b_6 - a_6*b_5) + (ball_y - self.g_center_y)*t
-            self.line_down_r_x = (a_5*c_6 - a_6*c_5)/(a_6*b_5 - a_5*b_6) + (ball_x - self.g_center_x)*t
+            self.line_up_r_y = (b_6*c_4 - b_4*c_6)/(a_6*b_4 - a_4*b_6) + (ball_y - self.g_center_y)*t
+            self.line_up_r_x = (a_6*c_4 - a_4*c_6)/(a_4*b_6 - a_6*b_4) + (ball_x - self.g_center_x)*t
+            self.line_down_r_y = (b_6*c_5 - b_5*c_6)/(a_6*b_5 - a_5*b_6) + (ball_y - self.g_center_y)*t
+            self.line_down_r_x = (a_6*c_5 - a_5*c_6)/(a_5*b_6 - a_6*b_5) + (ball_x - self.g_center_x)*t
+            self.L_a = abs(a_6*ball_y + b_6*ball_x + c_6)/math.sqrt(a_6**2 + b_6**2)
 
         # その他
         else:
@@ -328,49 +304,104 @@ class Calculation():
             self.line_down_r_x = self.p_area_down_x + self.offset_r
             self.line_down_r_y = self.g_down_y/2
 
-        # 念の為クリップ
-        self.line_up_r_x = np.clip(self.line_up_r_x, -6.0, 6.0)
-        self.line_up_r_y = np.clip(self.line_up_r_y, -4.5, 4.5)
-        self.line_down_r_x = np.clip(self.line_down_r_x, -6.0, 6.0)
-        self.line_down_r_y = np.clip(self.line_down_r_y, -4.5, 4.5)
-        # パブリッシュ用の変数に代入
-        self.def_pos.def1_pos_x = self.line_up_r_x
-        self.def_pos.def1_pos_y = self.line_up_r_y
-        self.def_pos.def2_pos_x = self.line_down_r_x
-        self.def_pos.def2_pos_y = self.line_down_r_y
+        # ここまでが壁の基本位置計算
+        # ここからがロボットの移動を考慮した位置補正と壁をニアorファーサイドに寄せる計算
 
-        #rospy.loginfo("(x_LL':y_LL') = (%.3f:%.3f)",self.line_down_r_x,self.line_down_r_y)
+        # ボールが壁に到達するまでに移動可能な距離の計算
+        tmp = (self.L_a/self.ball_MAX_SPEED - self.delay_time_ms/1000.0)
+        if tmp > 0:
+            self.L_G = self.robot_a*(tmp**2)/2.0
+        else:
+            self.L_G = 0
+
+        # ボールがハーフラインよりも敵陣側（壁が一台）かつ1台で守れる範囲：パターン1
+        if (ball_x > 0) and (((self.line_up_r_y - self.line_down_r_y)**2 + (self.line_up_r_x - self.line_down_r_x)**2) <= 4.0*((self.L_G + self.robot_r)**2)):
+            def1_pos_y = (self.line_up_r_y + self.line_down_r_y)/2.0
+            def1_pos_x = (self.line_up_r_x + self.line_down_r_x)/2.0
+            def2_pos_y = 0.0
+            def2_pos_x = 0.0
+
+        # ボールがハーフラインよりも味方陣側（壁が二台）かつ2台で守れる範囲：パターン2-1,2
+        elif (ball_x <= 0) and (((self.line_up_r_y - self.line_down_r_y)**2 + (self.line_up_r_x - self.line_down_r_x)**2) <= 16.0*((self.L_G + self.robot_r)**2)):
+            y_R = (3.0*self.line_down_r_y + self.line_up_r_y)/4
+            x_R = (3.0*self.line_down_r_x + self.line_up_r_x)/4
+            y_L = (self.line_down_r_y + 3.0*self.line_up_r_y)/4
+            x_L = (self.line_down_r_x + 3.0*self.line_up_r_x)/4
+            # 2台がぶつからない場合
+            if (y_R - y_L)**2 + (x_R - x_L)**2 >= 4.0*(self.robot_r**2):
+                def1_pos_y = y_L
+                def1_pos_x = x_L
+                def2_pos_y = y_R
+                def2_pos_x = x_R
+            # 2台がぶつかるのでずらす
+            else:
+                t_1 = self.robot_r/math.sqrt((self.line_down_r_y - self.line_up_r_y)**2 + (self.line_down_r_x - self.line_up_r_x)**2)
+                def1_pos_y = (self.line_up_r_y + self.line_down_r_y)/2.0 + (self.line_up_r_y - self.line_down_r_y)*t_1
+                def1_pos_x = (self.line_up_r_x + self.line_down_r_x)/2.0 + (self.line_up_r_x - self.line_down_r_x)*t_1
+                def2_pos_y = (self.line_up_r_y + self.line_down_r_y)/2.0 - (self.line_up_r_y - self.line_down_r_y)*t_1
+                def2_pos_x = (self.line_up_r_x + self.line_down_r_x)/2.0 - (self.line_up_r_x - self.line_down_r_x)*t_1
+
+        # 壁が1台かつ1台で守れない or 壁が2台かつ2台で守れない：パターン3-1,2,3,4
+        else:
+            t_2 = (self.L_G + self.robot_r)/math.sqrt((self.line_up_r_y - self.line_down_r_y)**2 + (self.line_up_r_x - self.line_down_r_x)**2)
+            # 1台の時
+            if ball_x > 0:
+                # 右サイドにボールがある
+                if ball_y > 0:
+                    def1_pos_y = self.line_down_r_y + (self.line_up_r_y - self.line_down_r_y)*t_2
+                    def1_pos_x = self.line_up_r_x + (self.line_down_r_x - self.line_up_r_x)*t_2
+                    def2_pos_y = 0.0
+                    def2_pos_x = 0.0
+                    rospy.loginfo("3-1")
+                # 左サイドにボールがある
+                else:
+                    def1_pos_y = self.line_up_r_y + (self.line_down_r_y - self.line_up_r_y)*t_2
+                    def1_pos_x = self.line_down_r_x + (self.line_up_r_x - self.line_down_r_x)*t_2
+                    def2_pos_y = 0.0
+                    def2_pos_x = 0.0
+                    rospy.loginfo("3-2")
+            # 2台の時
+            else:
+                # 右サイドにボールがある
+                if ball_y > 0:
+                    def2_pos_y = self.line_down_r_y + (self.line_up_r_y - self.line_down_r_y)*t_2
+                    def2_pos_x = self.line_down_r_x + (self.line_up_r_x - self.line_down_r_x)*t_2
+                    def1_pos_y = self.line_down_r_y + 3.0*(self.line_up_r_y - self.line_down_r_y)*t_2
+                    def1_pos_x = self.line_down_r_x + 3.0*(self.line_up_r_x - self.line_down_r_x)*t_2
+                    rospy.loginfo("3-3")
+                # 左サイドにボールがある
+                else:
+                    def1_pos_y = self.line_up_r_y + (self.line_down_r_y - self.line_up_r_y)*t_2
+                    def1_pos_x = self.line_up_r_x + (self.line_down_r_x - self.line_up_r_x)*t_2
+                    def2_pos_y = self.line_up_r_y + 3.0*(self.line_down_r_y - self.line_up_r_y)*t_2
+                    def2_pos_x = self.line_up_r_x + 3.0*(self.line_down_r_x - self.line_up_r_x)*t_2
+                    rospy.loginfo("3-4")
+
+        # 念の為クリップ
+        def1_pos_x = np.clip(def1_pos_x, -6.0, 6.0)
+        def1_pos_y = np.clip(def1_pos_y, -4.5, 4.5)
+        def2_pos_x = np.clip(def2_pos_x, -6.0, 6.0)
+        def2_pos_y = np.clip(def2_pos_y, -4.5, 4.5)
+        # パブリッシュ用の変数に代入
+        self.def_pos.def1_pos_x = def1_pos_x
+        self.def_pos.def1_pos_y = def1_pos_y
+        self.def_pos.def2_pos_x = def2_pos_x
+        self.def_pos.def2_pos_y = def2_pos_y
 
 if __name__ == "__main__":
     a = Calculation()
     pub = Publisher()
     
-    #a.odom_listener()
     a.objects.odom_listener()
 
     loop_rate = rospy.Rate(WORLD_LOOP_RATE)
 
-    #time3 = 0
-    #time4 = 0
-
-    print("start calculation node")
+    rospy.loginfo("start calculation node")
 
     while not rospy.is_shutdown():
-        #print(a.ball_params.ball_pos_x,a.ball_params.ball_pos_y)
-
-        #time4 = time3
-        #time3 = time.time()
-        #hz2 = 1 / (time3 - time4)
-        #print(hz2:hz2)
-
-        #rospy.loginfo("hz1:%f\thz2:%f", a.ball_params.hz1, hz2)
-        #rospy.loginfo("%s",a.ball_params.header_time)
-
-        #rospy.spinOnce()
 
         a.calc_ball_line()
         a.calc_def_pos()
-        #a.ball_params.ball_params_publisher()
         pub.ball_params_publisher(a.ball_sub_params)
         pub.def_pos_publisher(a.def_pos)
         loop_rate.sleep()
