@@ -3,8 +3,10 @@
 import numpy as np
 import rospy
 
-class RobotKeeper:
+class RobotKeeper(object):
     def __init__(self, robot_id, objects, ball_params, pid, status, kick):
+        # type: (str, objects.Objects, entity.Ball, robot_pid.RobotPid,
+        #        robot_status.RobotStatus, robot_kick.RobotKick) -> None
         self.robot_id = int(robot_id)
         self.ctrld_robot = objects.robot[int(robot_id)]
         self.friend = objects.robot

@@ -8,7 +8,16 @@ import tf
 
 
 class Objects(object):
+
+    # シングルトン化
+    __instance = None
+    def __new__(cls, *args, **keys):
+        if cls.__instance is None:
+            cls.__instance = object.__new__(cls)
+        return cls.__instance
+
     def __init__(self, team_color, robot_total, enemy_total):
+        # type: (str, int, int) -> None
         self.team_color = team_color
         self.robot_total = robot_total
         self.enemy_total = enemy_total
@@ -16,8 +25,8 @@ class Objects(object):
         self._robot_ids = range(self.robot_total)
         self._enemy_ids = range(self.enemy_total)
 
-        self.robot = [entity.Robot() for i in self._robot_ids]
-        self.enemy = [entity.Robot() for i in self._enemy_ids]
+        self.robot = [entity.Robot() for i in self._robot_ids]  # type: typing.List[entity.Robot]
+        self.enemy = [entity.Robot() for i in self._enemy_ids]  # type: typing.List[entity.Robot]
 
         self.ball = entity.Ball()
 
