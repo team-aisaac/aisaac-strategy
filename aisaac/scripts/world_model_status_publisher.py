@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 from aisaac.msg import Status
@@ -12,7 +12,7 @@ except:
     print("Module: typing (for better completion) not found. You can ignore this.")
 
 
-class StatusPublisher(object):
+class WorldModelStatusPublisher(object):
     def __init__(self, team_color, robot_ids=range(config.NUM_FRIEND_ROBOT)):
         # type: (str, List[int]) -> None
         self._team_color = team_color

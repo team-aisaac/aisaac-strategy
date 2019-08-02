@@ -17,11 +17,15 @@ import config
 
 ROBOT_LOOP_RATE = config.ROBOT_LOOP_RATE
 
-class Robot():
-    def __init__(self):
+class Robot(object):
+    def __init__(self, robot_id=None):
         rospy.init_node("robot")
         self.robot_color = str(rospy.get_param("~robot_color"))
-        self.robot_id = str(rospy.get_param("~robot_num"))
+        
+        if not robot_id:
+            self.robot_id = str(rospy.get_param("~robot_num"))
+        else:
+            self.robot_id = robot_id
 
         self.robot_total = config.NUM_FRIEND_ROBOT
         self.enemy_total = config.NUM_ENEMY_ROBOT
@@ -60,6 +64,7 @@ class Robot():
         self.def_pos_listener()
         rospy.Timer(rospy.Duration(0.1), self.pid.replan_timerCallback)
 
+    def run(self):
         #Loop 処理
         self.loop_rate = rospy.Rate(ROBOT_LOOP_RATE)
         rospy.loginfo("Robot start: "+self.robot_id)
@@ -93,7 +98,7 @@ class Robot():
             self.loop_rate.sleep()
             #elapsed_time = time.time() - start
             #print ("elapsed_time:{0}".format(1./elapsed_time) + "[Hz]")
-            
+
 
 
         """
@@ -130,7 +135,24 @@ class Robot():
         rospy.Subscriber("/" + self.robot_color + "/def_pos", Def_pos, self.defence.def_pos_callback)
 
 if __name__ == "__main__":
-    robot = Robot()
+    is_single_thread = True
+
+    if is_single_thread:
+        robot = Robot()
+        robot.run()
+    else:
+        import threading
+        robots = []
+        for i in range(config.NUM_FRIEND_ROBOT):
+            robot = Robot(str(i))
+            th = threading.Thread(target=robot.run)
+            th.setDaemon(True)
+            th.start()
+
+        while not rospy.is_shutdown():
+            pass
+
+    
 """    
     robot.odom_listener()
     #robot.goal_pose_listener()

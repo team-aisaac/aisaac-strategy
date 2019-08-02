@@ -6,8 +6,9 @@ from referee import Referee
 from objects import Objects
 
 import strategy
-from strategy_calcurator import StrategyCalcurator
-from world_model_status_publisher import StatusPublisher
+from strategy_calcurator import NormalStartStrategyCalcurator
+from strategy_context import StrategyContext
+from world_model_status_publisher import WorldModelStatusPublisher
 
 import config
 
@@ -27,9 +28,16 @@ class WorldModel(object):
 
         """---Referee---"""
         self._referee = Referee(self._objects)
-        self._stcalcurator = StrategyCalcurator(self._objects)
-        self._status_publisher = StatusPublisher(
+        self._stcalcurator = NormalStartStrategyCalcurator(self._objects)
+        self._status_publisher = WorldModelStatusPublisher(
             self._team_color, robot_ids=self._objects.get_robot_ids())
+        
+        # 積分などに必要な情報を保存するオブジェクト
+        self._strategy_context = StrategyContext()
+
+        # とりあえず例として"last_number"という名前で10フレーム分のコンテキストを作成。
+        # 初期値は全て0を指定。
+        self._strategy_context.register_new_context("last_number", 10, 0)
 
     def get_referee(self):
         # type: () -> Referee
@@ -40,8 +48,11 @@ class WorldModel(object):
         return self._status_publisher
 
     def get_strategy_calcurator(self):
-        # type: () -> StrategyCalcurator
+        # type: () -> NormalStartStrategyCalcurator
         return self._stcalcurator
+
+    def get_strategy_context(self):
+        return self._strategy_context
 
 
 if __name__ == "__main__":
@@ -56,29 +67,34 @@ if __name__ == "__main__":
     #   assignment_x, assignment_y, assignment_theta)
 
     status_publisher = world_model.get_status_publisher()
+
     try:
         referee = world_model.get_referee()
-        strategy_calcurator = world_model.get_strategy_calcurator()
+        strat_calcrator = world_model.get_strategy_calcurator()
+        strat_ctx = world_model.get_strategy_context()
+
         while not rospy.is_shutdown():
+            strat_ctx.fire_one_loop_event()
+
             # referee_branch = referee.get_referee_branch()
             referee_branch = "NORMAL_START"
-            strat = strategy.StopStrategy()
+            strat = strategy.StopStaticStrategy()
 
             if referee_branch == "HALT":
-                strat = strategy.HaltStrategy()
+                strat = strategy.HaltStaticStrategy()
             elif referee_branch == "STOP":
-                strat = strategy.StopStrategy()
+                strat = strategy.StopStaticStrategy()
             elif referee_branch == "NORMAL_START":
-                strat = strategy_calcurator.calcurate()
+                strat = strat_calcrator.calcurate(strat_ctx)
             elif referee_branch == "KICKOFF":
-                strat = strategy.KickOffStrategy()
+                strat = strategy.KickOffStaticStrategy()
             elif referee_branch == "DEFENCE":
-                strat = strategy.DefenceStrategy()
+                strat = strategy.DefenceStaticStrategy()
 
-            # status_publisher.publish_all(strat)
+            status_publisher.publish_all(strat)
             loop_rate.sleep()
     except Exception as e:
         import traceback
         traceback.print_exc()
-        status_publisher.publish_all(strategy.StopStrategy())
+        status_publisher.publish_all(strategy.StopStaticStrategy())
         # world_model.decision_maker.stop_all()
