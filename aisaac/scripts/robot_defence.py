@@ -1,12 +1,11 @@
 import math
 
 class RobotDefence:
-    def __init__(self, ball_params, pid, cmd, status, command_pub):
+    def __init__(self, ball_params, pid, cmd, status):
         self.ball_params = ball_params
         self.pid = pid
         self.status = status
         self.cmd = cmd
-        self.command_pub = command_pub
 
         self.def1_pos_x = 0.0
         self.def1_pos_y = 0.0

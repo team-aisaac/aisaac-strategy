@@ -25,7 +25,7 @@ class Objects(object):
         self._robot_ids = range(self.robot_total)
         self._enemy_ids = range(self.enemy_total)
 
-        self.robot = [entity.Robot() for i in self._robot_ids]  # type: typing.List[entity.Robot]
+        self.robot = [entity.Robot(id=i) for i in self._robot_ids]  # type: typing.List[entity.Robot]
         self.enemy = [entity.Robot() for i in self._enemy_ids]  # type: typing.List[entity.Robot]
 
         self.ball = entity.Ball()
