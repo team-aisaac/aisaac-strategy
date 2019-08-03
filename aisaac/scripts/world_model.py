@@ -6,7 +6,7 @@ from referee import Referee
 from objects import Objects
 
 import strategy
-from strategy_calcurator import NormalStartStrategyCalcurator
+from normal_start_strategy_calcurator import NormalStartStrategyCalcurator
 from strategy_context import StrategyContext
 from world_model_status_publisher import WorldModelStatusPublisher
 
