@@ -15,11 +15,9 @@ import entity
 import matplotlib.pyplot as plt
 from matplotlib import animation
 import functions
-from robot_functions import RobotPid
-ROBOT_LOOP_RATE = 60.
-DT =  1. / ROBOT_LOOP_RATE
-COEFFICIENT = 1.
-MAX_SPEED =  3.7
+from robot_pid import RobotPid
+import config
+ROBOT_LOOP_RATE = config.ROBOT_LOOP_RATE
 
 
 class Dribble(RobotPid):
@@ -58,7 +56,7 @@ class Dribble(RobotPid):
 
         if self.goal_pos_init_flag == True:
             self.recursion_count = 0
-            self.next_pos_x, self.next_pos_y = self.pass_plan(goal_pos_x, goal_pos_y)
+            self.next_pos_x, self.next_pos_y = self.path_plan(goal_pos_x, goal_pos_y)
 
         d_x = self.next_pos_x - self.robot_params.current_x
         d_y = self.next_pos_y - self.robot_params.current_y

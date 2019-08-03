@@ -22,8 +22,9 @@ import serial
 import time
 #from aisaac.srv import Kick
 from aisaac.msg import Status
+import config
 
-WORLD_LOOP_RATE = 100.
+WORLD_LOOP_RATE = config.WORLD_LOOP_RATE
 
 #import physics as phy
 """
@@ -992,9 +993,9 @@ class WorldModel():
 
 
 if __name__ == "__main__":
-    a = WorldModel()
-    a.odom_listener()
-    a.referee_listener()
+    #a = WorldModel()
+    #a.odom_listener()
+    #a.referee_listener()
     #a.kick_client()
 
     print("START")

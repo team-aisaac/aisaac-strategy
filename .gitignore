@@ -49,3 +49,23 @@ qtcreator-*
 
 # Catkin custom files
 CATKIN_IGNORE
+
+# Vim
+# Swap
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+
+# Auto-generated tag files
+tags
+
+# Persistent undo
+[._]*.un~
+
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json

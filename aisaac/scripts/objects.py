@@ -3,16 +3,31 @@
 import entity
 import rospy
 from nav_msgs.msg import Odometry
+from aisaac.msg import Ball_sub_params
 import tf
 
 
 class Objects(object):
+
+    # シングルトン化
+    __instance = None
+    def __new__(cls, *args, **keys):
+        if cls.__instance is None:
+            cls.__instance = object.__new__(cls)
+        return cls.__instance
+
     def __init__(self, team_color, robot_total, enemy_total):
+        # type: (str, int, int) -> None
         self.team_color = team_color
         self.robot_total = robot_total
         self.enemy_total = enemy_total
-        self.robot = [entity.Robot() for i in range(self.robot_total)]
-        self.enemy = [entity.Robot() for i in range(self.enemy_total)]
+
+        self._robot_ids = range(self.robot_total)
+        self._enemy_ids = range(self.enemy_total)
+
+        self.robot = [entity.Robot() for i in self._robot_ids]  # type: typing.List[entity.Robot]
+        self.enemy = [entity.Robot() for i in self._enemy_ids]  # type: typing.List[entity.Robot]
+
         self.ball = entity.Ball()
 
         """---ボール軌道の考慮時間幅(linear Regressionで軌道予測するため)---"""
@@ -20,6 +35,12 @@ class Objects(object):
         self.ball_dynamics = [[0., 0.] for i in range(self.ball_dynamics_window)]
 
         self.odom_listener()
+
+    def get_robot_ids(self):
+        return self._robot_ids
+
+    def get_enemy_ids(self):
+        return self._enemy_ids
 
     def set_first_positions(self):
         self.robot[0].set_future_position(x=-5.5, y=0., theta=0.)
@@ -62,6 +83,7 @@ class Objects(object):
             rospy.Subscriber("/" + self.team_color + "/enemy_" + str(j) + "/odom", Odometry, self.enemy_odom_callback, callback_args=j)
 
         rospy.Subscriber("/" + self.team_color + "/ball_observer/estimation", Odometry, self.ball_odom_callback)
+        rospy.Subscriber("/" + self.team_color + "/ball_sub_params", Ball_sub_params, self.ball_sub_params_callback)
 
 
     """---Visionからrobotの現在地をもらう---"""
@@ -69,9 +91,9 @@ class Objects(object):
         robot_x = msg.pose.pose.position.x
         robot_y = msg.pose.pose.position.y
         robot_t = tf.transformations.euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))
-        robot_v_x = msg.twist.twist.linear.x;
-        robot_v_y = msg.twist.twist.linear.y;
-        robot_v_t = msg.twist.twist.linear.z;
+        robot_v_x = msg.twist.twist.linear.x
+        robot_v_y = msg.twist.twist.linear.y
+        robot_v_t = msg.twist.twist.linear.z
         self.robot[id].set_current_position(x = robot_x, y = robot_y, theta=robot_t[2])
         self.robot[id].set_current_velocity(vx = robot_v_x, vy = robot_v_y, vtheta=robot_v_t)
 
@@ -80,9 +102,9 @@ class Objects(object):
         enemy_x = msg.pose.pose.position.x
         enemy_y = msg.pose.pose.position.y
         enemy_t = tf.transformations.euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))
-        enemy_v_x = msg.twist.twist.linear.x;
-        enemy_v_y = msg.twist.twist.linear.y;
-        enemy_v_t = msg.twist.twist.linear.z;
+        enemy_v_x = msg.twist.twist.linear.x
+        enemy_v_y = msg.twist.twist.linear.y
+        enemy_v_t = msg.twist.twist.linear.z
         self.enemy[id].set_current_position(x = enemy_x, y = enemy_y, theta=enemy_t[2])
         self.enemy[id].set_current_velocity(vx = enemy_v_x, vy = enemy_v_y, vtheta=enemy_v_t)
 
@@ -94,3 +116,8 @@ class Objects(object):
         self.ball.set_current_position(x = ball_x, y = ball_y, theta=ball_t[2])
         _ = self.ball_dynamics.pop(0)
         self.ball_dynamics.append([ball_x, ball_y])
+
+    def ball_sub_params_callback(self, msg):
+        self.ball.set_line_a(msg.a)
+        self.ball.set_line_b(msg.b)
+        self.ball.set_future_position(msg.future_x, msg.future_y)
