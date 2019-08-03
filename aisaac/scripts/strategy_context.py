@@ -40,7 +40,7 @@ class StrategyContext(object):
 
         self._last_loop_time = rospy.Time.now()
 
-    def fire_one_loop_event(self):
+    def handle_loop_callback(self):
         # ループ一回につき１度だけ呼ぶイベント。必ずフレームと同じ回数(60FPSなら60回/秒)だけ呼ぶこと。
 
         self.update("__last_loop_time__", rospy.Time.now())
