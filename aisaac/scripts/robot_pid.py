@@ -421,7 +421,7 @@ class RobotPid(object):
 
         max_velocity = config.ROBOT_MAX_VELOCITY # m/s 機体の最高速度
         vel_vector = np.array([Vx, Vy])
-        vel_vector_norm = nplinalg.norm(vel_vector)
+        vel_vector_norm = np.linalg.norm(vel_vector)
         if vel_vector_norm > max_velocity:
             vel_vector = vel_vector * max_velocity / vel_vector_norm
             Vx = vel_vector[0]

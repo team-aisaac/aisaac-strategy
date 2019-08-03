@@ -72,7 +72,6 @@ if __name__ == "__main__":
 
     try:
         referee = world_model.get_referee()
-        strat_calcrator = world_model.get_strategy_calcurator()
         strat_ctx = world_model.get_strategy_context()
 
         while not rospy.is_shutdown():
