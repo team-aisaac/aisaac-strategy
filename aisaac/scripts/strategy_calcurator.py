@@ -41,6 +41,7 @@ class StrategyCalcuratorBase(object):
     共通処理のうちでも、引数だけで計算出来、状態がかかわらない計算
     （例：距離の計算は点A(x,y),点B(x,y)がわかればできる）はこのクラスではなく、
     Utilクラスに@staticmethodをつけて実装する（したい）。
+    functions.pyでもOK。
 
     変数命名規則:
         "self._"で始まるもの：StrategyCalcuratorBaseとその子クラスのみからアクセスする変数・関数（protected）
