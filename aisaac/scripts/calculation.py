@@ -352,14 +352,14 @@ class Calculation():
                     def1_pos_x = self.line_up_r_x + (self.line_down_r_x - self.line_up_r_x)*t_2
                     def2_pos_y = 0.0
                     def2_pos_x = 0.0
-                    rospy.loginfo("3-1")
+                    rospy.loginfo_throttle(1, "3-1")
                 # 左サイドにボールがある
                 else:
                     def1_pos_y = self.line_up_r_y + (self.line_down_r_y - self.line_up_r_y)*t_2
                     def1_pos_x = self.line_down_r_x + (self.line_up_r_x - self.line_down_r_x)*t_2
                     def2_pos_y = 0.0
                     def2_pos_x = 0.0
-                    rospy.loginfo("3-2")
+                    rospy.loginfo_throttle(1, "3-1")
             # 2台の時
             else:
                 # 右サイドにボールがある
@@ -368,14 +368,14 @@ class Calculation():
                     def2_pos_x = self.line_down_r_x + (self.line_up_r_x - self.line_down_r_x)*t_2
                     def1_pos_y = self.line_down_r_y + 3.0*(self.line_up_r_y - self.line_down_r_y)*t_2
                     def1_pos_x = self.line_down_r_x + 3.0*(self.line_up_r_x - self.line_down_r_x)*t_2
-                    rospy.loginfo("3-3")
+                    rospy.loginfo_throttle(1, "3-1")
                 # 左サイドにボールがある
                 else:
                     def1_pos_y = self.line_up_r_y + (self.line_down_r_y - self.line_up_r_y)*t_2
                     def1_pos_x = self.line_up_r_x + (self.line_down_r_x - self.line_up_r_x)*t_2
                     def2_pos_y = self.line_up_r_y + 3.0*(self.line_down_r_y - self.line_up_r_y)*t_2
                     def2_pos_x = self.line_up_r_x + 3.0*(self.line_down_r_x - self.line_up_r_x)*t_2
-                    rospy.loginfo("3-4")
+                    rospy.loginfo_throttle(1, "3-1")
 
         # 念の為クリップ
         def1_pos_x = np.clip(def1_pos_x, -6.0, 6.0)
