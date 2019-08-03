@@ -71,8 +71,14 @@ class Entity(object):
 
 
 class Robot(Entity):
-    def __init__(self):
+    def __init__(self, id=None):
         super(Robot, self).__init__()
+        if id:
+            self._id = id
+
+        else:
+            self._id = None
+
         self.size_r = 90.0 / 1000
 
         self.front_degree = 11.86 * 2
@@ -87,6 +93,9 @@ class Robot(Entity):
         self.velocity_surge = 0
         self.velocity_sway = 0
         self.omega = 0
+
+    def get_id(self):
+        return self._id
 
     def has_a_ball(self):
         return self._has_a_ball

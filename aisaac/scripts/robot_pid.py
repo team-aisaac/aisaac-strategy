@@ -419,6 +419,14 @@ class RobotPid(object):
         Vy = self.Kpv * self.pid_p_y + self.Kdv * self.pid_d_y / (1./ROBOT_LOOP_RATE)
         Vr = self.Kpr * self.pid_p_theta + self.Kdr * self.pid_d_theta / (1./ROBOT_LOOP_RATE)
 
+        max_velocity = config.ROBOT_MAX_VELOCITY # m/s 機体の最高速度
+        vel_vector = np.array([Vx, Vy])
+        vel_vector_norm = nplinalg.norm(vel_vector)
+        if vel_vector_norm > max_velocity:
+            vel_vector = vel_vector * max_velocity / vel_vector_norm
+            Vx = vel_vector[0]
+            Vy = vel_vector[1]
+
         self.cmd.vel_surge = Vx*math.cos(self.ctrld_robot.get_current_orientation())+Vy*math.sin(self.ctrld_robot.get_current_orientation())
         self.cmd.vel_sway = -Vx*math.sin(self.ctrld_robot.get_current_orientation())+Vy*math.cos(self.ctrld_robot.get_current_orientation())
         self.cmd.omega = Vr

@@ -65,8 +65,8 @@ class StrategyCalcuratorBase(object):
 
     def __init__(self, objects):
         # type: (Objects) -> None
-        self._objects = objects
-        self._robot = self._objects.robot
+        self._objects = objects # type: Objects
+        self._robot = self._objects.robot # type: entity.
         self._enemy = self._objects.enemy
         self._robot_ids = self._objects.get_robot_ids()
         self._enemy_ids = self._objects.get_enemy_ids()
@@ -90,6 +90,12 @@ class StrategyCalcuratorBase(object):
         active_enemy_ids = self._enemy_ids
         # TODO: アクティブな敵ロボットのIDリストにする
         return active_enemy_ids
+
+    def _get_robot_ids_ordered_by_distance(self, point_x, point_y):
+        # type: (float, float) -> List[int]
+        # TODO:ソートする
+        # sorted_list = sorted(self._robot, key=lambda item: Util.get_distance((point_x,point_y), item.get_current_position()))
+        return self._robot_ids
 
     def _get_who_has_a_ball(self):
         # type: () -> str

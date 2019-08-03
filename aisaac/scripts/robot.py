@@ -52,7 +52,7 @@ class Robot(object):
 
         self.status = RobotStatus(self.pid, self.ctrld_robot)
         self.kick = RobotKick(self.ball_params, self.ctrld_robot, self.pid, self.cmd, self.status, self.command_pub)
-        self.defence = RobotDefence(self.ball_params, self.pid, self.cmd, self.status, self.command_pub)
+        self.defence = RobotDefence(self.ball_params, self.pid, self.cmd, self.status)
         self.keeper = RobotKeeper(self.robot_id, self.objects, self.ball_params, self.pid, self.status, self.kick)
 
         # listner 起動
@@ -69,7 +69,8 @@ class Robot(object):
         self.loop_rate = rospy.Rate(ROBOT_LOOP_RATE)
         rospy.loginfo("Robot start: "+self.robot_id)
         while not rospy.is_shutdown():
-            #start = time.time()
+            # start = time.time()
+
             if self.status.robot_status == "move_linear":
                 self.pid.pid_linear(self.ctrld_robot.get_future_position()[0],
                                     self.ctrld_robot.get_future_position()[1],

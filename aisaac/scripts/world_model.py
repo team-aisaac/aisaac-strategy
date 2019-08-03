@@ -28,7 +28,9 @@ class WorldModel(object):
 
         """---Referee---"""
         self._referee = Referee(self._objects)
-        self._stcalcurator = NormalStartStrategyCalcurator(self._objects)
+        self._stcalcurator = {
+            'normal_start': NormalStartStrategyCalcurator(self._objects)
+        }
         self._status_publisher = WorldModelStatusPublisher(
             self._team_color, robot_ids=self._objects.get_robot_ids())
         
@@ -47,9 +49,9 @@ class WorldModel(object):
         # type: () -> StatusPublisher
         return self._status_publisher
 
-    def get_strategy_calcurator(self):
-        # type: () -> NormalStartStrategyCalcurator
-        return self._stcalcurator
+    def get_strategy_calcurator(self, key):
+        # type: () -> StrategyCalcuratorBase
+        return self._stcalcurator[key]
 
     def get_strategy_context(self):
         return self._strategy_context
@@ -85,6 +87,7 @@ if __name__ == "__main__":
             elif referee_branch == "STOP":
                 strat = strategy.StopStaticStrategy()
             elif referee_branch == "NORMAL_START":
+                strat_calcrator = world_model.get_strategy_calcurator('normal_start')
                 strat = strat_calcrator.calcurate(strat_ctx)
             elif referee_branch == "KICKOFF":
                 strat = strategy.KickOffStaticStrategy()
