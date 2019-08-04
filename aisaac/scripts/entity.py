@@ -1,22 +1,32 @@
+#!/usr/bin/env  python
+# coding:utf-8
 import numpy as np
 import random
 from context import RobotContext
+import config
 
 class Entity(object):
     def __init__(self):
         self.field_x_size = 12000.
         self.field_y_size = 9000.
         self.size_r = 0.
+
+        """
+        position情報はvision_positionとcurrent_positionの2つを用意する
+        _vision_position->_current_positionを2パターンで更新する。
+        1. 自分以外のロボット情報およびボール情報
+            vision以外の情報は利用できないので恒等関数
+            _current_position = _vision_position
+        2. 自分自身
+            自分が移動する速度情報とvision情報両方を利用してアップデート
+        """
         self._current_position_x = 0.
         self._current_position_y = 0.
-        #self._current_position_x = random.uniform(-self.field_x_size/2, self.field_x_size/2)
-        #self._current_position_y = random.uniform(-self.field_y_size/2, self.field_y_size/2)
         self._current_orientation = 0.
 
-        self._future_position_x = 0.
-        self._future_position_y = 0.
-        self._future_orientation = 0.
-
+        self._vision_position_x = 0.
+        self._vision_position_y = 0.
+        self._vision_orientation = 0.
 
     def set_current_position(self, x, y, theta=None):
         self._current_position_x = x
@@ -110,6 +120,38 @@ class Robot(Entity):
         self._pass_target_pos_x = x
         self._pass_target_pos_y = y
 
+    # カルマンフィルタ用のセッター
+    def set_current_position_for_filter(self, x, y, theta, x_sigma_square, y_sigma_square, theta_sigma_square):
+        self._current_position_x = x
+        self._current_position_y = y
+        self._current_orientation = theta
+        self._current_position_x_sigma = x_sigma
+        self._current_position_y_sigma = y_sigma
+        self._current_orientation_sigma = theta_sigma
+
+    # カルマンフィルタ用のゲッター
+    def get_current_position_for_filter(self):
+        return self._current_position_x, self._current_position_y, self._current_orientation, \
+                self._current_position_x_sigma, self._current_position_y_sigma, self._current_orientation_sigma
+
+    def get_vision_position(self):
+        return self._vision_position_x, self._vision_position_y, self._vision_orientation
+
+    def set_vision_position(self, x, y, theta):
+        self._vision_position_x = x
+        self._vision_position_y = y
+        self._vision_orientation = theta
+
+
+
+    # def set_current_position(self, x, y, theta):
+    #     None
+    # def set_current_velosity(self, x, y, theta):
+    #     None
+
+    # def get_future_position(self):
+    #     return self.future_position_x, self.future_position_y, self.future_orientation
+
     def get_pass_target_position(self):
         return self._pass_target_pos_x, self._pass_target_pos_y
 
@@ -147,4 +189,3 @@ class Ball(Entity):
 
     def set_line_b(self, b):
         self._line_b = b
-

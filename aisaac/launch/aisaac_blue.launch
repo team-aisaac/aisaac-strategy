@@ -34,9 +34,7 @@
     <!-- <node name="decision_making" pkg="aisaac" type="decision_making.py" output="screen" /> -->
       <!-- <param name="team_color" type="string" value="$(arg color)" /> -->
 
-
-    <node name="decision_making" pkg="aisaac" type="world_model.py" output="screen" />
-
+    <node name="world_model" pkg="aisaac" type="world_model.py" output="screen" />
       <param name="team_color" type="string" value="$(arg color)" />
 
     <node name="launch_manager" pkg="launch_manager" type="launch_manager.py" required="true"/>
@@ -78,18 +76,21 @@
       <param name="robot_side" value="$(arg side)" />
     </node>
 
+  <!--
     <node name="robot5" pkg="aisaac" type="robot.py" output="screen">
       <param name="robot_num" type="int" value="5" />
       <param name="robot_color" value="$(arg color)" />
       <param name="robot_side" value="$(arg side)" />
     </node>
-
+  -->
+  <!--
     <node name="robot6" pkg="aisaac" type="robot.py" output="screen">
       <param name="robot_num" type="int" value="6" />
       <param name="robot_color" value="$(arg color)" />
       <param name="robot_side" value="$(arg side)" />
     </node>
-
+  -->
+  <!--
     <node name="robot7" pkg="aisaac" type="robot.py" output="screen">
       <param name="robot_num" type="int" value="7" />
       <param name="robot_color" value="$(arg color)" />
@@ -101,7 +102,7 @@
       <param name="robot_side" value="$(arg side)" />
       <!-- <param name="robot_num" type="int" value="8" /> -->
     </node>
-
+  -->
   </group>
 
 </launch>
