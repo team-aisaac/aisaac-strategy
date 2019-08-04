@@ -2,6 +2,7 @@
 # coding:utf-8
 import numpy as np
 import random
+import config
 
 class Entity(object):
     def __init__(self):
@@ -21,6 +22,7 @@ class Entity(object):
         self._current_position_x = 0.
         self._current_position_y = 0.
         self._current_orientation = 0.
+
         self._vision_position_x = 0.
         self._vision_position_y = 0.
         self._vision_orientation = 0.
@@ -31,22 +33,6 @@ class Entity(object):
 
         if theta:
             self._current_orientation = theta
-
-    def set_current_velocity(self, vx, vy, vtheta=None):
-        self._current_velocity_x = vx
-        self._current_velocity_y = vy
-
-        if vtheta:
-            self._current_velocity_orientation = vtheta
-
-    def set_current_velocity_orientation(self, vtheta):
-        self._current_velocity_orientation = vtheta
-
-    def get_current_velocity(self):
-        return self._current_velocity_x, self._current_velocity_y
-
-    def get_current_velocity_orientation(self):
-        return self._current_velocity_orientation
 
 
 class Robot(Entity):
@@ -73,12 +59,14 @@ class Robot(Entity):
         self.velocity_sway = 0
         self.omega = 0
 
+        self._current_velocity_x = 0.
+        self._current_velocity_y = 0.
+        self._current_velocity_orientation = 0.
+
         # カルマンフィルタ用にcurrent_positionの信用度(分散行列の対角成分をもたせる)
-        # パラメータは修正の必要あり
-        # 初期値は小さいほうがよい（更新で利用するVisionデータを優先する）
-        self._current_position_x_sigma_square = self.field_x_size / 1000.
-        self._current_position_y_sigma_square = self.field_y_size / 1000.
-        self._current_orientation_sigma_square = np.pi
+        self._current_position_x_sigma = config.INITIAL_POSITION_SIGMA
+        self._current_position_y_sigma = config.INITIAL_POSITION_SIGMA
+        self._current_orientation_sigma = config.INITIAL_ORIENTATION_SIGMA
 
     def get_id(self):
         return self._id
@@ -90,19 +78,38 @@ class Robot(Entity):
         self._pass_target_pos_x = x
         self._pass_target_pos_y = y
 
+    def set_current_velocity(self, vx, vy, vtheta=None):
+        self._current_velocity_x = vx
+        self._current_velocity_y = vy
+
+        if vtheta:
+            self._current_velocity_orientation = vtheta
+
+    def get_current_velocity(self):
+        return self._current_velocity_x, self._current_velocity_y, self._current_velocity_orientation
+
     # カルマンフィルタ用のセッター
-    def set_current_position_through_filter(self, x, y, theta, x_sigma_square, y_sigma_square, theta_sigma_square):
+    def set_current_position_for_filter(self, x, y, theta, x_sigma_square, y_sigma_square, theta_sigma_square):
         self._current_position_x = x
         self._current_position_y = y
         self._current_orientation = theta
-        self._current_position_x_sigma_square = x_sigma_square
-        self._current_position_y_sigma_square = y_sigma_square
-        self._current_orientation_sigma_square = theta_sigma_square
+        self._current_position_x_sigma = x_sigma
+        self._current_position_y_sigma = y_sigma
+        self._current_orientation_sigma = theta_sigma
 
     # カルマンフィルタ用のゲッター
-    def get_current_position_through_filter(self):
+    def get_current_position_for_filter(self):
         return self._current_position_x, self._current_position_y, self._current_orientation, \
-                self._current_position_x_sigma_square, self._current_position_y_sigma_square, self._current_orientation_sigma_square
+                self._current_position_x_sigma, self._current_position_y_sigma, self._current_orientation_sigma
+
+    def get_vision_position(self):
+        return self._vision_position_x, self._vision_position_y, self._vision_orientation
+
+    def set_vision_position(self, x, y, theta):
+        self._vision_position_x = x
+        self._vision_position_y = y
+        self._vision_orientation = theta
+
 
 
     # def set_current_position(self, x, y, theta):
