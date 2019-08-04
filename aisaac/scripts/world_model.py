@@ -86,6 +86,13 @@ if __name__ == "__main__":
         world_model.add_loop_event_listener(strat_ctx.handle_loop_callback)
 
         while not rospy.is_shutdown():
+            # 恒等関数フィルタの適用
+            # vision_positionからcurrent_positionを決定してつめる
+            for robot in self.robot_friend:
+                IdentityFilter(robot)
+            for enemy in self.robot_enemy:
+                IdentityFilter(enemy)
+
             # referee_branch = referee.get_referee_branch()
             referee_branch = "NORMAL_START"
             strat = strategy.StopStaticStrategy()

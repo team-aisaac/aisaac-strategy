@@ -271,7 +271,7 @@ class DecisionMaker:
         #velocity_difference = np.sqrt( (((goal_x - current_x) * 3.7 / distance) - current_vx)**2 + (((goal_y - current_y) * 3.7 / distance) - current_vy)**2 )
         collision = self.count_collision(robot_id, current_x, current_y, goal_x, goal_y)
         velocity_difference = 0.
-                
+
         move_cost = distance * 1.# + velocity_difference * 0.1 + collision * 3.
 
         return move_cost

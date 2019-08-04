@@ -16,6 +16,8 @@ from context import RobotContext
 from objects import Objects
 from robot_command_publisher_wrapper import RobotCommandPublisherWrapper
 
+from filter import KalmanFilter, IdentityFilter
+
 import config
 
 ROBOT_LOOP_RATE = config.ROBOT_LOOP_RATE
@@ -98,6 +100,18 @@ class Robot(object):
 
         while not rospy.is_shutdown():
             # start = time.time()
+
+            # カルマンフィルタ,恒等関数フィルタの適用
+            # vision_positionからcurrent_positionを決定してつめる
+            KalmanFilter(self.ctrld_robot)
+            for robot in self.robot_friend:
+                if robot.get_id() == self.ctrld_robot.get_id():
+                    continue
+                else:
+                    IdentityFilter(robot)
+            for enemy in self.robot_enemy:
+                IdentityFilter(enemy)
+
 
             if self.status.robot_status == "move_linear":
                 self.pid.pid_linear(self.ctrld_robot.get_future_position()[0],
@@ -196,7 +210,7 @@ if __name__ == "__main__":
             pass
 
 
-"""    
+"""
     robot.odom_listener()
     #robot.goal_pose_listener()
     #robot.goal_pose_listener()
@@ -220,5 +234,5 @@ if __name__ == "__main__":
 
         print(robot.status.robot_status)
         loop_rate.sleep()
-    
+
 """
