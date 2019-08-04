@@ -91,5 +91,43 @@ class Dribble(RobotPid):
         self.cmd.omega = Vr
         self.command_pub.publish(self.cmd)
 
-    def replan_timerCallback(self, event):
+    def pid_circle(self, center_x, center_y, x, y, theta):
+        self.Kpv = 2
+        self.Kpr = 7
+        self.Kdr = 4
+        d_x = center_x - self.robot_params.current_x
+        d_y = center_y - self.robot_params.current_y
+        d_theta = theta - self.robot_params.current_theta
+        if self.goal_pos_init_flag:
+            self.goal_pos_init_flag = False
+            self.pid_d_theta = d_theta
+            self.pid_p_prev_theta = d_theta
+        else:
+            self.pid_d_theta = d_theta - self.pid_p_prev_theta
+            self.pid_p_prev_theta = d_theta
+
+        self.pid_p_x = d_x
+        self.pid_p_y = d_y
+        self.pid_p_theta = d_theta
+
+        Vx = 0
+        Vy = 0
+        Vr = 0
+
+        Vx_tangent = 0
+        Vy_tangent = 0
+
+        if math.sqrt(d_x * d_x + d_y * d_y) != 0:
+            Vx = self.Kpv * self.pid_p_x
+            Vy = self.Kpv * self.pid_p_y
+            Vr = self.Kpr * self.pid_p_theta + self.Kdr * self.pid_d_theta / (1./ROBOT_LOOP_RATE)
+            Vx_tangent = (-d_y / math.sqrt(d_x * d_x + d_y * d_y)) * 2
+            Vy_tangent = (d_x / math.sqrt(d_x * d_x + d_y * d_y)) * 2
+
+            self.cmd.vel_surge=(Vx + Vx_tangent)*math.cos(self.robot_params.current_theta)+(Vy + Vy_tangent)*math.sin(self.robot_params.current_theta)
+            self.cmd.vel_sway=-(Vx + Vx_tangent)*math.sin(self.robot_params.current_theta)+(Vy + Vy_tangent)*math.cos(self.robot_params.current_theta)
+            self.cmd.omega=Vr
+            self.command_pub.publish(self.cmd)
+
+    def replan_timer_callback(self, event):
         self.goal_pos_init_flag = True

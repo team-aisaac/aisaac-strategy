@@ -11,37 +11,9 @@ VISION_ORIENTATION_SIGMA = config.VISION_ORIENTATION_SIGMA
 ACTION_POSITION_SIGMA = config.ACTION_POSITION_SIGMA
 ACTION_ORIENTATION_SIGMA = config.ACTION_ORIENTATION_SIGMA
 
-class KalmanFilteredPosition(object):
-    '''
-    位置推定のカルマンフィルタ
-    精度が上がるかはわからんが、Visoion情報と速度情報を利用して
-    Vision情報のノイズを下げるフィルタ
-    ただし、速度情報の遅延が考えられるのでそこは考慮する必要がある
-    シミュレータ上を想定して遅延なしをまず実装する
-    initで位置ノイズ、観測ノイズ、初期ノイズを指定
-    ノイズ行列は無相関で全部同じ値を仮定
-    ---------
-    [input]
-    visionのtにおける(x,y,theta)の平均と分散
-    robotがもつt-1における(x,y,thta)の平均と分散
-    ----------
-    [output]
-    robotがもつtにおける(x,y,thta)
-    '''
-    def __init__(self, robot):
-        self.robot = robot
-        self.position_noise = 0.01
-        self.observation_noise = 0.01
-        self.initial_noise = 0.01
-        self.delta_t = 1/60
-
-    def update(self, position_before, velocity, observe_position):
-        mu_prediction = position_before + self.delta_t * observe_position
-        sigma_prediction = sigma_before +
-
 def KalmanFilter(robot):
     x, y, theta, x_sigma, y_sigma, theta_sigma = robot.get_current_position_for_filter()
-    vx, vy, v_theta = robot.get_current_velocity()
+    vx, vy, v_theta = robot.get_last_expected_velocity()
     # 行動による信念アップデート
     x += vx * ROBOT_DT
     y += vy * ROBOT_DT
@@ -62,10 +34,9 @@ def KalmanFilter(robot):
     updated_y_sigma = (1. - vision_y_sigma) * y_sigma
     updated_theta_sigma = (1. - vision_theta_sigma) * theta_sigma
 
-    # アップデートした信念を追加
+    # アップデートした信念で上書き
     robot.set_current_position_for_filter(updated_x, updated_y, updated_theta, updated_x_sigma,updated_y_sigma, updated_theta_sigma)
 
-
-
-if __name__ == '__main__':
-    pass
+def IdentityFilter(robot):
+    x, y, theta = robot.get_vision_position()
+    robot.set_current_position(x, y, theta)

@@ -94,7 +94,7 @@ class Objects(object):
         robot_v_x = msg.twist.twist.linear.x
         robot_v_y = msg.twist.twist.linear.y
         robot_v_t = msg.twist.twist.linear.z
-        self.robot[id].set_current_position(x = robot_x, y = robot_y, theta=robot_t[2])
+        self.robot[id].set_vision_position(x = robot_x, y = robot_y, theta=robot_t[2])
         self.robot[id].set_current_velocity(vx = robot_v_x, vy = robot_v_y, vtheta=robot_v_t)
 
     """---Visionからenemyの現在地をもらう---"""
@@ -105,7 +105,7 @@ class Objects(object):
         enemy_v_x = msg.twist.twist.linear.x
         enemy_v_y = msg.twist.twist.linear.y
         enemy_v_t = msg.twist.twist.linear.z
-        self.enemy[id].set_current_position(x = enemy_x, y = enemy_y, theta=enemy_t[2])
+        self.enemy[id].set_vision_position(x = enemy_x, y = enemy_y, theta=enemy_t[2])
         self.enemy[id].set_current_velocity(vx = enemy_v_x, vy = enemy_v_y, vtheta=enemy_v_t)
 
     """---Visionからballの現在地をもらう---"""

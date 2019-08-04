@@ -35,6 +35,12 @@ def calculate_contact(a, b, c, x_0, y_0):
     y = denominator * (-a * b * x_0 + a**2 * y_0 - b * c)
     return x, y
 
+
+"""---二点間距離計算---"""
+def distance_btw_two_points(point_a, point_b):
+    return math.sqrt((point_a[0] - point_b[0])**2
+                     + (point_a[1] - point_b[1])**2)
+
 """---点と直線の距離の計算---"""
 def distance_of_a_point_and_a_straight_line(x_0, y_0, a, b, c):
     d = abs(a * x_0 + b * y_0 + c) / np.sqrt(a**2 + b**2)
