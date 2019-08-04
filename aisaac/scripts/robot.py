@@ -74,6 +74,22 @@ class Robot(object):
 
         self._command_pub.publish(self.cmd)
 
+    def reset_cmd(self):
+        default_cmd = robot_commands()
+        default_cmd.kick_speed_x = 0
+        default_cmd.kick_speed_z = 0
+        default_cmd.dribble_power = 0
+
+        self.cmd.vel_x = default_cmd.vel_x
+        self.cmd.vel_y = default_cmd.vel_y
+        self.cmd.vel_surge = default_cmd.vel_surge
+        self.cmd.vel_sway = default_cmd.vel_sway
+        self.cmd.omega = default_cmd.omega
+        self.cmd.theta = default_cmd.theta
+        self.cmd.kick_speed_x = default_cmd.kick_speed_x
+        self.cmd.kick_speed_z = default_cmd.kick_speed_z
+        self.cmd.dribble_power = default_cmd.dribble_power
+
 
     def run(self):
         # Loop 処理
@@ -114,6 +130,9 @@ class Robot(object):
                     self.defence.def2_pos_x, self.defence.def2_pos_y)
             elif self.status.robot_status == "keeper":
                 self.keeper.keeper()
+            elif self.status.robot_status == "stop":
+                self.reset_cmd()
+                self.status.robot_status = "none"
 
             self.store_and_publish_commands()
             loop_rate.sleep()
