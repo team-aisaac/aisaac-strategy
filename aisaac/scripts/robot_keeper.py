@@ -3,17 +3,16 @@
 import numpy as np
 import rospy
 
+
 class RobotKeeper(object):
-    def __init__(self, robot_id, objects, ball_params, pid, status, kick):
-        # type: (str, objects.Objects, entity.Ball, robot_pid.RobotPid,
-        #        robot_status.RobotStatus, robot_kick.RobotKick) -> None
-        self.robot_id = int(robot_id)
-        self.ctrld_robot = objects.robot[int(robot_id)]
-        self.friend = objects.robot
-        self.enemy = objects.enemy
-        self.ball_params = ball_params
-        self.pid = pid
-        self.status = status
+    def __init__(self, kick):
+        # type: (robot_kick.RobotKick) -> None
+
+        self.robot_id = kick.pid.robot_id
+        self.ctrld_robot = kick.pid.ctrld_robot
+        self.friend = kick.pid.friend
+        self.enemy = kick.pid.enemy
+        self.ball_params = kick.ball_params
         self.kick = kick
         self.team_side =  str(rospy.get_param("team_side"))
         self.goal_right = [6, -0.620]
@@ -356,6 +355,5 @@ class RobotKeeper(object):
             shel = self.sort_sheltered_area(shel_r, shel_l)
             defense_point_x, defense_point_y = self.culc_defense_point(shel)
         x, y, theta = self.calc_keeper_position(defense_point_x, defense_point_y)
-        #self.pid.pid_linear(x, y, theta)
         self.kick.receive_ball(x, y)
 

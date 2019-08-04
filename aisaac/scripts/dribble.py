@@ -116,5 +116,5 @@ class dribble(RobotPid):
             self.cmd.omega=Vr
             self.command_pub.publish(self.cmd)
 
-    def replan_timerCallback(self, event):
+    def replan_timer_callback(self, event):
         self.goal_pos_init_flag = True

@@ -4,25 +4,20 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 import functions
-from statistics import variance
-from entity import Ball
 
-class RobotKick:
-    def __init__(self, ball_params, ctrld_robot, pid, cmd, status, command_pub):
-        """
-        Parameters
-        ----------
-        ball_params: Ball
-        """
+
+class RobotKick(object):
+    def __init__(self, pid, cmd, status):
+        # type: (entity.Ball, entity.Robot, robot_pid.RobotPid,
+        #        aisaac.msg.Status, robot_status.RobotStatus) -> None
         self.kick_power_x = 10
         self.kick_power_z = 0
 
-        self.ball_params = ball_params
-        self.ctrld_robot = ctrld_robot
+        self.ball_params = pid.ball_params
+        self.ctrld_robot = pid.ctrld_robot
         self.pid = pid
         self.status = status
         self.cmd = cmd
-        self.command_pub = command_pub
         self.dispersion1 = [10] * 1
         self.dispersion2 = [10] * 1
         self.rot_dispersion = [10] * 1
@@ -58,12 +53,13 @@ class RobotKick:
 
     def kick_x(self):
         area = 0.5
-        if math.sqrt((self.ball_params.get_current_position()[0] - self.ctrld_robot.get_current_position()[0])**2 + (self.ball_params.get_current_position()[1] - self.ctrld_robot.get_current_position()[1])**2) > self.ctrld_robot.size_r + area:
+        if functions.distance_btw_two_points(self.ball_params.get_current_position(),
+                                             self.ctrld_robot.get_current_position()) \
+                > self.ctrld_robot.size_r + area:
             self.cmd.vel_surge = 0
             self.cmd.vel_sway = 0
             self.cmd.omega = 0
             self.cmd.kick_speed_x = 0
-            self.command_pub.publish(self.cmd)
             self.status.robot_status = "None"
             self.pass_stage = 0
             self.dispersion1 = [10] * 1
@@ -71,9 +67,9 @@ class RobotKick:
             return
 
         self.cmd.kick_speed_x = self.kick_power_x
+
         self.pid.pid_linear(self.ball_params.get_current_position()[0], self.ball_params.get_current_position()[1], self.pose_theta)
         #self.cmd.vel_surge = 3
-        self.command_pub.publish(self.cmd)
 
     def pass_ball(self, target_x, target_y):
         distance = math.sqrt((target_x - self.ball_params.get_current_position()[0])**2 + (target_y - self.ball_params.get_current_position()[1])**2)

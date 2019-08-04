@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from strategy import StrategyBase
 import copy
 import rospy
 
@@ -11,7 +10,7 @@ except:
     print("Module: typing (for better completion) not found. You can ignore this.")
 
 
-class StrategyContext(object):
+class ContextBase(object):
     """
     過去のループでの情報をFPSに同期して保持しておくためのクラス
     """
@@ -23,6 +22,8 @@ class StrategyContext(object):
 
         # dtを得るための時間情報
         self.register_new_context("__last_loop_time__", 2, rospy.Time.now())
+
+        self._updated = False
 
     def register_new_context(self, key, length, default, strict=False):
         # type: (str, int, object, bool) -> None
@@ -40,15 +41,21 @@ class StrategyContext(object):
 
         self._last_loop_time = rospy.Time.now()
 
-    def fire_one_loop_event(self):
+    def handle_loop_callback(self):
         # ループ一回につき１度だけ呼ぶイベント。必ずフレームと同じ回数(60FPSなら60回/秒)だけ呼ぶこと。
 
         self.update("__last_loop_time__", rospy.Time.now())
+        self._updated = True
 
         for key in self._new_context:
             self._context[key].append(copy.deepcopy(self._new_context[key]))
             self._context[key].pop(0)
         self._new_context = {}
+
+    def is_valid(self):
+        # 一度もcallbackが呼ばれていない場合、このコンテキストは管理されていない。
+        # handle_loop_callbackを毎ループ呼ぶ必要がある。
+        return self._updated
 
     def update(self, key, new_value):
         # type: (str, object) -> None
@@ -96,3 +103,11 @@ class StrategyContext(object):
         # type: (str) -> object
         # 最も古いデータを取得する関数
         return self._context[key][0]
+
+
+class RobotContext(ContextBase):
+    pass
+
+
+class StrategyContext(ContextBase):
+    pass

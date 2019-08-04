@@ -7,7 +7,7 @@ from objects import Objects
 
 import strategy
 from normal_start_strategy_calcurator import NormalStartStrategyCalcurator
-from strategy_context import StrategyContext
+from context import StrategyContext
 from world_model_status_publisher import WorldModelStatusPublisher
 
 import config
@@ -33,13 +33,21 @@ class WorldModel(object):
         }
         self._status_publisher = WorldModelStatusPublisher(
             self._team_color, robot_ids=self._objects.get_robot_ids())
-        
+
         # 積分などに必要な情報を保存するオブジェクト
         self._strategy_context = StrategyContext()
 
         # とりあえず例として"last_number"という名前で10フレーム分のコンテキストを作成。
         # 初期値は全て0を指定。
         self._strategy_context.register_new_context("last_number", 10, 0)
+        self._loop_events = []
+
+    def add_loop_event_listener(self, callback):
+        self._loop_events.append(callback)
+
+    def trigger_loop_events(self):
+        for callback in self._loop_events:
+            callback()
 
     def get_referee(self):
         # type: () -> Referee
@@ -54,6 +62,7 @@ class WorldModel(object):
         return self._stcalcurator[key]
 
     def get_strategy_context(self):
+        # type: () -> StrategyContext
         return self._strategy_context
 
 
@@ -74,9 +83,9 @@ if __name__ == "__main__":
         referee = world_model.get_referee()
         strat_ctx = world_model.get_strategy_context()
 
-        while not rospy.is_shutdown():
-            strat_ctx.fire_one_loop_event()
+        world_model.add_loop_event_listener(strat_ctx.handle_loop_callback)
 
+        while not rospy.is_shutdown():
             # referee_branch = referee.get_referee_branch()
             referee_branch = "NORMAL_START"
             strat = strategy.StopStaticStrategy()
@@ -86,7 +95,8 @@ if __name__ == "__main__":
             elif referee_branch == "STOP":
                 strat = strategy.StopStaticStrategy()
             elif referee_branch == "NORMAL_START":
-                strat_calcrator = world_model.get_strategy_calcurator('normal_start')
+                strat_calcrator = world_model.get_strategy_calcurator(
+                    'normal_start')
                 strat = strat_calcrator.calcurate(strat_ctx)
             elif referee_branch == "KICKOFF":
                 strat = strategy.KickOffStaticStrategy()
@@ -94,6 +104,7 @@ if __name__ == "__main__":
                 strat = strategy.DefenceStaticStrategy()
 
             # status_publisher.publish_all(strat)
+            world_model.trigger_loop_events()
             loop_rate.sleep()
     except Exception as e:
         import traceback

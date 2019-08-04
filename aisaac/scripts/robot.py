@@ -1,6 +1,7 @@
 #!/usr/bin/env  python
 # coding:utf-8
 import rospy
+
 from consai_msgs.msg import robot_commands
 from aisaac.msg import Status, Ball_sub_params, Def_pos
 from aisaac.srv import pid
@@ -10,18 +11,21 @@ from robot_pid import RobotPid
 from robot_status import RobotStatus
 from robot_defence import RobotDefence
 from robot_keeper import RobotKeeper
+from context import RobotContext
 
 from objects import Objects
+from robot_command_publisher_wrapper import RobotCommandPublisherWrapper
 
 import config
 
 ROBOT_LOOP_RATE = config.ROBOT_LOOP_RATE
 
+
 class Robot(object):
     def __init__(self, robot_id=None):
         rospy.init_node("robot")
         self.robot_color = str(rospy.get_param("~robot_color"))
-        
+
         if not robot_id:
             self.robot_id = str(rospy.get_param("~robot_num"))
         else:
@@ -35,39 +39,47 @@ class Robot(object):
         self.cmd.kick_speed_z = 0
         self.cmd.dribble_power = 0
 
-        self.command_pub = rospy.Publisher("/" + self.robot_color + "/robot_" + self.robot_id + "/robot_commands", robot_commands, queue_size=10)
+        self._command_pub = RobotCommandPublisherWrapper(self.robot_color, self.robot_id)
 
         # Composition
         self.objects = Objects(self.robot_color, self.robot_total, self.enemy_total)
-
-        self.ctrld_robot = self.objects.robot[int(self.robot_id)]
+        self.ctrld_robot = self.objects.robot[int(self.robot_id)] # type: entity.Robot
 
         self.robot_friend = self.objects.robot
         self.robot_enemy = self.objects.enemy
 
         self.ball_params = self.objects.ball
 
-        # self.pid = RobotPid(self.ctrld_robot, self.ball_params, self.cmd, self.command_pub)
-        self.pid = RobotPid(self.robot_id, self.objects, self.cmd, self.command_pub)
-
-        self.status = RobotStatus(self.pid, self.ctrld_robot)
-        self.kick = RobotKick(self.ball_params, self.ctrld_robot, self.pid, self.cmd, self.status, self.command_pub)
-        self.defence = RobotDefence(self.ball_params, self.pid, self.cmd, self.status)
-        self.keeper = RobotKeeper(self.robot_id, self.objects, self.ball_params, self.pid, self.status, self.kick)
+        self.pid = RobotPid(self.robot_id, self.objects, self.cmd)
+        self.status = RobotStatus(self.pid)
+        self.kick = RobotKick(self.pid, self.cmd, self.status)
+        self.defence = RobotDefence(self.status)
+        self.keeper = RobotKeeper(self.kick)
 
         # listner 起動
         # self.odom_listener()
-        #self.goal_pose_listener()
-        #self.target_pose_listener()
+        # self.goal_pose_listener()
+        # self.target_pose_listener()
         self.status_listener()
         self.set_pid_server()
         self.def_pos_listener()
-        rospy.Timer(rospy.Duration(0.1), self.pid.replan_timerCallback)
+        rospy.Timer(rospy.Duration(0.1), self.pid.replan_timer_callback)
+
+
+    def store_and_publish_commands(self):
+        self.ctrld_robot.update_expected_velocity_context(self.cmd.vel_x,
+                                                          self.cmd.vel_y,
+                                                          self.cmd.omega)
+        self.ctrld_robot.handle_loop_callback()
+
+        self._command_pub.publish(self.cmd)
+
 
     def run(self):
-        #Loop 処理
-        self.loop_rate = rospy.Rate(ROBOT_LOOP_RATE)
-        rospy.loginfo("Robot start: "+self.robot_id)
+        # Loop 処理
+        loop_rate = rospy.Rate(ROBOT_LOOP_RATE)
+        rospy.loginfo("start robot node: "+self.robot_id)
+
         while not rospy.is_shutdown():
             # start = time.time()
 
@@ -77,30 +89,37 @@ class Robot(object):
                                     self.ctrld_robot.get_future_orientation())
             elif self.status.robot_status == "move_circle":
                 self.pid.pid_circle(self.pid.pid_circle_center_x, self.pid.pid_circle_center_y,
-                                    self.ctrld_robot.get_future_position()[0], 
+                                    self.ctrld_robot.get_future_position()[0],
                                     self.ctrld_robot.get_future_position()[1],
                                     self.ctrld_robot.get_future_orientation())
             elif self.status.robot_status == "kick":
                 self.kick.kick_x()
             elif self.status.robot_status == "pass":
-                self.kick.pass_ball(self.ctrld_robot.get_pass_target_position()[0], self.ctrld_robot.get_pass_target_position()[1])
+                self.kick.pass_ball(self.ctrld_robot.get_pass_target_position()[0],
+                                    self.ctrld_robot.get_pass_target_position()[1])
             elif self.status.robot_status == "receive":
-                self.kick.receive_ball(self.ctrld_robot.get_pass_target_position()[0],self.ctrld_robot.get_pass_target_position()[1])
+                self.kick.receive_ball(self.ctrld_robot.get_pass_target_position()[0],
+                                       self.ctrld_robot.get_pass_target_position()[1])
             elif self.status.robot_status == "defence1":
-                self.defence.move_defence(self.defence.def1_pos_x,self.defence.def1_pos_y)
+                self.defence.move_defence(
+                    self.defence.def1_pos_x, self.defence.def1_pos_y)
             elif self.status.robot_status == "defence2":
-                self.defence.move_defence(self.defence.def2_pos_x,self.defence.def2_pos_y)
+                self.defence.move_defence(
+                    self.defence.def2_pos_x, self.defence.def2_pos_y)
             elif self.status.robot_status == "defence3":
-                self.kick.receive_ball(self.defence.def1_pos_x,self.defence.def1_pos_y)
+                self.kick.receive_ball(
+                    self.defence.def1_pos_x, self.defence.def1_pos_y)
             elif self.status.robot_status == "defence4":
-                self.kick.receive_ball(self.defence.def2_pos_x,self.defence.def2_pos_y)
+                self.kick.receive_ball(
+                    self.defence.def2_pos_x, self.defence.def2_pos_y)
             elif self.status.robot_status == "keeper":
                 self.keeper.keeper()
-            self.loop_rate.sleep()
+
+            self.store_and_publish_commands()
+            loop_rate.sleep()
+
             #elapsed_time = time.time() - start
             #print ("elapsed_time:{0}".format(1./elapsed_time) + "[Hz]")
-
-
 
         """
 
@@ -113,10 +132,12 @@ class Robot(object):
         """
 
     def status_listener(self):
-        rospy.Subscriber("/" + self.robot_color + "/robot_" + self.robot_id + "/status", Status, self.status.status_callback)
+        rospy.Subscriber("/" + self.robot_color + "/robot_" +
+                         self.robot_id + "/status", Status, self.status.status_callback)
 
     def set_pid_server(self):
-        rospy.Service("/" + self.robot_color + "/robot_" + self.robot_id + "/set_pid", pid, self.pid.set_pid_callback)
+        rospy.Service("/" + self.robot_color + "/robot_" +
+                      self.robot_id + "/set_pid", pid, self.pid.set_pid_callback)
 
     """
     def kick(self, req):
@@ -133,7 +154,9 @@ class Robot(object):
     """
 
     def def_pos_listener(self):
-        rospy.Subscriber("/" + self.robot_color + "/def_pos", Def_pos, self.defence.def_pos_callback)
+        rospy.Subscriber("/" + self.robot_color + "/def_pos",
+                         Def_pos, self.defence.def_pos_callback)
+
 
 if __name__ == "__main__":
     is_single_thread = True
@@ -153,7 +176,7 @@ if __name__ == "__main__":
         while not rospy.is_shutdown():
             pass
 
-    
+
 """    
     robot.odom_listener()
     #robot.goal_pose_listener()
