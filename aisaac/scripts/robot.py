@@ -11,6 +11,7 @@ from robot_pid import RobotPid
 from robot_status import RobotStatus
 from robot_defence import RobotDefence
 from robot_keeper import RobotKeeper
+from context import RobotContext
 
 from objects import Objects
 from robot_command_publisher_wrapper import RobotCommandPublisherWrapper
@@ -42,8 +43,7 @@ class Robot(object):
 
         # Composition
         self.objects = Objects(self.robot_color, self.robot_total, self.enemy_total)
-
-        self.ctrld_robot = self.objects.robot[int(self.robot_id)]
+        self.ctrld_robot = self.objects.robot[int(self.robot_id)] # type: entity.Robot
 
         self.robot_friend = self.objects.robot
         self.robot_enemy = self.objects.enemy
@@ -65,10 +65,21 @@ class Robot(object):
         self.def_pos_listener()
         rospy.Timer(rospy.Duration(0.1), self.pid.replan_timer_callback)
 
+
+    def store_and_publish_commands(self):
+        self.ctrld_robot.update_expected_velocity_context(self.cmd.vel_x,
+                                                          self.cmd.vel_y,
+                                                          self.cmd.omega)
+        self.ctrld_robot.handle_loop_callback()
+
+        self._command_pub.publish(self.cmd)
+
+
     def run(self):
         # Loop 処理
-        self.loop_rate = rospy.Rate(ROBOT_LOOP_RATE)
-        rospy.loginfo("Robot start: "+self.robot_id)
+        loop_rate = rospy.Rate(ROBOT_LOOP_RATE)
+        rospy.loginfo("start robot node: "+self.robot_id)
+
         while not rospy.is_shutdown():
             # start = time.time()
 
@@ -84,11 +95,11 @@ class Robot(object):
             elif self.status.robot_status == "kick":
                 self.kick.kick_x()
             elif self.status.robot_status == "pass":
-                self.kick.pass_ball(self.ctrld_robot.get_pass_target_position()[
-                                    0], self.ctrld_robot.get_pass_target_position()[1])
+                self.kick.pass_ball(self.ctrld_robot.get_pass_target_position()[0],
+                                    self.ctrld_robot.get_pass_target_position()[1])
             elif self.status.robot_status == "receive":
-                self.kick.receive_ball(self.ctrld_robot.get_pass_target_position()[
-                                       0], self.ctrld_robot.get_pass_target_position()[1])
+                self.kick.receive_ball(self.ctrld_robot.get_pass_target_position()[0],
+                                       self.ctrld_robot.get_pass_target_position()[1])
             elif self.status.robot_status == "defence1":
                 self.defence.move_defence(
                     self.defence.def1_pos_x, self.defence.def1_pos_y)
@@ -104,14 +115,11 @@ class Robot(object):
             elif self.status.robot_status == "keeper":
                 self.keeper.keeper()
 
-            self.publish_commands()
+            self.store_and_publish_commands()
+            loop_rate.sleep()
 
-            self.loop_rate.sleep()
             #elapsed_time = time.time() - start
             #print ("elapsed_time:{0}".format(1./elapsed_time) + "[Hz]")
-
-    def publish_commands(self):
-        self._command_pub.publish(self.cmd)
 
         """
 

@@ -360,6 +360,8 @@ class RobotPid(object):
 
         print self.Kpv, self.Kpr, self.Kdv, self.Kdr
 
+        return 1
+
     def pid_linear(self, goal_pos_x, goal_pos_y, goal_pos_theta):
         """
         self.recursion_count = 0
@@ -427,13 +429,17 @@ class RobotPid(object):
             Vx = vel_vector[0]
             Vy = vel_vector[1]
 
+        self.cmd.vel_x = Vx
+        self.cmd.vel_y = Vy
         self.cmd.vel_surge = Vx*math.cos(self.ctrld_robot.get_current_orientation())+Vy*math.sin(self.ctrld_robot.get_current_orientation())
         self.cmd.vel_sway = -Vx*math.sin(self.ctrld_robot.get_current_orientation())+Vy*math.cos(self.ctrld_robot.get_current_orientation())
         self.cmd.omega = Vr
         self.cmd.theta = goal_pos_theta
 
-
     def pid_circle(self, center_x, center_y, x, y, theta):        
+        """
+        2019/08/04 当初敵の撹乱などに利用予定だったが作業時間の都合上今は利用していない
+        """
         self.Kpv = 2
         self.Kpr = 7
         self.Kdr = 4

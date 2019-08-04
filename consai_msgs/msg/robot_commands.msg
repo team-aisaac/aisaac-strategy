@@ -1,3 +1,5 @@
+float32 vel_x
+float32 vel_y
 float32 vel_surge
 float32 vel_sway
 float32 omega

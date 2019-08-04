@@ -7,7 +7,7 @@ from objects import Objects
 
 import strategy
 from normal_start_strategy_calcurator import NormalStartStrategyCalcurator
-from strategy_context import StrategyContext
+from context import StrategyContext
 from world_model_status_publisher import WorldModelStatusPublisher
 
 import config
@@ -82,11 +82,10 @@ if __name__ == "__main__":
     try:
         referee = world_model.get_referee()
         strat_ctx = world_model.get_strategy_context()
+
         world_model.add_loop_event_listener(strat_ctx.handle_loop_callback)
 
         while not rospy.is_shutdown():
-            world_model.trigger_loop_events()
-
             # referee_branch = referee.get_referee_branch()
             referee_branch = "NORMAL_START"
             strat = strategy.StopStaticStrategy()
@@ -105,6 +104,7 @@ if __name__ == "__main__":
                 strat = strategy.DefenceStaticStrategy()
 
             # status_publisher.publish_all(strat)
+            world_model.trigger_loop_events()
             loop_rate.sleep()
     except Exception as e:
         import traceback

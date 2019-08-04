@@ -53,8 +53,8 @@ class RobotKick(object):
 
     def kick_x(self):
         area = 0.5
-        if math.sqrt((self.ball_params.get_current_position()[0] - self.ctrld_robot.get_current_position()[0])**2
-                     + (self.ball_params.get_current_position()[1] - self.ctrld_robot.get_current_position()[1])**2) \
+        if functions.distance_btw_two_points(self.ball_params.get_current_position(),
+                                             self.ctrld_robot.get_current_position()) \
                 > self.ctrld_robot.size_r + area:
             self.cmd.vel_surge = 0
             self.cmd.vel_sway = 0

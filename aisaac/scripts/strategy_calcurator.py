@@ -8,6 +8,7 @@ from strategy import StrategyBase, InitialStaticStrategy, StopStaticStrategy, Dy
 from strategy_context import StrategyContext
 from objects import Objects
 from aisaac.msg import Status
+import functions
 import copy
 
 try:
@@ -25,8 +26,7 @@ class Util(object):
     def get_distance(point_a, point_b):
         # type: (Tuple[float, float],
         #        Tuple[float, float]) -> float
-        return math.sqrt((point_a[0] - point_b[0])**2
-                         + (point_a[1] - point_b[1])**2)
+        return functions.distance_btw_two_points(point_a, point_b)
 
 
 class StrategyCalcuratorBase(object):
