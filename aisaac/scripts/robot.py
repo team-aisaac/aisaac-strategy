@@ -16,7 +16,7 @@ from context import RobotContext
 from objects import Objects
 from robot_command_publisher_wrapper import RobotCommandPublisherWrapper
 
-from filter import KalmanFilter, IdentityFilter
+from filter import kalman_filter, identity_filter
 
 import config
 
@@ -103,14 +103,14 @@ class Robot(object):
 
             # カルマンフィルタ,恒等関数フィルタの適用
             # vision_positionからcurrent_positionを決定してつめる
-            KalmanFilter(self.ctrld_robot)
+            kalman_filter(self.ctrld_robot)
             for robot in self.robot_friend:
                 if robot.get_id() == self.ctrld_robot.get_id():
                     continue
                 else:
-                    IdentityFilter(robot)
+                    identity_filter(robot)
             for enemy in self.robot_enemy:
-                IdentityFilter(enemy)
+                identity_filter(enemy)
 
 
             if self.status.robot_status == "move_linear":
