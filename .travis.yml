@@ -1,6 +1,6 @@
 sudo: required
 cache:
-- apt
+  - apt
 language: generic
 
 # ros distro
