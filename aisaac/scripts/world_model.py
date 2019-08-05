@@ -10,6 +10,8 @@ from normal_start_strategy_calcurator import NormalStartStrategyCalcurator
 from context import StrategyContext
 from world_model_status_publisher import WorldModelStatusPublisher
 
+from filter import identity_filter
+
 import config
 
 """
@@ -89,9 +91,9 @@ if __name__ == "__main__":
             # 恒等関数フィルタの適用
             # vision_positionからcurrent_positionを決定してつめる
             for robot in self.robot_friend:
-                IdentityFilter(robot)
+                identity_filter(robot)
             for enemy in self.robot_enemy:
-                IdentityFilter(enemy)
+                identity_filter(enemy)
 
             # referee_branch = referee.get_referee_branch()
             referee_branch = "NORMAL_START"

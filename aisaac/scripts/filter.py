@@ -11,7 +11,7 @@ VISION_ORIENTATION_SIGMA = config.VISION_ORIENTATION_SIGMA
 ACTION_POSITION_SIGMA = config.ACTION_POSITION_SIGMA
 ACTION_ORIENTATION_SIGMA = config.ACTION_ORIENTATION_SIGMA
 
-def KalmanFilter(robot):
+def kalman_filter(robot):
     x, y, theta, x_sigma, y_sigma, theta_sigma = robot.get_current_position_for_filter()
     vx, vy, v_theta = robot.get_last_expected_velocity()
     # 行動による信念アップデート
@@ -37,6 +37,6 @@ def KalmanFilter(robot):
     # アップデートした信念で上書き
     robot.set_current_position_for_filter(updated_x, updated_y, updated_theta, updated_x_sigma,updated_y_sigma, updated_theta_sigma)
 
-def IdentityFilter(robot):
+def identity_filter(robot):
     x, y, theta = robot.get_vision_position()
     robot.set_current_position(x, y, theta)
