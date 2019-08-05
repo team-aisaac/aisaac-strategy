@@ -47,9 +47,8 @@ install:
   - source devel/setup.bash
   - cd ~/catkin_ws/src
   - ln -s $CI_SOURCE_PATH .
-  - ls -la
 
 script:
   # build
   - cd ~/catkin_ws
-  - catkin_make
+  - catkin_make -j1
