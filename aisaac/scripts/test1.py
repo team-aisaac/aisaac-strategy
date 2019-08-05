@@ -12,7 +12,7 @@ executable = 'robot.py'
 
 # launch roscore
 roscore = subprocess.Popen('roscore')
-time.sleep(1) 
+time.sleep(3) 
 
 
 rospy.set_param('team_side', 'blue')

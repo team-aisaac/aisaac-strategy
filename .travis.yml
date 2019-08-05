@@ -52,6 +52,7 @@ script:
   # build
   - cd ~/catkin_ws
   - catkin_make -j1
+  - source devel/setup.bash
   - rosrun aisaac test1.py
   - rosrun aisaac test2.py
   - rosrun aisaac test3.py
