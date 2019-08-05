@@ -107,6 +107,10 @@ class Robot(Entity):
         self.velocity_sway = 0
         self.omega = 0
 
+        self._current_position_x_sigma = config.INITIAL_POSITION_SIGMA
+        self._current_position_y_sigma = config.INITIAL_POSITION_SIGMA
+        self._current_orientation_sigma = config.INITIAL_POSITION_SIGMA
+
         self._robot_context = RobotContext()
         self._robot_context.register_new_context("vel_xyr", 2, (0.0, 0.0, 0.0))
 
