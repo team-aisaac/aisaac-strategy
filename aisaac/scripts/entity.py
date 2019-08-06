@@ -125,7 +125,7 @@ class Robot(Entity):
         self._pass_target_pos_y = y
 
     # カルマンフィルタ用のセッター
-    def set_current_position_for_filter(self, x, y, theta, x_sigma_square, y_sigma_square, theta_sigma_square):
+    def set_current_position_for_filter(self, x, y, theta, x_sigma, y_sigma, theta_sigma):
         self._current_position_x = x
         self._current_position_y = y
         self._current_orientation = theta
