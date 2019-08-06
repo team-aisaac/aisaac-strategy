@@ -14,7 +14,11 @@ before_install:
   - sudo docker pull osrf/ros:melodic-desktop-full || true
 
 install:
-  - sudo docker build --pull --cache-from osrf/ros:melodic-desktop-full -t aisaac:rostest .
+  - sudo docker build -t aisaac:rostest .
 
 script:
   - sudo docker run -it --rm --name aisaac_test aisaac:rostest
+
+ cache:
+    directories:
+     - /var/lib/docker
