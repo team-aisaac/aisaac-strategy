@@ -6,8 +6,9 @@ services:
 matrix:
   include:
   - name: "bionic melodic"
+    dist: bionic
 
-before_install:
+install:
   - docker build -t aisaac:rostest .
 
 script:
