@@ -15,11 +15,11 @@ matrix:
 #   - if [[ -d $HOME/docker ]]; then ls $HOME/docker/*.tar | xargs -I {file} sh -c "docker load < {file}"; fi
 
 install:
-  - sudo travis_retry docker pull osrf/ros:melodic-desktop-full
-  - sudo travis_retry docker build -t aisaac:rostest .
+  - travis_retry sudo docker pull osrf/ros:melodic-desktop-full
+  - travis_retry sudo docker build -t aisaac:rostest .
 
 script:
-  - sudo docker run -it --rm --name aisaac_test aisaac:rostest
+  - travis_retry sudo docker run -it --rm --name aisaac_test aisaac:rostest
 
 # before_cache:
 #   - mkdir -p $HOME/docker && docker images -a --filter='dangling=false' --format '{{.Repository}}:{{.Tag}} {{.ID}}' | grep 'melodic' | xargs -n 2 -t sh -c 'test -e $HOME/docker/$1.tar.gz || docker save $0 > $HOME/docker/$1.tar'
