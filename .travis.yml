@@ -1,7 +1,12 @@
-language: generic
+sudo: required
+cache:
+  - apt: true
+  - pip: true
 
 services:
   - docker
+
+language: generic
 
 matrix:
   include:
@@ -9,7 +14,7 @@ matrix:
     dist: bionic
 
 install:
-  - docker build -t aisaac:rostest .
+  - sudo docker build -t aisaac:rostest .
 
 script:
-  - docker run -it --rm --name aisaac_test aisaac:rostest
+  - sudo docker run -it --rm --name aisaac_test aisaac:rostest
