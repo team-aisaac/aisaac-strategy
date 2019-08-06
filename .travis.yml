@@ -1,13 +1,60 @@
 sudo: required
-dist: trusty
+cache:
+  - apt: true
+  - pip: true
 
-before_script:
-  - bash -xve ./test/travis_ros_install.bash
-  - source ~/catkin_ws/devel/setup.bash
-  - bash -xve ./test/travis_build_consai.bash
-  - source ~/catkin_ws/devel/setup.bash
+language: generic
+
+# ros distro
+matrix:
+  include:
+  - name: "bionic melodic"
+    dist: bionic
+    env: ROS_DISTRO=melodic
+
+# env
+env:
+  global:
+    - ROS_CI_DESKTOP=$(lsb_release -cs)
+    - CI_SOURCE_PATH=$(pwd)
+
+before_install:
+  # install ros
+  - sudo sh -c "echo \"deb http://packages.ros.org/ros/ubuntu $ROS_CI_DESKTOP main\" > /etc/apt/sources.list.d/ros-latest.list"
+  - sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+  - sudo apt-get update -qq
+
+  - sudo apt-get install -y python-catkin-pkg python-rosdep ros-$ROS_DISTRO-desktop-full 
+  - sudo apt-get install -y python-tk
+  - sudo apt-get install -y libprotobuf-dev libprotoc-dev protobuf-compiler python-pip
+  - sudo apt-get install -y ros-$ROS_DISTRO-navigation ros-$ROS_DISTRO-bfl
+  - sudo apt-get install -y graphviz libgraphviz-dev pkg-config
+
+  - source /opt/ros/$ROS_DISTRO/setup.bash
+  - sudo rosdep init
+  - rosdep update
+
+  - sudo pip2 install protobuf
+  - sudo pip2 install pygraphviz --install-option="--include-path=/usr/include/graphviz" --install-option="--library-path=/usr/lib/graphviz/"
+  - sudo pip2 install numpy bayesian-optimization
+
+install:
+  # make catkin_ws
+  - mkdir -p ~/catkin_ws/src
+  - cd ~/catkin_ws/src
+  - catkin_init_workspace
+
+  - cd ~/catkin_ws
+  - catkin_make
+  - source devel/setup.bash
+  - cd ~/catkin_ws/src
+  - ln -s $CI_SOURCE_PATH .
 
 script:
-  - rostest ai_core test_simulator.launch
-  - rostest ai_core test_robot.launch ai_name:="/" number:=0
-  - rostest ai_core test_ai_core.launch
+  # build
+  - cd ~/catkin_ws
+  - catkin_make -j1
+  - source devel/setup.bash
+  - rosrun aisaac test1.py
+  - rosrun aisaac test2.py
+  - rosrun aisaac test3.py
