@@ -10,9 +10,6 @@ matrix:
   - name: "bionic melodic"
     dist: bionic
 
-before_install:
-  - sudo docker pull osrf/ros:melodic-desktop-full || true
-
 install:
   - sudo docker build -t aisaac:rostest .
 
