@@ -1,60 +1,29 @@
 sudo: required
-cache:
-  - apt: true
-  - pip: true
+
+services:
+  - docker
 
 language: generic
 
-# ros distro
 matrix:
   include:
   - name: "bionic melodic"
     dist: bionic
-    env: ROS_DISTRO=melodic
-
-# env
-env:
-  global:
-    - ROS_CI_DESKTOP=$(lsb_release -cs)
-    - CI_SOURCE_PATH=$(pwd)
 
 before_install:
-  # install ros
-  - sudo sh -c "echo \"deb http://packages.ros.org/ros/ubuntu $ROS_CI_DESKTOP main\" > /etc/apt/sources.list.d/ros-latest.list"
-  - sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
-  - sudo apt-get update -qq
-
-  - sudo apt-get install -y python-catkin-pkg python-rosdep ros-$ROS_DISTRO-desktop-full 
-  - sudo apt-get install -y python-tk
-  - sudo apt-get install -y libprotobuf-dev libprotoc-dev protobuf-compiler python-pip
-  - sudo apt-get install -y ros-$ROS_DISTRO-navigation ros-$ROS_DISTRO-bfl
-  - sudo apt-get install -y graphviz libgraphviz-dev pkg-config
-
-  - source /opt/ros/$ROS_DISTRO/setup.bash
-  - sudo rosdep init
-  - rosdep update
-
-  - sudo pip2 install protobuf
-  - sudo pip2 install pygraphviz --install-option="--include-path=/usr/include/graphviz" --install-option="--library-path=/usr/lib/graphviz/"
-  - sudo pip2 install numpy bayesian-optimization
+  # Load cached docker images
+  - if [[ -d $HOME/docker ]]; then ls $HOME/docker/*.tar.gz | xargs -I {file} sh -c "zcat {file} | docker load"; fi
 
 install:
-  # make catkin_ws
-  - mkdir -p ~/catkin_ws/src
-  - cd ~/catkin_ws/src
-  - catkin_init_workspace
-
-  - cd ~/catkin_ws
-  - catkin_make
-  - source devel/setup.bash
-  - cd ~/catkin_ws/src
-  - ln -s $CI_SOURCE_PATH .
+  - sudo docker pull osrf/ros:melodic-desktop-full
+  - sudo docker build -t aisaac:rostest .
 
 script:
-  # build
-  - cd ~/catkin_ws
-  - catkin_make -j1
-  - source devel/setup.bash
-  - rosrun aisaac test1.py
-  - rosrun aisaac test2.py
-  - rosrun aisaac test3.py
+  - sudo docker run -it --rm --name aisaac_test aisaac:rostest
+
+before_cache:
+  - mkdir -p $HOME/docker && docker images -a --filter='dangling=false' --format '{{.Repository}}:{{.Tag}} {{.ID}}' | grep 'melodic' | xargs -n 2 -t sh -c 'test -e $HOME/docker/$1.tar.gz || docker save $0 | gzip -2 > $HOME/docker/$1.tar.gz'
+
+cache:
+  directories:
+    - $HOME/docker
