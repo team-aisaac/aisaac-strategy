@@ -16,6 +16,6 @@ install:
 script:
   - sudo docker run -it --rm --name aisaac_test aisaac:rostest
 
- cache:
-    directories:
+cache:
+  directories:
     - /var/lib/docker
