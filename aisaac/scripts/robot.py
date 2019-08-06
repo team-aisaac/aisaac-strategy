@@ -103,14 +103,14 @@ class Robot(object):
 
             # カルマンフィルタ,恒等関数フィルタの適用
             # vision_positionからcurrent_positionを決定してつめる
-            # kalman_filter(self.ctrld_robot)
-            # for robot in self.robot_friend:
-            #     if robot.get_id() == self.ctrld_robot.get_id():
-            #         continue
-            #     else:
-            #         identity_filter(robot)
-            # for enemy in self.robot_enemy:
-            #     identity_filter(enemy)
+            for robot in self.robot_friend:
+                if robot.get_id() == self.ctrld_robot.get_id():
+                    # kalman_filter(self.ctrld_robot)
+                    identity_filter(self.ctrld_robot)
+                else:
+                    identity_filter(robot)
+            for enemy in self.robot_enemy:
+                identity_filter(enemy)
 
 
             if self.status.robot_status == "move_linear":
@@ -196,7 +196,13 @@ if __name__ == "__main__":
 
     if is_single_thread:
         robot = Robot()
-        robot.run()
+        try:
+            robot.run()
+        except:
+            import traceback
+            traceback.print_exc()
+            print("Robot color:" + robot.robot_color)
+            print("Robot id   :" + robot.robot_id)
     else:
         import threading
         robots = []
