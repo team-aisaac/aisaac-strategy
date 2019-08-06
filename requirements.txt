@@ -1,0 +1,4 @@
+numpy
+bayesian-optimization
+sklearn
+statistics
