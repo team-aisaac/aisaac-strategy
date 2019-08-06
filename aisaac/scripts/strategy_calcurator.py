@@ -5,7 +5,7 @@ import math
 from abc import ABCMeta, abstractmethod
 
 from strategy import StrategyBase, InitialStaticStrategy, StopStaticStrategy, DynamicStrategy
-from strategy_context import StrategyContext
+from context import StrategyContext
 from objects import Objects
 from aisaac.msg import Status
 import functions
