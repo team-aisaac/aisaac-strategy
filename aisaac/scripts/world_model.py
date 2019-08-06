@@ -22,7 +22,7 @@ import config
 class WorldModel(object):
     def __init__(self):
         rospy.init_node("world_model")
-        self._team_color = str(rospy.get_param('team_color'))
+        self._team_color = str(rospy.get_param('~team_color'))
 
         """----上の5つの変数、インスタンスをまとめたもの、callbackをもつ---"""
         self._objects = Objects(
@@ -67,6 +67,10 @@ class WorldModel(object):
         # type: () -> StrategyContext
         return self._strategy_context
 
+    def get_objects(self):
+        # type: () -> Objects
+        return self._objects
+
 
 if __name__ == "__main__":
     world_model = WorldModel()
@@ -90,9 +94,9 @@ if __name__ == "__main__":
         while not rospy.is_shutdown():
             # 恒等関数フィルタの適用
             # vision_positionからcurrent_positionを決定してつめる
-            for robot in self.robot_friend:
+            for robot in world_model.get_objects().robot:
                 identity_filter(robot)
-            for enemy in self.robot_enemy:
+            for enemy in world_model.get_objects().enemy:
                 identity_filter(enemy)
 
             # referee_branch = referee.get_referee_branch()

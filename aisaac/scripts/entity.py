@@ -32,7 +32,7 @@ class Entity(object):
         self._current_position_x = x
         self._current_position_y = y
 
-        if theta:
+        if theta is not None:
             self._current_orientation = theta
 
     def get_current_position(self, theta=False):
@@ -48,7 +48,7 @@ class Entity(object):
         self._current_velocity_x = vx
         self._current_velocity_y = vy
 
-        if vtheta:
+        if vtheta is not None:
             self._current_velocity_orientation = vtheta
 
     def set_current_velocity_orientation(self, vtheta):
@@ -64,7 +64,7 @@ class Entity(object):
         self._future_position_x = x
         self._future_position_y = y
 
-        if theta:
+        if theta is not None:
             self._future_orientation = theta
 
     def set_future_orientation(self, theta):
@@ -129,9 +129,9 @@ class Robot(Entity):
         self._current_position_x = x
         self._current_position_y = y
         self._current_orientation = theta
-        self._current_position_x_sigma = x_sigma
-        self._current_position_y_sigma = y_sigma
-        self._current_orientation_sigma = theta_sigma
+        self._current_position_x_sigma = x_sigma_square
+        self._current_position_y_sigma = y_sigma_square
+        self._current_orientation_sigma = theta_sigma_square
 
     # カルマンフィルタ用のゲッター
     def get_current_position_for_filter(self):

@@ -21,7 +21,7 @@ WORLD_LOOP_RATE = config.WORLD_LOOP_RATE
 # Publisher用クラス
 class Publisher():
     def __init__(self):
-        self.team_color = str(rospy.get_param('/blue/team_color'))
+        self.team_color = str(rospy.get_param("~robot_color"))
 
         self.ball_sub_params_pub = rospy.Publisher("/" + self.team_color + "/ball_sub_params", Ball_sub_params, queue_size=10)
         self.def_pos_pub = rospy.Publisher("/" + self.team_color + "/def_pos", Def_pos, queue_size=10)

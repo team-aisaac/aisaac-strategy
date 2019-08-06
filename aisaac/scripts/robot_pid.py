@@ -25,12 +25,14 @@ class RobotPid(object):
         self.recursion_max = 10
         self.recursion_count = 0
 
-        self.Kpv = 2.2
-        self.Kpr = 2.0
-        self.Kdv = 3.0
-        self.Kdr = 1.0
-
-        self._pid_linear_lasttime = rospy.Time.now()
+        self.Kpv = 3.615645812128088
+        self.Kpr = 3.0
+        self.Kdv = 1.9759837181620452
+        self.Kdr = 3.0
+        # self.Kpv = 3.5
+        # self.Kpr = 3.5
+        # self.Kdv = 5.0
+        # self.Kdr = 5.0
         
         # 壁用
         # self.Kpv = 3.0

@@ -18,9 +18,9 @@ class RobotKick(object):
         self.pid = pid
         self.status = status
         self.cmd = cmd
-        self.dispersion1 = [10] * 1
-        self.dispersion2 = [10] * 1
-        self.rot_dispersion = [10] * 1
+        self.dispersion1 = [10] * 20
+        self.dispersion2 = [10] * 20
+        self.rot_dispersion = [10] * 20
 
         self.access_threshold1 = 0.1
         self.access_threshold2 = 0.5
@@ -143,7 +143,7 @@ class RobotKick(object):
         # 未実装
 
         # 距離だけで諦めるかどうか判断
-        if (d < 1) and  (self.ball_params.get_line_a() != 0):
+        if (d < 2.0) and  (self.ball_params.get_line_a() != 0):
             pose_theta = math.atan2( (self.ball_params.get_current_position()[1] - hy) , (self.ball_params.get_current_position()[0] - hx) )
             # pose_theta = math.atan2( (self.ball_params.get_current_position()[1]) , (self.ball_params.get_current_position()[0]) )
             self.pid.pid_linear(hx, hy, pose_theta)

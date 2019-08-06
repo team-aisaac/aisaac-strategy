@@ -13,7 +13,7 @@ ACTION_ORIENTATION_SIGMA = config.ACTION_ORIENTATION_SIGMA
 
 def kalman_filter(robot):
     x, y, theta, x_sigma, y_sigma, theta_sigma = robot.get_current_position_for_filter()
-    vx, vy, v_theta = robot.get_last_expected_velocity()
+    vx, vy, v_theta = robot.get_last_expected_velocity(theta=True)
     # 行動による信念アップデート
     x += vx * ROBOT_DT
     y += vy * ROBOT_DT
