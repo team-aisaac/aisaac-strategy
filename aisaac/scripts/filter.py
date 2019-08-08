@@ -18,6 +18,7 @@ def kalman_filter(robot):
     x += vx * ROBOT_DT
     y += vy * ROBOT_DT
     theta += v_theta * ROBOT_DT
+    theta %= 2 * np.pi # 2πでmod
     x_sigma += ACTION_POSITION_SIGMA
     y_sigma += ACTION_POSITION_SIGMA
     theta_sigma += ACTION_ORIENTATION_SIGMA
@@ -30,6 +31,7 @@ def kalman_filter(robot):
     updated_x = x + vision_x_sigma * (vision_x - x)
     updated_y = y + vision_y_sigma * (vision_y - y)
     updated_theta = theta + vision_theta_sigma * (vision_theta - theta)
+    updated_theta %= 2 * np.pi # 2πでmod
     updated_x_sigma = (1. - vision_x_sigma) * x_sigma
     updated_y_sigma = (1. - vision_y_sigma) * y_sigma
     updated_theta_sigma = (1. - vision_theta_sigma) * theta_sigma
