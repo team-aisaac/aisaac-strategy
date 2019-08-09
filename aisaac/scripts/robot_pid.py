@@ -8,15 +8,14 @@ import rospy
 
 ROBOT_LOOP_RATE = config.ROBOT_LOOP_RATE
 
-class RobotPid(object):
-    def __init__(self, robot_id, objects, cmd, command_pub):
+class RobotPid(object):    
+    def __init__(self, robot_id, objects, cmd):
         self.robot_id = int(robot_id)
         self.ctrld_robot = objects.robot[int(robot_id)]
         self.friend = objects.robot
         self.enemy = objects.enemy
         self.ball_params = objects.ball
         self.cmd = cmd
-        self.command_pub = command_pub
 
         self.goal_pos_init_flag = True
 
@@ -29,10 +28,14 @@ class RobotPid(object):
         self.last_loop_time = rospy.Time.now()
         self.dt = 0
 
-        self.Kpv = 2.2
-        self.Kpr = 2.0
-        self.Kdv = 3.0
-        self.Kdr = 1.0
+        self.Kpv = 3.615645812128088
+        self.Kpr = 3.0
+        self.Kdv = 1.9759837181620452
+        self.Kdr = 3.0
+        # self.Kpv = 3.5
+        # self.Kpr = 3.5
+        # self.Kdv = 5.0
+        # self.Kdr = 5.0
 
         # 実機
         # self.Kpv = 4.5
@@ -368,8 +371,9 @@ class RobotPid(object):
 
         print self.Kpv, self.Kpr, self.Kdv, self.Kdr
 
-    def pid_linear(self, goal_pos_x, goal_pos_y, goal_pos_theta):
+        return 1
 
+    def pid_linear(self, goal_pos_x, goal_pos_y, goal_pos_theta):
         """
         self.recursion_count = 0
         next_pos_x, next_pos_y = self.path_plan(goal_pos_x, goal_pos_y)
@@ -431,14 +435,25 @@ class RobotPid(object):
         Vy = self.Kpv * self.pid_p_y + self.Kdv * self.pid_d_y / self.dt.to_sec()
         Vr = self.Kpr * self.pid_p_theta + self.Kdr * self.pid_d_theta / self.dt.to_sec()
 
+        max_velocity = config.ROBOT_MAX_VELOCITY # m/s 機体の最高速度
+        vel_vector = np.array([Vx, Vy])
+        vel_vector_norm = np.linalg.norm(vel_vector)
+        if vel_vector_norm > max_velocity:
+            vel_vector = vel_vector * max_velocity / vel_vector_norm
+            Vx = vel_vector[0]
+            Vy = vel_vector[1]
+
+        self.cmd.vel_x = Vx
+        self.cmd.vel_y = Vy
         self.cmd.vel_surge = Vx*math.cos(self.ctrld_robot.get_current_orientation())+Vy*math.sin(self.ctrld_robot.get_current_orientation())
         self.cmd.vel_sway = -Vx*math.sin(self.ctrld_robot.get_current_orientation())+Vy*math.cos(self.ctrld_robot.get_current_orientation())
         self.cmd.omega = Vr
         self.cmd.theta = goal_pos_theta
 
-        self.command_pub.publish(self.cmd)
-
-    def pid_circle(self, center_x, center_y, x, y, theta):
+    def pid_circle(self, center_x, center_y, x, y, theta):        
+        """
+        2019/08/04 当初敵の撹乱などに利用予定だったが作業時間の都合上今は利用していない
+        """
         self.Kpv = 2
         self.Kpr = 7
         self.Kdr = 4
@@ -474,7 +489,6 @@ class RobotPid(object):
             self.cmd.vel_surge=(Vx + Vx_tangent)*math.cos(self.ctrld_robot.get_current_orientation())+(Vy + Vy_tangent)*math.sin(self.ctrld_robot.get_current_orientation())
             self.cmd.vel_sway=-(Vx + Vx_tangent)*math.sin(self.ctrld_robot.get_current_orientation())+(Vy + Vy_tangent)*math.cos(self.ctrld_robot.get_current_orientation())
             self.cmd.omega=Vr
-            self.command_pub.publish(self.cmd)
 
-    def replan_timerCallback(self, event):
+    def replan_timer_callback(self, event):
         self.goal_pos_init_flag = True

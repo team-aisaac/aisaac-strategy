@@ -20,20 +20,33 @@ import config
 ROBOT_LOOP_RATE = config.ROBOT_LOOP_RATE
 
 
-class dribble(RobotPid):
+class Dribble(RobotPid):
     def __init__(self, robot_params, ball_params, cmd, command_pub):
-        self.robot_params = robot_params
-        self.ball_params = ball_params
-        self.cmd = cmd
-        self.command_pub = command_pub
+        super(Dribble, self).__init__(robot_params, ball_params, cmd, command_pub)
+        #self.max_dribble_time = 1.5
 
-        self.goal_pos_init_flag = True
+    def calculate_vector(self, vel_x_before, vel_y_before, vel_x_after, vel_y_after):
+        acceleration_x = (vel_x_after - vel_x_before) / DT  #ロボットの加速度x = ホールにかかる加速度と見ている
+        acceleration_y = (vel_y_after - vel_y_before) / DT　#ロボットの加速度y = ホールにかかる加速度と見ている
+        # 遠心力の計算
+        centrifugalforce_x, centrifugalforce_y = functions.calculate_centrifugalforce(vel_x_before, vel_y_before, vel_x_after, vel_y_after)
+        # 遠心力方向の加速度と進行方向の加速度の合成ベクトル(ボールが受ける加速度)の逆ベクトル
+        composite_vector_x = -1 * acceleration_x * COEFFICIENT + centrifugalforce_x
+        composite_vector_y = -1 * acceleration_y * COEFFICIENT + centrifugalforce_y
+        # 目標角度とボールの加速度の逆ベクトル
+        tan_acceleration = np.arctan2(acceleration_x, acceleration_y)
+        # tan_
+        if np.arctan2(composite_vector_x, composite_vector_y) > np.arctan2(acceleration_x, acceleration_y):
 
-        self.pid_circle_center_x = 0.
-        self.pid_circle_center_y = 0.
+        vel_x_after / MAX_SPEED * composite_vector_x +
 
-        self.recursion_max = 10.
-        self.recursion_count = 0.
+    def path_plan(self, goal_pos_x, goal_pos_y):
+        self.recursion_count += 1
+        collision = self.collision_Detection(goal_pos_x, goal_pos_y)
+        if collision[0] and self.recursion_count < self.recursion_max:
+            goal_pos_x, goal_pos_y = self.get_sub_goal(collision[1], collision[2], collision[3], collision[4], collision[5])
+            self.path_plan(goal_pos_x, goal_pos_y)
+        return goal_pos_x, goal_pos_y
 
     def pid_linear(self, goal_pos_x, goal_pos_y, goal_pos_theta):
         self.Kpv = 2.2
@@ -116,5 +129,5 @@ class dribble(RobotPid):
             self.cmd.omega=Vr
             self.command_pub.publish(self.cmd)
 
-    def replan_timerCallback(self, event):
+    def replan_timer_callback(self, event):
         self.goal_pos_init_flag = True

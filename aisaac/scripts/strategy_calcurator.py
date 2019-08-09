@@ -5,9 +5,10 @@ import math
 from abc import ABCMeta, abstractmethod
 
 from strategy import StrategyBase, InitialStaticStrategy, StopStaticStrategy, DynamicStrategy
-from strategy_context import StrategyContext
+from context import StrategyContext
 from objects import Objects
 from aisaac.msg import Status
+import functions
 import copy
 
 try:
@@ -25,8 +26,7 @@ class Util(object):
     def get_distance(point_a, point_b):
         # type: (Tuple[float, float],
         #        Tuple[float, float]) -> float
-        return math.sqrt((point_a[0] - point_b[0])**2
-                         + (point_a[1] - point_b[1])**2)
+        return functions.distance_btw_two_points(point_a, point_b)
 
 
 class StrategyCalcuratorBase(object):
@@ -41,6 +41,7 @@ class StrategyCalcuratorBase(object):
     共通処理のうちでも、引数だけで計算出来、状態がかかわらない計算
     （例：距離の計算は点A(x,y),点B(x,y)がわかればできる）はこのクラスではなく、
     Utilクラスに@staticmethodをつけて実装する（したい）。
+    functions.pyでもOK。
 
     変数命名規則:
         "self._"で始まるもの：StrategyCalcuratorBaseとその子クラスのみからアクセスする変数・関数（protected）
@@ -64,8 +65,8 @@ class StrategyCalcuratorBase(object):
 
     def __init__(self, objects):
         # type: (Objects) -> None
-        self._objects = objects
-        self._robot = self._objects.robot
+        self._objects = objects # type: Objects
+        self._robot = self._objects.robot # type: entity.
         self._enemy = self._objects.enemy
         self._robot_ids = self._objects.get_robot_ids()
         self._enemy_ids = self._objects.get_enemy_ids()
@@ -89,6 +90,12 @@ class StrategyCalcuratorBase(object):
         active_enemy_ids = self._enemy_ids
         # TODO: アクティブな敵ロボットのIDリストにする
         return active_enemy_ids
+
+    def _get_robot_ids_ordered_by_distance(self, point_x, point_y):
+        # type: (float, float) -> List[int]
+        # TODO:ソートする
+        # sorted_list = sorted(self._robot, key=lambda item: Util.get_distance((point_x,point_y), item.get_current_position()))
+        return self._robot_ids
 
     def _get_who_has_a_ball(self):
         # type: () -> str
