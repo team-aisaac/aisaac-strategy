@@ -25,6 +25,9 @@ class RobotPid(object):
         self.recursion_max = 10
         self.recursion_count = 0
 
+        self.last_loop_time = rospy.Time.now()
+        self.dt = 0
+
         self.Kpv = 3.615645812128088
         self.Kpr = 3.0
         self.Kdv = 1.9759837181620452
@@ -33,6 +36,12 @@ class RobotPid(object):
         # self.Kpr = 3.5
         # self.Kdv = 5.0
         # self.Kdr = 5.0
+
+        # 実機
+        # self.Kpv = 4.5
+        # self.Kpr = 2.0
+        # self.Kdv = 1.5
+        # self.Kdr = 1.0
         
         # 壁用
         # self.Kpv = 3.0
@@ -374,6 +383,9 @@ class RobotPid(object):
             goal_pos_y = next_pos_y
         """
 
+        self.dt = rospy.Time.now() - self.last_loop_time
+        self.last_loop_time = rospy.Time.now()
+        #print self.dt.to_sec()
 
         if self.goal_pos_init_flag == True:
             self.recursion_count = 0
@@ -419,9 +431,9 @@ class RobotPid(object):
         self.pid_p_y = d_y
         self.pid_p_theta = d_theta
 
-        Vx = self.Kpv * self.pid_p_x + self.Kdv * self.pid_d_x / (1./ROBOT_LOOP_RATE)
-        Vy = self.Kpv * self.pid_p_y + self.Kdv * self.pid_d_y / (1./ROBOT_LOOP_RATE)
-        Vr = self.Kpr * self.pid_p_theta + self.Kdr * self.pid_d_theta / (1./ROBOT_LOOP_RATE)
+        Vx = self.Kpv * self.pid_p_x + self.Kdv * self.pid_d_x / self.dt.to_sec()
+        Vy = self.Kpv * self.pid_p_y + self.Kdv * self.pid_d_y / self.dt.to_sec()
+        Vr = self.Kpr * self.pid_p_theta + self.Kdr * self.pid_d_theta / self.dt.to_sec()
 
         max_velocity = config.ROBOT_MAX_VELOCITY # m/s 機体の最高速度
         vel_vector = np.array([Vx, Vy])
