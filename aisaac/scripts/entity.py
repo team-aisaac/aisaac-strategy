@@ -84,7 +84,7 @@ class Entity(object):
 class Robot(Entity):
     def __init__(self, id=None):
         super(Robot, self).__init__()
-        if id:
+        if id is not None:
             self._id = id
 
         else:
