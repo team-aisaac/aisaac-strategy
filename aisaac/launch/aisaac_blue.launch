@@ -98,13 +98,13 @@
       <param name="robot_side" value="$(arg side)" />
     </node>
   -->
-<!--
+
     <node name="calculation" pkg="aisaac" type="calculation.py" output="screen">
       <param name="robot_color" value="$(arg color)" />
       <param name="robot_side" value="$(arg side)" />
       <param name="robot_num" type="int" value="8" /> 
     </node>
--->
+
   </group>
 
 </launch>

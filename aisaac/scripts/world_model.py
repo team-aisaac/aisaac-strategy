@@ -42,6 +42,7 @@ class WorldModel(object):
         # とりあえず例として"last_number"という名前で10フレーム分のコンテキストを作成。
         # 初期値は全て0を指定。
         self._strategy_context.register_new_context("last_number", 10, 0)
+        self._strategy_context.register_new_context("normal_strat_state", 2, 0)
         self._loop_events = []
 
     def add_loop_event_listener(self, callback):
@@ -116,7 +117,7 @@ if __name__ == "__main__":
             elif referee_branch == "DEFENCE":
                 strat = strategy.DefenceStaticStrategy()
 
-            # status_publisher.publish_all(strat)
+            status_publisher.publish_all(strat)
             world_model.trigger_loop_events()
             loop_rate.sleep()
     except Exception as e:
