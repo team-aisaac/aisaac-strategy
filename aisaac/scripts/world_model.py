@@ -117,7 +117,7 @@ if __name__ == "__main__":
             elif referee_branch == "DEFENCE":
                 strat = strategy.DefenceStaticStrategy()
 
-            status_publisher.publish_all(strat)
+            # status_publisher.publish_all(strat)
             world_model.trigger_loop_events()
             loop_rate.sleep()
     except Exception as e:

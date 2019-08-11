@@ -46,7 +46,7 @@ class Objects(object):
         sorted_robots = sorted(self.robot,
                                key=lambda robot: functions.distance_btw_two_points(robot.get_current_position(),
                                                                                    (target_x, target_y)))
-        sorted_ids = map(lambda robot: robot.get_id, sorted_robots)
+        sorted_ids = map(lambda robot: robot.get_id(), sorted_robots)
         return sorted_ids
 
     def get_robot_ids(self):
