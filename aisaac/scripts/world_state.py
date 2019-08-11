@@ -4,7 +4,7 @@
 from objects import Objects
 
 
-class WorldState:
+class WorldState(object):
     def __init__(self, objects):
         # type: (Objects) -> None
         self.robot = objects.robot

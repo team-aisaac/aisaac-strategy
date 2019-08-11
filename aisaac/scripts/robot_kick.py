@@ -108,16 +108,20 @@ class RobotKick(object):
                 if dispersion_average1 < self.access_threshold1 and dispersion_average2 < self.access_threshold2 and rot_dispersion_average < self.rot_access_threshold:
                     self.kick_power_x = math.sqrt(distance) * self.const
                     self.pose_theta = pose_theta
-                    self.status.robot_status = "kick"
-                    #self.pass_stage = 1
+                    # self.status.robot_status = "kick"
+                    self.pass_stage = 1
+
+                self.pid.pid_linear(pose_x, pose_y, pose_theta)
+
+            elif self.pass_stage == 1:
+                self.kick_x()
+
             """
             if self.pass_stage == 1:
                 self.kick_power_x = math.sqrt(distance) * self.const
                 self.pose_theta = pose_theta
                 self.status.robot_status = "kick"
             """
-            
-            self.pid.pid_linear(pose_x, pose_y, pose_theta)
 
     def kick_z(self):
         pass
