@@ -5,6 +5,7 @@ import rospy
 from nav_msgs.msg import Odometry
 from aisaac.msg import Ball_sub_params
 import tf
+import functions
 
 
 class Objects(object):
@@ -35,6 +36,18 @@ class Objects(object):
         self.ball_dynamics = [[0., 0.] for i in range(self.ball_dynamics_window)]
 
         self.odom_listener()
+
+    def get_robot_ids_sorted_by_distance_to_ball(self):
+        return self.get_robot_ids_sorted_by_distance(self.ball.get_current_position())
+
+    def get_robot_ids_sorted_by_distance(self, target_xy):
+        target_x = target_xy[0]
+        target_y = target_xy[1]
+        sorted_robots = sorted(self.robot,
+                               key=lambda robot: functions.distance_btw_two_points(robot.get_current_position(),
+                                                                                   (target_x, target_y)))
+        sorted_ids = map(lambda robot: robot.get_id, sorted_robots)
+        return sorted_ids
 
     def get_robot_ids(self):
         return self._robot_ids
