@@ -19,8 +19,14 @@ except:
 
 
 class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
+    def __init__(self, objects):
+        super(NormalStartStrategyCalcurator, self).__init__(objects)
+        self._receiver_id=None
 
-    def reset_state(self):
+    def _reset_state(self):
+        pass
+
+    def _pass_and_shoot(self, pass_positions, strategy_context):
         pass
 
     """
@@ -36,12 +42,21 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
 
         last_state = strategy_context.get_last("normal_strat_state")
 
-        self.reset_state()
+        self._reset_state()
         is_shoot = False
 
-        ball_pos = self._objects.ball.get_current_position()
         area = self._objects.robot[0].size_r + 0.2
-        if functions.distance_btw_two_points(ball_pos, pass_positions[last_state]) < area:
+
+        ball_pos = self._objects.ball.get_current_position()
+        if self._receiver_id is None:
+            target_pos = pass_positions[last_state]
+        else:
+            # パスの目標ではなく、受け取る側のロボットが実際にリーチした場所を目標とする
+            target_pos = self._objects.robot[self._receiver_id].get_current_position()
+
+        distance = functions.distance_btw_two_points(ball_pos, target_pos)
+        print(str(distance)+":"+str(area))
+        if distance < area:
             if len(pass_positions) > last_state + 1:
                 cur_state = last_state + 1
             else:
@@ -62,27 +77,47 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
             if idx == 0:
                 status.status = "keeper"
             elif idx == 1:
-                status.status = "defence1"
+                status.status = "defence3"
             elif idx == 2:
-                status.status = "defence2"
+                status.status = "defence4"
             elif idx == 3:
-                status.status = "pass" if cur_state % 2 == 0 else "receive"
-                if is_shoot and status.status == "receive":
-                    status.status = "stop"
+
+                if cur_state % 2 == 0:
+                    status.status = "pass"
+                else:
+                    if is_shoot:
+                        status.status = "stop"
+                    else:
+                        status.status = "receive"
+                        self._receiver_id = robot_id
+
                 status.pass_target_pos_x = pass_positions[cur_state][0]
                 status.pass_target_pos_y = pass_positions[cur_state][1]
+
             elif idx == 4:
-                status.status = "receive" if cur_state % 2 == 0 else "pass"
-                if is_shoot and status.status == "receive":
-                    status.status = "stop"
+
+                if cur_state % 2 == 0:
+                    if is_shoot:
+                        status.status = "stop"
+                    else:
+                        status.status = "receive"
+                        self._receiver_id = robot_id
+                else:
+                    status.status = "pass"
+
                 status.pass_target_pos_x = pass_positions[cur_state][0]
                 status.pass_target_pos_y = pass_positions[cur_state][1]
 
             self._dynamic_strategy.set_robot_status(robot_id, status)
 
         # self._dynamic_strategy.clone_from(self._static_strategies['initial'])
-        result = self._dynamic_strategy
+        if is_shoot:
+            # シュートしたらリセット
+            strategy_context.update("normal_strat_state", 0)
+            self._receiver_id = None
+        else:
+            strategy_context.update("normal_strat_state", cur_state)
 
-        strategy_context.update("normal_strat_state", cur_state)
+        result = self._dynamic_strategy
 
         return result
