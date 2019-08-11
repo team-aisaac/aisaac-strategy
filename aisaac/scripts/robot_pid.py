@@ -28,10 +28,21 @@ class RobotPid(object):
         self.last_loop_time = rospy.Time.now()
         self.dt = 0
 
-        self.Kpv = 3.615645812128088
-        self.Kpr = 3.0
-        self.Kdv = 1.9759837181620452
-        self.Kdr = 3.0
+        # self.Kpv = 3.615645812128088
+        # self.Kpr = 3.0
+        # self.Kdv = 1.9759837181620452
+        # self.Kdr = 3.0
+        self.Kpv = 3.112
+        self.Kpr = 5.037
+        self.Kdv = 5.437
+        self.Kdr = 4.78
+        # param_dict = {'Kdv': 4.210412653218034, 'Kpv': 3.9577989929770307, 'Kpr': 7.492985949699556, 'Kdr': 5.743020391472334}
+        # self.Kpr = param_dict['Kpr']
+        # self.Kpv = param_dict['Kpv']
+        # self.Kdv = param_dict['Kdv']
+        # self.Kdr = param_dict['Kdr']
+
+
         # self.Kpv = 3.5
         # self.Kpr = 3.5
         # self.Kdv = 5.0
