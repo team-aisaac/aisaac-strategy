@@ -35,6 +35,8 @@ const uint8_t ESCAPE_MASK = 0x20;
 #define SERIAL_PORT "/dev/ttyUSB0" // SDevice file corrensponding to serial interface
 #define MAX_DATA_TYPE 3
 
+#define VEL_MAX 1500
+
 #define ENABLE_DBG             // Toggle when using printf() function
 #ifndef ENABLE_DBG
 #define DBG(...)
@@ -65,7 +67,7 @@ public:
   int checksum = 0;
   uint8_t u8_checksum = 0;
   uint8_t datatype = 0;
-  int16_t x_vector = 0, y_vector = 0;
+  int16_t x_vector = 0, y_vector = 0, omega = 0;
   uint16_t th_vector = 0, calib_data = 0, command = 0;
   double current_orientation[3] = {0, 0, 0};
 
@@ -92,26 +94,36 @@ public:
   void command_callback(const consai_msgs::robot_commandsConstPtr& msg) {
     for(int i = 0; i < MAX_DATA_TYPE; i++){
       // get sending data from ROS bus
+ 
+//      float x = -1.5;
+//      float y = -1.5;
+//      float th = 1.57;
+//      float calib = 3.14;
 
-      
-      float x = 1.5;
-      float y = 1.5;
-      float th = 1.57;
-      float calib = 3.14;
+      x_vector = int16_t(msg->vel_surge * 1000);
+      y_vector = int16_t(msg->vel_sway * 1000);
+      omega = int16_t(-msg->omega * (180.0 / M_PI) * 10);
+      float vector_sum = pow(x_vector,2) + pow(y_vector,2); 
+      if(sqrt(vector_sum) > VEL_MAX){
+          float k = sqrt(vector_sum) / VEL_MAX;
+          x_vector = x_vector / k;
+          y_vector = y_vector / k;
+      }
 
-//      x_vector = int16_t(msg->vel_surge * 1000);
-//      y_vector = int16_t(msg->vel_sway * 1000);
-//
-//      float theta_deg = msg->theta * (180 / M_PI);
-//      while(!(0 <= theta_deg && theta_deg < 360)){
-//          if(theta_deg < 0){
-//              theta_deg += 360;
-//          }else{
-//              theta_deg -= 360;
-//          }
-//      }
+        int16_t tmp = y_vector;
+        y_vector = x_vector;
+        x_vector = -tmp;
 
-      
+      float theta_deg = msg->theta * (180 / M_PI);
+      while(!(0 <= theta_deg && theta_deg < 360)){
+          if(theta_deg < 0){
+              theta_deg += 360;
+          }else{
+              theta_deg -= 360;
+          }
+      }
+
+/*
       x_vector = int16_t(x * 1000);
       y_vector = int16_t(y * 1000);
 
@@ -123,7 +135,7 @@ public:
               theta_deg -= 360;
           }
       }
-      
+  */
 
       double current_orientation_deg = current_orientation[2] * (180 / M_PI);
       while(!(0 <= current_orientation_deg && current_orientation_deg < 360)){
@@ -177,10 +189,14 @@ public:
     }
 
 
+    int16_t tmp = x_vector;
+    x_vector = y_vector;
+    y_vector = -tmp;
       DBG(" %4d ", x_vector);
       DBG(" %4d ", y_vector);
       DBG(" %4d ", th_vector);
       DBG(" %4d ", calib_data);
+      DBG(" %4d ", omega);
       DBG("\n\n\n");
 
 
@@ -208,6 +224,10 @@ public:
         tmp = (y_vector & 0x7) << 5 | (th_vector >> 7);
         buf->push_back(tmp);
         tmp = (th_vector & 0x7F ) << 1;
+        buf->push_back(tmp);
+        tmp = (omega >> 8);
+        buf->push_back(tmp);
+        tmp = (omega & 0xFF);
         buf->push_back(tmp);
         break;
       case 1:
@@ -250,8 +270,8 @@ int main(int argc, char** argv)
   ros::Rate r(60);
   ros::Subscriber command_sub[1], odom_sub[1];
   Sender senders[1];
-  command_sub[0] = nh.subscribe("/blue/robot_0/robot_commands", 100, &Sender::command_callback, &senders[0]);
-  odom_sub[0] = nh.subscribe("/blue/robot_0/odom", 100, &Sender::odom_callback, &senders[0]);
+  command_sub[0] = nh.subscribe("/blue/robot_1/robot_commands", 100, &Sender::command_callback, &senders[0]);
+  odom_sub[0] = nh.subscribe("/blue/robot_1/odom", 100, &Sender::odom_callback, &senders[0]);
 
   errorFlag = 0;
 
