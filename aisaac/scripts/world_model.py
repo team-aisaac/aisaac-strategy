@@ -105,8 +105,8 @@ if __name__ == "__main__":
                 identity_filter(enemy)
 
             referee_branch = referee.get_referee_branch()
-            #referee_branch = "NORMAL_START"
-            strat = strategy.StopStaticStrategy()
+            # referee_branch = "NORMAL_START"
+            # strat = strategy.StopStaticStrategy()
 
             if referee_branch == "HALT":
                 strat = strategy.HaltStaticStrategy()
@@ -129,7 +129,7 @@ if __name__ == "__main__":
                     'indirect_free_blue')
                 strat = strat_calcrator.calcurate(strat_ctx)
 
-            #status_publisher.publish_all(strat)
+            status_publisher.publish_all(strat)
             world_model.trigger_loop_events()
             loop_rate.sleep()
     except Exception as e:
