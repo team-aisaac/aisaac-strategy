@@ -7,7 +7,6 @@ from aisaac.msg import Ball_sub_params
 import tf
 import functions
 
-
 class Objects(object):
 
     # シングルトン化
@@ -109,30 +108,31 @@ class Objects(object):
     def robot_odom_callback(self, msg, id):
         robot_x = msg.pose.pose.position.x
         robot_y = msg.pose.pose.position.y
-        robot_t = tf.transformations.euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))
+        robot_t = tf.transformations.euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))[2]
         robot_v_x = msg.twist.twist.linear.x
         robot_v_y = msg.twist.twist.linear.y
         robot_v_t = msg.twist.twist.linear.z
-        self.robot[id].set_vision_position(x = robot_x, y = robot_y, theta=robot_t[2])
+        self.robot[id].set_vision_position(x = robot_x, y = robot_y, theta=robot_t)
         self.robot[id].set_current_velocity(vx = robot_v_x, vy = robot_v_y, vtheta=robot_v_t)
 
     """---Visionからenemyの現在地をもらう---"""
     def enemy_odom_callback(self, msg, id):
         enemy_x = msg.pose.pose.position.x
         enemy_y = msg.pose.pose.position.y
-        enemy_t = tf.transformations.euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))
+        enemy_t = tf.transformations.euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))[2]
         enemy_v_x = msg.twist.twist.linear.x
         enemy_v_y = msg.twist.twist.linear.y
         enemy_v_t = msg.twist.twist.linear.z
-        self.enemy[id].set_vision_position(x = enemy_x, y = enemy_y, theta=enemy_t[2])
+
+        self.enemy[id].set_vision_position(x = enemy_x, y = enemy_y, theta=enemy_t)
         self.enemy[id].set_current_velocity(vx = enemy_v_x, vy = enemy_v_y, vtheta=enemy_v_t)
 
     """---Visionからballの現在地をもらう---"""
     def ball_odom_callback(self, msg):
         ball_x = msg.pose.pose.position.x
         ball_y = msg.pose.pose.position.y
-        ball_t = tf.transformations.euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))
-        self.ball.set_current_position(x = ball_x, y = ball_y, theta=ball_t[2])
+        ball_t = tf.transformations.euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))[2]
+        self.ball.set_current_position(x = ball_x, y = ball_y, theta=ball_t)
         _ = self.ball_dynamics.pop(0)
         self.ball_dynamics.append([ball_x, ball_y])
 
