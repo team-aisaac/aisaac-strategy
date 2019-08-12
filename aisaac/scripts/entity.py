@@ -84,7 +84,7 @@ class Entity(object):
 class Robot(Entity):
     def __init__(self, id=None):
         super(Robot, self).__init__()
-        if id:
+        if id is not None:
             self._id = id
 
         else:
@@ -129,9 +129,9 @@ class Robot(Entity):
         self._current_position_x = x
         self._current_position_y = y
         self._current_orientation = theta
-        self._current_position_x_sigma = x_sigma_square
-        self._current_position_y_sigma = y_sigma_square
-        self._current_orientation_sigma = theta_sigma_square
+        self._current_position_x_sigma = x_sigma
+        self._current_position_y_sigma = y_sigma
+        self._current_orientation_sigma = theta_sigma
 
     # カルマンフィルタ用のゲッター
     def get_current_position_for_filter(self):
