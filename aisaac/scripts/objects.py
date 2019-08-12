@@ -123,7 +123,6 @@ class Objects(object):
         enemy_v_x = msg.twist.twist.linear.x
         enemy_v_y = msg.twist.twist.linear.y
         enemy_v_t = msg.twist.twist.linear.z
-
         self.enemy[id].set_vision_position(x = enemy_x, y = enemy_y, theta=enemy_t)
         self.enemy[id].set_current_velocity(vx = enemy_v_x, vy = enemy_v_y, vtheta=enemy_v_t)
 
