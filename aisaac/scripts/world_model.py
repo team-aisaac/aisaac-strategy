@@ -8,7 +8,9 @@ from objects import Objects
 import strategy
 from normal_start_strategy_calcurator import NormalStartStrategyCalcurator, NormalStartKickOffStrategyCalcurator
 from direct_free_attack_strategy_calcurator import DirectFreeAttack
+from direct_free_defence_strategy_calcurator import DirectFreeDefence
 from indirect_free_attack_strategy_calcurator import IndirectFreeAttack
+from indirect_free_defence_strategy_calcurator import IndirectFreeDefence
 from context import StrategyContext
 from world_model_status_publisher import WorldModelStatusPublisher
 
@@ -36,7 +38,9 @@ class WorldModel(object):
             'normal_start_normal': NormalStartStrategyCalcurator(self._objects),
             'normal_start_kickoff': NormalStartKickOffStrategyCalcurator(self._objects),
             'direct_free_attack': DirectFreeAttack(self._objects),
-            'indirect_free_attack': IndirectFreeAttack(self._objects)
+            'direct_free_defence': DirectFreeDefence(self._objects),
+            'indirect_free_attack': IndirectFreeAttack(self._objects),
+            'indirect_free_defence': IndirectFreeDefence(self._objects)
         }
         self._status_publisher = WorldModelStatusPublisher(
             self._team_color, robot_ids=self._objects.get_robot_ids())
@@ -144,9 +148,17 @@ def run_world_model():
                 strat_calcrator = world_model.get_strategy_calcurator(
                     'direct_free_attack')
                 strat = strat_calcrator.calcurate(strat_ctx)
+            elif referee_branch == "DIRECT_FREE_DEFENCE":
+                strat_calcrator = world_model.get_strategy_calcurator(
+                    'direct_free_defence')
+                strat = strat_calcrator.calcurate(strat_ctx)
             elif referee_branch == "INDIRECT_FREE_ATTACK":
                 strat_calcrator = world_model.get_strategy_calcurator(
                     'indirect_free_attack')
+                strat = strat_calcrator.calcurate(strat_ctx)
+            elif referee_branch == "INDIRECT_FREE_DEFENCE":
+                strat_calcrator = world_model.get_strategy_calcurator(
+                    'indirect_free_defence')
                 strat = strat_calcrator.calcurate(strat_ctx)
 
             if tmp_last_referee_branch != referee_branch:

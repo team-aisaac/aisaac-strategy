@@ -87,7 +87,7 @@ class StrategyCalcuratorBase(object):
 
     def _get_active_enemy_ids(self):
         # type: () -> List[int]
-        active_enemy_ids = self._enemy_ids
+        active_enemy_ids = copy.deepcopy(self._enemy_ids)
         # TODO: アクティブな敵ロボットのIDリストにする
         return active_enemy_ids
 
