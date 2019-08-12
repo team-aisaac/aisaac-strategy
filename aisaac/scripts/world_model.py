@@ -7,8 +7,8 @@ from objects import Objects
 
 import strategy
 from normal_start_strategy_calcurator import NormalStartStrategyCalcurator, NormalStartKickOffStrategyCalcurator
-from direct_free_blue_strategy_calcurator import DirectFreeBlue
-from indirect_free_blue_strategy_calcurator import IndirectFreeBlue
+from direct_free_attack_strategy_calcurator import DirectFreeAttack
+from indirect_free_attack_strategy_calcurator import IndirectFreeAttack
 from context import StrategyContext
 from world_model_status_publisher import WorldModelStatusPublisher
 
@@ -35,8 +35,8 @@ class WorldModel(object):
         self._stcalcurator = {
             'normal_start_normal': NormalStartStrategyCalcurator(self._objects),
             'normal_start_kickoff': NormalStartKickOffStrategyCalcurator(self._objects),
-            'direct_free_blue': DirectFreeBlue(self._objects),
-            'indirect_free_blue': IndirectFreeBlue(self._objects)
+            'direct_free_attack': DirectFreeAttack(self._objects),
+            'indirect_free_attack': IndirectFreeAttack(self._objects)
         }
         self._status_publisher = WorldModelStatusPublisher(
             self._team_color, robot_ids=self._objects.get_robot_ids())
@@ -140,15 +140,13 @@ def run_world_model():
 
             elif referee_branch == "DEFENCE":
                 strat = strategy.DefenceStaticStrategy()
-
-            elif referee_branch == "DIRECT_FREE_BLUE":
+            elif referee_branch == "DIRECT_FREE_ATTACK":
                 strat_calcrator = world_model.get_strategy_calcurator(
-                    'direct_free_blue')
+                    'direct_free_attack')
                 strat = strat_calcrator.calcurate(strat_ctx)
-
-            elif referee_branch == "INDIRECT_FREE_BLUE":
+            elif referee_branch == "INDIRECT_FREE_ATTACK":
                 strat_calcrator = world_model.get_strategy_calcurator(
-                    'indirect_free_blue')
+                    'indirect_free_attack')
                 strat = strat_calcrator.calcurate(strat_ctx)
 
             if tmp_last_referee_branch != referee_branch:

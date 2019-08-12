@@ -1,7 +1,7 @@
 # !/usr/bin/env  python
 # coding:utf-8
 
-from world_state import WorldState
+#from world_state import WorldState
 import rospy
 from consai_msgs.msg import RefereeTeamInfo
 from std_msgs.msg import Int8
@@ -9,7 +9,7 @@ from std_msgs.msg import Int8
 class Referee:
     def __init__(self, objects):
         self.team_color = objects.team_color
-        self.world_state = WorldState(objects)
+        #self.world_state = WorldState(objects)
 
         """refereeから受信する情報"""
         self._command = None
@@ -66,39 +66,39 @@ class Referee:
         elif self._command == "data: 3":
             # FORCE_START = 3
 		    #The yellow team may move into kickoff position.
-            referee_branch = "NORMAL_START"
-        elif self._command == "data: 4":
+            referee_branch = "FORCE_START"
+        elif (self._command == "data: 4" and self.team_color == 'yellow') or (self._command == "data: 5" and self.team_color == 'blue'):
             # PREPARE_KICKOFF_YELLOW = 4;
 		    #The blue team may move into kickoff position.
             referee_branch = "KICKOFF"
-        elif self._command == "data: 5":
+        elif (self._command == "data: 4" and self.team_color == 'blue') or (self._command == "data: 5" and self.team_color == 'yellow'):
             # PREPARE_KICKOFF_BLUE = 5;
 		    # The yellow team may move into penalty position.
             referee_branch = "DEFENCE"
-        elif self._command == "data: 6":
+        elif (self._command == "data: 6" and self.team_color == 'yellow') or (self._command == "data: 7" and self.team_color == 'blue'):
             # PREPARE_PENALTY_YELLOW = 6;
 		    # The blue team may move into penalty position.
-            referee_branch = "HALT"
-        elif self._command == "data: 7":
+            referee_branch = "PENALTY_ATTACK"
+        elif (self._command == "data: 6"  and self.team_color == 'blue') or (self._command == "data: 7" and self.team_color == 'yellow'):
             # PREPARE_PENALTY_BLUE = 7;
 		    # The yellow team may take a direct free kick.
-            referee_branch = "HALT"
-        elif self._command == "data: 8":
+            referee_branch = "PENALTY_DIFFENCE"
+        elif (self._command == "data: 8" and self.team_color == 'yellow') or (self._command == "data: 9" and self.team_color == 'blue'):
             # DIRECT_FREE_YELLOW = 8;
 		    # The blue team may take a direct free kick.
-            referee_branch = "HALT"
-        elif self._command == "data: 9":
+            referee_branch = "DIRECT_FREE_ATTACK"
+        elif (self._command == "data: 8" and self.team_color == 'blue') or (self._command == "data: 9" and self.team_color == 'yellow'):
             #DIRECT_FREE_BLUE = 9;
 		    # The yellow team may take an indirect free kick.
-            referee_branch = "DIRECT_FREE_BLUE"
-        elif self._command == "data: 10":
+            referee_branch = "DIRECT_FREE_DEFFENCE"
+        elif (self._command == "data: 10" and self.team_color == 'yellow') or (self._command == "data: 11" and self.team_color == 'blue'):
             #INDIRECT_FREE_YELLOW = 10;
 		    # The blue team may take an indirect free kick.
-            referee_branch = "HALT"
-        elif self._command == "data: 11":
+            referee_branch = "INDIRECT_FREE_ATTACK"
+        elif (self._command == "data: 10" and self.team_color == 'blue') or (self._command == "data: 11" and self.team_color == 'yellow'):
             # INDIRECT_FREE_BLUE = 11;
 		    # The yellow team is currently in a timeout.
-            referee_branch = "INDIRECT_FREE_BLUE"
+            referee_branch = "INDIRECT_FREE_DEFFENCE"
         elif self._command == "data: 12":
             # TIMEOUT_YELLOW = 12;
 		    # The blue team is currently in a timeout.
@@ -126,11 +126,5 @@ class Referee:
         elif self._command == "data: 17":
             #BALL_PLACEMENT_BLUE = 17;
             referee_branch = "STOP"
-
-        if self.world_state.color == "Blue":
-            if self._command == "data: 4":
-                referee_branch = "DEFENCE"
-            elif self._command == "data: 5":
-                referee_branch = "KICKOFF"
 
         return referee_branch

@@ -17,18 +17,22 @@ except:
     print("Module: typing (for better completion) not found. You can ignore this.")
 
 
-class IndirectFreeBlue(StrategyCalcuratorBase):
+class IndirectFreeAttack(StrategyCalcuratorBase):
     """
-    referee_branchがINDIRECT_FREE_BLUEの場合のCalcurator。
+    referee_branchがINDIRECT_FREE_BLUEで自分もBLUE、または
+    referee_branchがINDIRECT_FREE_YELLOWで自分もYELLOW の場合のCalcurator。
     """
     def __init__(self, objects):
+        self.objects = objects
         self.friend = objects.robot
         self._robot_ids = objects.get_robot_ids()
         self._dynamic_strategy = DynamicStrategy()
 
     def calcurate(self, strategy_context=None):
         # type: (StrategyContext) -> StrategyBase
-
+        sorted_ids = object.get_robot_ids_sorted_by_distance([6.0,0.0])
+        print sorted_ids
+            
         active_robot_ids = self._get_active_robot_ids()
         status = Status()
         for idx, robot_id in enumerate(active_robot_ids):
