@@ -38,11 +38,10 @@ class Calculation():
         
         self.robot_color = str(rospy.get_param("~robot_color"))
         # self.robot_id = str(rospy.get_param("~robot_num"))
-        self.robot_total = 8
-        self.enemy_total = 8
 
         # Composition
-        self.objects = Objects(self.robot_color, self.robot_total, self.enemy_total)
+        self.objects = Objects(
+            self.robot_color, config.NUM_FRIEND_ROBOT, config.NUM_ENEMY_ROBOT)
 
         # self.ctrld_robot = self.objects.robot[int(self.robot_id)]
 
