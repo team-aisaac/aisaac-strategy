@@ -31,12 +31,7 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
     def _pass_and_shoot(self, pass_positions, strategy_context):
         pass
 
-    """
-    referee_branchがNORMAL_STARTの場合のCalcurator。
-    """
-    def calcurate(self, strategy_context=None):
-        # type: (StrategyContext) -> StrategyBase
-
+    def _attack_strategy1(self, strategy_context=None):
         pass_positions = [
             [2.0, 2.0],
             [-2.0, -2.0],
@@ -73,18 +68,36 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
             cur_state = cur_state - 1
             should_reset = True
 
-        print("State:"+str(cur_state))
+        # print("State:"+str(cur_state))
 
         # InitialStaticStrategyを元に組み立てる
         self._dynamic_strategy.clone_from(self._static_strategies['initial'])
 
         # 生きてるロボットにだけ新たな指示を出す例
         active_robot_ids = self._get_active_robot_ids()
-        robots_near_to_ball = self._objects.get_robot_ids_sorted_by_distance_to_ball(active_robot_ids)
 
         not_assigned_robot_ids = active_robot_ids
 
-        for idx, robot_id in enumerate(robots_near_to_ball[:2]):
+
+        # Defence系を先にアサイン
+        not_assigned_ops = ["keeper", "defence3", "defence4"]
+
+        # for文で消えないようコピー
+        sorted_not_assigned_robot_ids = sorted(not_assigned_robot_ids, reverse=True)
+        for robot_id in sorted_not_assigned_robot_ids:
+            if not_assigned_ops == []:
+                break
+            status = Status()
+            status.status = not_assigned_ops[0]
+
+            self._dynamic_strategy.set_robot_status(robot_id, status)
+
+            not_assigned_ops.pop(0)
+            not_assigned_robot_ids.remove(robot_id)
+
+        robots_near_to_ball = self._objects.get_robot_ids_sorted_by_distance_to_ball(not_assigned_robot_ids)
+
+        for idx, robot_id in enumerate(robots_near_to_ball):
             status = Status()
             if idx == 0:
                 status.status = "pass"
@@ -110,15 +123,6 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
 
             self._dynamic_strategy.set_robot_status(robot_id, status)
 
-        not_assigned_ops = ["keeper", "defence3", "defence4"]
-
-        for robot_id in not_assigned_robot_ids:
-            status = Status()
-            status.status = not_assigned_ops[0]
-            not_assigned_ops.pop(0)
-
-            self._dynamic_strategy.set_robot_status(robot_id, status)
-
         # self._dynamic_strategy.clone_from(self._static_strategies['initial'])
         if should_reset:
             # シュートしたらリセット
@@ -127,6 +131,15 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
         else:
             strategy_context.update("normal_strat_state", cur_state)
 
-        result = self._dynamic_strategy
+        result = copy.deepcopy(self._dynamic_strategy)
+        return result
+
+    """
+    referee_branchがNORMAL_STARTの場合のCalcurator。
+    """
+    def calcurate(self, strategy_context=None):
+        # type: (StrategyContext) -> StrategyBase
+        if True:
+            result = self._attack_strategy1(strategy_context)
 
         return result
