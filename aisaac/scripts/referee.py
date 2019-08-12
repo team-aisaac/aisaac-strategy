@@ -86,7 +86,7 @@ class Referee:
         elif self._command == "data: 8":
             # DIRECT_FREE_YELLOW = 8;
 		    # The blue team may take a direct free kick.
-            referee_branch = "HALT"
+            referee_branch = "DIRECT_FREE_YELLOW"
         elif self._command == "data: 9":
             #DIRECT_FREE_BLUE = 9;
 		    # The yellow team may take an indirect free kick.
@@ -94,7 +94,7 @@ class Referee:
         elif self._command == "data: 10":
             #INDIRECT_FREE_YELLOW = 10;
 		    # The blue team may take an indirect free kick.
-            referee_branch = "HALT"
+            referee_branch = "INDIRECT_FREE_YELLOW"
         elif self._command == "data: 11":
             # INDIRECT_FREE_BLUE = 11;
 		    # The yellow team is currently in a timeout.

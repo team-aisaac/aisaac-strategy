@@ -8,7 +8,9 @@ from objects import Objects
 import strategy
 from normal_start_strategy_calcurator import NormalStartStrategyCalcurator
 from direct_free_blue_strategy_calcurator import DirectFreeBlue
+from direct_free_yellow_strategy_calcurator import DirectFreeYellow
 from indirect_free_blue_strategy_calcurator import IndirectFreeBlue
+from indirect_free_yellow_strategy_calcurator import IndirectFreeYellow
 from context import StrategyContext
 from world_model_status_publisher import WorldModelStatusPublisher
 
@@ -35,7 +37,9 @@ class WorldModel(object):
         self._stcalcurator = {
             'normal_start': NormalStartStrategyCalcurator(self._objects),
             'direct_free_blue': DirectFreeBlue(self._objects),
-            'indirect_free_blue': IndirectFreeBlue(self._objects)
+            'direct_free_yellow': DirectFreeYellow(self._objects),
+            'indirect_free_blue': IndirectFreeBlue(self._objects),
+            'indirect_free_yellow': IndirectFreeYellow(self._objects)
         }
         self._status_publisher = WorldModelStatusPublisher(
             self._team_color, robot_ids=self._objects.get_robot_ids())
@@ -105,6 +109,7 @@ if __name__ == "__main__":
                 identity_filter(enemy)
 
             referee_branch = referee.get_referee_branch()
+            print referee_branch
             # referee_branch = "NORMAL_START"
             #strat = strategy.StopStaticStrategy()
 
@@ -124,9 +129,17 @@ if __name__ == "__main__":
                 strat_calcrator = world_model.get_strategy_calcurator(
                     'direct_free_blue')
                 strat = strat_calcrator.calcurate(strat_ctx)
+            elif referee_branch == "DIRECT_FREE_YELLOW":
+                strat_calcrator = world_model.get_strategy_calcurator(
+                    'direct_free_yellow')
+                strat = strat_calcrator.calcurate(strat_ctx)
             elif referee_branch == "INDIRECT_FREE_BLUE":
                 strat_calcrator = world_model.get_strategy_calcurator(
                     'indirect_free_blue')
+                strat = strat_calcrator.calcurate(strat_ctx)
+            elif referee_branch == "INDIRECT_FREE_YELLOW":
+                strat_calcrator = world_model.get_strategy_calcurator(
+                    'indirect_free_yellow')
                 strat = strat_calcrator.calcurate(strat_ctx)
 
             status_publisher.publish_all(strat)
