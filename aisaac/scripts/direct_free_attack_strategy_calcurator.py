@@ -17,7 +17,7 @@ except:
     print("Module: typing (for better completion) not found. You can ignore this.")
 
 
-class DirectFreeBlue(StrategyCalcuratorBase):
+class DirectFreeAttack(StrategyCalcuratorBase):
     """
     referee_branchがDIRECT_FREE_BLUEの場合のCalcurator。
     """

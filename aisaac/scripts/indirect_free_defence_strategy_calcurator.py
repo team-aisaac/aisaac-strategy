@@ -18,9 +18,9 @@ except:
     print("Module: typing (for better completion) not found. You can ignore this.")
 
 
-class DirectFreeYellow(StrategyCalcuratorBase):
+class IndirectFreeDefence(StrategyCalcuratorBase):
     """
-    referee_branchがDIRECT_FREE_yellowの場合のCalcurator。
+    referee_branchがINDIRECT_FREE_DEFENCEの場合のCalcurator。
     """
     def __init__(self, objects):
         self.friend = objects.robot
@@ -51,6 +51,7 @@ class DirectFreeYellow(StrategyCalcuratorBase):
                 if nearest_enemy_id != None:
                     status.pid_goal_pos_x, status.pid_goal_pos_y = functions.calculate_internal_dividing_point(self.enemy[nearest_enemy_id].get_current_position()[0], self.enemy[nearest_enemy_id].get_current_position()[1], self.ball_params.get_current_position()[0], self.ball_params.get_current_position()[1], functions.distance_btw_two_points(self.enemy[nearest_enemy_id].get_current_position(), self.ball_params.get_current_position()) + 0.55, -0.55)
                     status.pid_goal_theta = math.atan2( (self.ball_params.get_current_position()[1] - self.friend[3].get_current_position()[1]) , (self.ball_params.get_current_position()[0] - self.friend[3].get_current_position()[0]) )
+            #パスカット実装予定
             else:
                 status.status = "none"
             self._dynamic_strategy.set_robot_status(robot_id, status)

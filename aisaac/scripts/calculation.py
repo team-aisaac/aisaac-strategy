@@ -38,11 +38,10 @@ class Calculation():
         
         self.robot_color = str(rospy.get_param("~robot_color"))
         # self.robot_id = str(rospy.get_param("~robot_num"))
-        self.robot_total = 8
-        self.enemy_total = 8
 
         # Composition
-        self.objects = Objects(self.robot_color, self.robot_total, self.enemy_total)
+        self.objects = Objects(
+            self.robot_color, config.NUM_FRIEND_ROBOT, config.NUM_ENEMY_ROBOT)
 
         # self.ctrld_robot = self.objects.robot[int(self.robot_id)]
 
@@ -345,21 +344,19 @@ class Calculation():
         else:
             t_2 = (self.L_G + self.robot_r)/math.sqrt((self.line_up_r_y - self.line_down_r_y)**2 + (self.line_up_r_x - self.line_down_r_x)**2)
             # 1台の時
-            if ball_x > 0:
+            if ball_x > 0.0:
                 # 右サイドにボールがある
                 if ball_y > 0:
                     def1_pos_y = self.line_down_r_y + (self.line_up_r_y - self.line_down_r_y)*t_2
                     def1_pos_x = self.line_up_r_x + (self.line_down_r_x - self.line_up_r_x)*t_2
                     def2_pos_y = 0.0
-                    def2_pos_x = 0.0
-                    rospy.loginfo_throttle(1, "3-1")
+                    def2_pos_x = -1.0
                 # 左サイドにボールがある
                 else:
                     def1_pos_y = self.line_up_r_y + (self.line_down_r_y - self.line_up_r_y)*t_2
                     def1_pos_x = self.line_down_r_x + (self.line_up_r_x - self.line_down_r_x)*t_2
                     def2_pos_y = 0.0
-                    def2_pos_x = 0.0
-                    rospy.loginfo_throttle(1, "3-1")
+                    def2_pos_x = -1.0
             # 2台の時
             else:
                 # 右サイドにボールがある
@@ -368,14 +365,12 @@ class Calculation():
                     def2_pos_x = self.line_down_r_x + (self.line_up_r_x - self.line_down_r_x)*t_2
                     def1_pos_y = self.line_down_r_y + 3.0*(self.line_up_r_y - self.line_down_r_y)*t_2
                     def1_pos_x = self.line_down_r_x + 3.0*(self.line_up_r_x - self.line_down_r_x)*t_2
-                    rospy.loginfo_throttle(1, "3-1")
                 # 左サイドにボールがある
                 else:
                     def1_pos_y = self.line_up_r_y + (self.line_down_r_y - self.line_up_r_y)*t_2
                     def1_pos_x = self.line_up_r_x + (self.line_down_r_x - self.line_up_r_x)*t_2
                     def2_pos_y = self.line_up_r_y + 3.0*(self.line_down_r_y - self.line_up_r_y)*t_2
                     def2_pos_x = self.line_up_r_x + 3.0*(self.line_down_r_x - self.line_up_r_x)*t_2
-                    rospy.loginfo_throttle(1, "3-1")
 
         # 念の為クリップ
         def1_pos_x = np.clip(def1_pos_x, -6.0, 6.0)
@@ -388,20 +383,25 @@ class Calculation():
         self.def_pos.def2_pos_x = def2_pos_x
         self.def_pos.def2_pos_y = def2_pos_y
 
-if __name__ == "__main__":
-    a = Calculation()
+def run_calculation():
+    calcuration = Calculation()
     pub = Publisher()
-    
-    a.objects.odom_listener()
 
     loop_rate = rospy.Rate(WORLD_LOOP_RATE)
 
     rospy.loginfo("start calculation node")
 
     while not rospy.is_shutdown():
-
-        a.calc_ball_line()
-        a.calc_def_pos()
-        pub.ball_params_publisher(a.ball_sub_params)
-        pub.def_pos_publisher(a.def_pos)
+        calcuration.calc_ball_line()
+        calcuration.calc_def_pos()
+        pub.ball_params_publisher(calcuration.ball_sub_params)
+        pub.def_pos_publisher(calcuration.def_pos)
         loop_rate.sleep()
+
+if __name__ == "__main__":
+    while True and not rospy.is_shutdown():
+        try:
+            run_calculation()
+        except:
+            import traceback
+            traceback.print_exc()

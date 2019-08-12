@@ -18,9 +18,9 @@ except:
     print("Module: typing (for better completion) not found. You can ignore this.")
 
 
-class IndirectFreeYellow(StrategyCalcuratorBase):
+class DirectFreeDefence(StrategyCalcuratorBase):
     """
-    referee_branchがINDIRECT_FREE_yellowの場合のCalcurator。
+    referee_branchがDIRECT_FREE_DEFENCEの場合のCalcurator。
     """
     def __init__(self, objects):
         self.friend = objects.robot
