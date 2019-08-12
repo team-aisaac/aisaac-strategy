@@ -38,9 +38,11 @@ class Objects(object):
         self.odom_listener()
 
     def get_robot_ids_sorted_by_distance_to_ball(self, robot_ids=None):
+        # type: (typing.List[int]) -> typing.List[int]
         return self.get_robot_ids_sorted_by_distance(self.ball.get_current_position(), robot_ids)
 
     def get_robot_ids_sorted_by_distance(self, target_xy, robot_ids=None):
+        # type: (typing.List[float], typing.List[int]) -> typing.List[int]
         target_x = target_xy[0]
         target_y = target_xy[1]
 

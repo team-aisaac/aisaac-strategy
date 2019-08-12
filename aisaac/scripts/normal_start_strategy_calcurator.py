@@ -24,6 +24,7 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
         super(NormalStartStrategyCalcurator, self).__init__(objects)
         self._receiver_id = None
         self._kicker_id = None
+        self._robots_near_to_ball = None
 
     def _attack_strategy1(self, strategy_context=None):
         pass_positions = [
@@ -45,13 +46,15 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
             target_pos = self._objects.robot[self._receiver_id].get_current_position()
 
         distance = functions.distance_btw_two_points(ball_pos, target_pos)
+        # print("Receiver: "+ str(self._receiver_id) +" Distance:"+str(distance))
 
         cur_state = last_state
 
         # 目標位置近くにボールが行ったら次のステートへ
-        if distance < succeeded_area:
-            if len(pass_positions) > cur_state:
-                cur_state = cur_state + 1
+        change_state = False
+        if distance < succeeded_area and len(pass_positions) > cur_state:
+            cur_state = cur_state + 1
+            change_state = True
 
         # 最後のpass_positionsだったらシュート
         is_shoot = False
@@ -73,7 +76,6 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
         active_robot_ids = self._get_active_robot_ids()
 
         not_assigned_robot_ids = active_robot_ids
-
 
         if len(active_robot_ids) >= 5:
             # 残り5台以上の場合
@@ -104,11 +106,13 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
             not_assigned_ops.pop(0)
             not_assigned_robot_ids.remove(robot_id)
 
-        robots_near_to_ball = self._objects.get_robot_ids_sorted_by_distance_to_ball(not_assigned_robot_ids)
+        # ステートが変わるときに近い順を更新
+        if self._robots_near_to_ball is None or change_state:
+            self._robots_near_to_ball = self._objects.get_robot_ids_sorted_by_distance_to_ball(not_assigned_robot_ids)
 
-        if len(robots_near_to_ball) >= 2: # 2台以上攻撃に割ける場合
+        if len(self._robots_near_to_ball) >= 2: # 2台以上攻撃に割ける場合
             # 残りをボールに近い順にアサイン
-            for idx, robot_id in enumerate(robots_near_to_ball):
+            for idx, robot_id in enumerate(self._robots_near_to_ball):
                 status = Status()
                 if idx == 0:
                     status.status = "pass"
@@ -136,7 +140,7 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
                 self._dynamic_strategy.set_robot_status(robot_id, status)
 
         else: # 1台以下の場合あまりがいればとりあえずゴールにシュート
-            for robot_id in robots_near_to_ball:
+            for robot_id in self._robots_near_to_ball:
                 status = Status()
                 status.status = "pass"
                 status.pass_target_pos_x = pass_positions[-1][0]
@@ -210,7 +214,6 @@ class NormalStartKickOffStrategyCalcurator(StrategyCalcuratorBase):
             status = Status()
             status.status = ops[idx]
             self._dynamic_strategy.set_robot_status(robot_id, status)
-
 
         result = self._dynamic_strategy
         return result
