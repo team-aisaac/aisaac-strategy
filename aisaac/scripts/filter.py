@@ -66,6 +66,7 @@ def kalman_filter(robot):
     # if  abs(vision_y - updated_y)>0.05:
     #     print robot.get_id(), "yがずれてる", vision_y - updated_y
 
+    #print updated_x_sigma, updated_y_sigma, updated_theta_sigma
     # アップデートした信念で上書き
     robot.set_current_position_for_filter(updated_x, updated_y, updated_theta, updated_x_sigma,updated_y_sigma, updated_theta_sigma)
 
