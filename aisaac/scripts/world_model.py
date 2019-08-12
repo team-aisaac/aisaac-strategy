@@ -106,7 +106,7 @@ if __name__ == "__main__":
 
             referee_branch = referee.get_referee_branch()
             # referee_branch = "NORMAL_START"
-            #strat = strategy.StopStaticStrategy()
+            # strat = strategy.StopStaticStrategy()
 
             if referee_branch == "HALT":
                 strat = strategy.HaltStaticStrategy()
