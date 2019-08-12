@@ -81,13 +81,22 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
         # 生きてるロボットにだけ新たな指示を出す例
         active_robot_ids = self._get_active_robot_ids()
         robots_near_to_ball = self._objects.get_robot_ids_sorted_by_distance_to_ball(active_robot_ids)
-        for idx, robot_id in enumerate(robots_near_to_ball):
+
+        not_assigned_robot_ids = active_robot_ids
+
+        for idx, robot_id in enumerate(robots_near_to_ball[:2]):
             status = Status()
             if idx == 0:
                 status.status = "pass"
+                if self._receiver_id is not None:
+                    receiver_pos = self._objects.robot[self._receiver_id].get_current_position()
+                    if functions.distance_btw_two_points(pass_positions[cur_state], receiver_pos) > area:
+                        status.status = "prepare_pass"
+
                 self._kicker_id = robot_id
                 status.pass_target_pos_x = pass_positions[cur_state][0]
                 status.pass_target_pos_y = pass_positions[cur_state][1]
+                not_assigned_robot_ids.remove(robot_id)
             elif idx == 1:
                 if is_shoot:
                     status.status = "stop"
@@ -97,12 +106,16 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
                     self._receiver_id = robot_id
                 status.pass_target_pos_x = pass_positions[cur_state][0]
                 status.pass_target_pos_y = pass_positions[cur_state][1]
-            elif idx == 2:
-                status.status = "defence3"
-            elif idx == 3:
-                status.status = "defence4"
-            elif idx == 4:
-                status.status = "keeper"
+                not_assigned_robot_ids.remove(robot_id)
+
+            self._dynamic_strategy.set_robot_status(robot_id, status)
+
+        not_assigned_ops = ["keeper", "defence3", "defence4"]
+
+        for robot_id in not_assigned_robot_ids:
+            status = Status()
+            status.status = not_assigned_ops[0]
+            not_assigned_ops.pop(0)
 
             self._dynamic_strategy.set_robot_status(robot_id, status)
 

@@ -71,7 +71,7 @@ class RobotKick(object):
         self.pid.pid_linear(self.ball_params.get_current_position()[0], self.ball_params.get_current_position()[1], self.pose_theta)
         #self.cmd.vel_surge = 3
 
-    def pass_ball(self, target_x, target_y):
+    def pass_ball(self, target_x, target_y, should_wait=False):
         distance = math.sqrt((target_x - self.ball_params.get_current_position()[0])**2 + (target_y - self.ball_params.get_current_position()[1])**2)
         if distance != 0:
             #print self.pass_stage
@@ -96,7 +96,9 @@ class RobotKick(object):
                 dispersion_average1 = sum(self.dispersion1)/len(self.dispersion1)
                 dispersion_average2 = sum(self.dispersion2)/len(self.dispersion2)
 
-                if dispersion_average1 > self.feint_threshold1 or dispersion_average2 > self.feint_threshold2:
+                if dispersion_average1 > self.feint_threshold1 \
+                        or dispersion_average2 > self.feint_threshold2 \
+                        or should_wait:
                     pose_theta += np.pi/3.
 
                 self.rot_dispersion.append((pose_theta - self.ctrld_robot.get_current_orientation())**2)
@@ -109,7 +111,8 @@ class RobotKick(object):
                     self.kick_power_x = math.sqrt(distance) * self.const
                     self.pose_theta = pose_theta
                     # self.status.robot_status = "kick"
-                    self.pass_stage = 1
+                    if not should_wait:
+                        self.pass_stage = 1
 
                 self.pid.pid_linear(pose_x, pose_y, pose_theta)
 
