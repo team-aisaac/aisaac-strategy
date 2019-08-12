@@ -37,13 +37,19 @@ class Objects(object):
 
         self.odom_listener()
 
-    def get_robot_ids_sorted_by_distance_to_ball(self):
-        return self.get_robot_ids_sorted_by_distance(self.ball.get_current_position())
+    def get_robot_ids_sorted_by_distance_to_ball(self, robot_ids=None):
+        return self.get_robot_ids_sorted_by_distance(self.ball.get_current_position(), robot_ids)
 
-    def get_robot_ids_sorted_by_distance(self, target_xy):
+    def get_robot_ids_sorted_by_distance(self, target_xy, robot_ids=None):
         target_x = target_xy[0]
         target_y = target_xy[1]
-        sorted_robots = sorted(self.robot,
+
+        if robot_ids is None:
+            robots = self.robot
+        else:
+            robots = [self.robot[i] for i in robot_ids]
+
+        sorted_robots = sorted(robots,
                                key=lambda robot: functions.distance_btw_two_points(robot.get_current_position(),
                                                                                    (target_x, target_y)))
         sorted_ids = map(lambda robot: robot.get_id(), sorted_robots)
