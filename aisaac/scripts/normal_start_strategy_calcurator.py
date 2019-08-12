@@ -103,7 +103,8 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
                 status.status = "pass"
                 if self._receiver_id is not None:
                     receiver_pos = self._objects.robot[self._receiver_id].get_current_position()
-                    if functions.distance_btw_two_points(pass_positions[cur_state], receiver_pos) > area:
+                    receiver_area = 1.0
+                    if functions.distance_btw_two_points(pass_positions[cur_state], receiver_pos) > receiver_area:
                         status.status = "prepare_pass"
 
                 self._kicker_id = robot_id

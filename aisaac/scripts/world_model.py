@@ -77,7 +77,7 @@ class WorldModel(object):
         return self._objects
 
 
-if __name__ == "__main__":
+def run_world_model():
     world_model = WorldModel()
     loop_rate = rospy.Rate(config.WORLD_LOOP_RATE)
     rospy.loginfo("start world model node")
@@ -137,3 +137,12 @@ if __name__ == "__main__":
         traceback.print_exc()
         status_publisher.publish_all(strategy.StopStaticStrategy())
         # world_model.decision_maker.stop_all()
+
+
+if __name__ == "__main__":
+    while True and not rospy.is_shutdown():
+        try:
+            run_world_model()
+        except:
+            import traceback
+            traceback.print_exc()

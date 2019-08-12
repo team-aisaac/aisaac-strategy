@@ -53,9 +53,10 @@ class RobotKick(object):
 
     def kick_x(self):
         area = 0.5
+        elapsed_time = rospy.Time.now() - self._kick_start_time
         if functions.distance_btw_two_points(self.ball_params.get_current_position(),
                                              self.ctrld_robot.get_current_position()) \
-                > self.ctrld_robot.size_r + area:
+                > self.ctrld_robot.size_r + area or elapsed_time.to_sec() > 1.0:
             self.cmd.vel_surge = 0
             self.cmd.vel_sway = 0
             self.cmd.omega = 0
@@ -112,6 +113,7 @@ class RobotKick(object):
                     self.pose_theta = pose_theta
                     # self.status.robot_status = "kick"
                     if not should_wait:
+                        self._kick_start_time = rospy.Time.now()
                         self.pass_stage = 1
 
                 self.pid.pid_linear(pose_x, pose_y, pose_theta)
@@ -150,7 +152,7 @@ class RobotKick(object):
         # 未実装
 
         # 距離だけで諦めるかどうか判断
-        if (d < 2.0) and  (self.ball_params.get_line_a() != 0):
+        if (d < 1.0) and  (self.ball_params.get_line_a() != 0):
             pose_theta = math.atan2( (self.ball_params.get_current_position()[1] - hy) , (self.ball_params.get_current_position()[0] - hx) )
             # pose_theta = math.atan2( (self.ball_params.get_current_position()[1]) , (self.ball_params.get_current_position()[0]) )
             self.pid.pid_linear(hx, hy, pose_theta)

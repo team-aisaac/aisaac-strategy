@@ -388,7 +388,7 @@ class Calculation():
         self.def_pos.def2_pos_x = def2_pos_x
         self.def_pos.def2_pos_y = def2_pos_y
 
-if __name__ == "__main__":
+def run_calcuration():
     a = Calculation()
     pub = Publisher()
     
@@ -405,3 +405,10 @@ if __name__ == "__main__":
         pub.ball_params_publisher(a.ball_sub_params)
         pub.def_pos_publisher(a.def_pos)
         loop_rate.sleep()
+if __name__ == "__main__":
+    while True and not rospy.is_shutdown():
+        try:
+            run_calcuration()
+        except:
+            import traceback
+            traceback.print_exc()
