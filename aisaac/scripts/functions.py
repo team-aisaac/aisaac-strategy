@@ -63,3 +63,9 @@ def calculate_centrifugalforce(vel_x_before, vel_y_before, vel_x_after, vel_y_af
     unit_vec_x = vel_x_after / np.sqrt(vel_x_after**2 + vel_y_after**2)
     unit_vec_y = -1 * vel_y_after / np.sqrt(vel_x_after**2 + vel_y_after**2)
     return R*unit_vec_x, R*unit_vec_y
+
+"""---m:nの内分点計算---"""
+def calculate_internal_dividing_point(x_0, y_0, x_1, y_1, m, n):
+    x = ((n * x_0) + (m * x_1)) / (m + n)
+    y = ((n * y_0) + (m * y_1)) / (m + n)
+    return x, y

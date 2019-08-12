@@ -68,7 +68,7 @@ class DynamicStrategy(StrategyBase):
 
     def set_robot_status(self, robot_id, status):
         # type: (int, Status) -> None
-        self._all_robot_status[robot_id] = status
+        self._all_robot_status[robot_id] = copy.deepcopy(status)
 
 
 class StaticStrategy(StrategyBase):
@@ -118,6 +118,21 @@ class StopStaticStrategy(StaticStrategy):
 
         status = _get_default_status()
         status.status = 'stop'
+
+        for robot_id in self._all_robot_status.keys():
+            self._all_robot_status[robot_id] = copy.deepcopy(status)
+
+class HaltStaticStrategy(StaticStrategy):
+    """
+    HALT指示に対するStrategy
+    """
+
+    def __init__(self, robot_ids=range(config.NUM_FRIEND_ROBOT)):
+        # type: (List[int]) -> None
+        super(HaltStaticStrategy, self).__init__(robot_ids)
+
+        status = _get_default_status()
+        status.status = 'halt'
 
         for robot_id in self._all_robot_status.keys():
             self._all_robot_status[robot_id] = copy.deepcopy(status)
