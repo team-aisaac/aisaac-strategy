@@ -23,7 +23,6 @@ import config
 ROBOT_LOOP_RATE = config.ROBOT_LOOP_RATE
 
 
-
 class Robot(object):
     def __init__(self, robot_id=None):
         rospy.init_node("robot")
@@ -74,6 +73,7 @@ class Robot(object):
                                                           self.cmd.vel_y,
                                                           self.cmd.omega)
         self.ctrld_robot.handle_loop_callback()
+
         self._command_pub.publish(self.cmd)
 
     def reset_cmd(self):
