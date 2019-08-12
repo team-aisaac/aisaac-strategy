@@ -68,7 +68,7 @@ class DynamicStrategy(StrategyBase):
 
     def set_robot_status(self, robot_id, status):
         # type: (int, Status) -> None
-        self._all_robot_status[robot_id] = status
+        self._all_robot_status[robot_id] = copy.deepcopy(status)
 
 
 class StaticStrategy(StrategyBase):

@@ -81,7 +81,7 @@ class StrategyCalcuratorBase(object):
 
     def _get_active_robot_ids(self):
         # type: () -> List[int]
-        active_robot_ids = self._robot_ids
+        active_robot_ids = copy.deepcopy(self._robot_ids)
         # TODO: アクティブな味方ロボットのIDリストにする
         return active_robot_ids
 
