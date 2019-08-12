@@ -6,7 +6,7 @@ from referee import Referee
 from objects import Objects
 
 import strategy
-from normal_start_strategy_calcurator import NormalStartStrategyCalcurator
+from normal_start_strategy_calcurator import NormalStartStrategyCalcurator, NormalStartKickOffStrategyCalcurator
 from direct_free_attack_strategy_calcurator import DirectFreeAttack
 from indirect_free_attack_strategy_calcurator import IndirectFreeAttack
 from context import StrategyContext
@@ -33,7 +33,8 @@ class WorldModel(object):
         """---Referee---"""
         self._referee = Referee(self._objects)
         self._stcalcurator = {
-            'normal_start': NormalStartStrategyCalcurator(self._objects),
+            'normal_start_normal': NormalStartStrategyCalcurator(self._objects),
+            'normal_start_kickoff': NormalStartKickOffStrategyCalcurator(self._objects),
             'direct_free_attack': DirectFreeAttack(self._objects),
             'indirect_free_attack': IndirectFreeAttack(self._objects)
         }
@@ -46,7 +47,10 @@ class WorldModel(object):
         # とりあえず例として"last_number"という名前で10フレーム分のコンテキストを作成。
         # 初期値は全て0を指定。
         self._strategy_context.register_new_context("last_number", 10, 0)
-        self._strategy_context.register_new_context("normal_strat_state", 2, 0)
+        self._strategy_context.register_new_context(
+            "normal_strat_state", 2, 0, namespace="normal_strat")
+        self._strategy_context.register_new_context(
+            "kickoff_complete", 2, False, namespace="world_model")
         self._loop_events = []
 
     def add_loop_event_listener(self, callback):
@@ -77,7 +81,7 @@ class WorldModel(object):
         return self._objects
 
 
-if __name__ == "__main__":
+def run_world_model():
     world_model = WorldModel()
     loop_rate = rospy.Rate(config.WORLD_LOOP_RATE)
     rospy.loginfo("start world model node")
@@ -96,6 +100,11 @@ if __name__ == "__main__":
 
         world_model.add_loop_event_listener(strat_ctx.handle_loop_callback)
 
+        # 1ループ前のreferee_branch
+        tmp_last_referee_branch = "NONE"
+        # 変更前のreferee_branch
+        last_referee_branch = "NONE"
+
         while not rospy.is_shutdown():
             # 恒等関数フィルタの適用
             # vision_positionからcurrent_positionを決定してつめる
@@ -105,19 +114,30 @@ if __name__ == "__main__":
                 identity_filter(enemy)
 
             referee_branch = referee.get_referee_branch()
-            referee_branch = "NORMAL_START"
+            # referee_branch = "KICKOFF"
             #strat = strategy.StopStaticStrategy()
 
             if referee_branch == "HALT":
                 strat = strategy.HaltStaticStrategy()
+
             elif referee_branch == "STOP":
                 strat = strategy.StopStaticStrategy()
+
             elif referee_branch == "NORMAL_START":
-                strat_calcrator = world_model.get_strategy_calcurator(
-                    'normal_start')
+                if not strat_ctx.get_last("kickoff_complete", namespace="world_model") \
+                        and last_referee_branch == "KICKOFF":
+                    # 前のreferee_branchがKICKOFFかつkickoff終了してない場合
+                    strat_calcrator = world_model.get_strategy_calcurator(
+                        'normal_start_kickoff')
+                else:
+                    strat_calcrator = world_model.get_strategy_calcurator(
+                        'normal_start_normal')
                 strat = strat_calcrator.calcurate(strat_ctx)
+
             elif referee_branch == "KICKOFF":
-                strat = strategy.KickOffStaticStrategy()
+                strat_ctx.update("kickoff_complete", False, namespace="world_model")
+                strat = strategy.InitialStaticStrategy()
+
             elif referee_branch == "DEFENCE":
                 strat = strategy.DefenceStaticStrategy()
             elif referee_branch == "DIRECT_FREE_ATTACK":
@@ -129,6 +149,11 @@ if __name__ == "__main__":
                     'indirect_free_attack')
                 strat = strat_calcrator.calcurate(strat_ctx)
 
+            if tmp_last_referee_branch != referee_branch:
+                last_referee_branch = tmp_last_referee_branch
+
+            tmp_last_referee_branch = referee_branch
+
             status_publisher.publish_all(strat)
             world_model.trigger_loop_events()
             loop_rate.sleep()
@@ -137,3 +162,12 @@ if __name__ == "__main__":
         traceback.print_exc()
         status_publisher.publish_all(strategy.StopStaticStrategy())
         # world_model.decision_maker.stop_all()
+
+
+if __name__ == "__main__":
+    while True and not rospy.is_shutdown():
+        try:
+            run_world_model()
+        except:
+            import traceback
+            traceback.print_exc()

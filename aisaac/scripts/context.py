@@ -25,17 +25,20 @@ class ContextBase(object):
 
         self._updated = False
 
-    def register_new_context(self, key, length, default, strict=False):
-        # type: (str, int, object, bool) -> None
+    def register_new_context(self, key, length, default, strict=True, namespace=""):
+        # type: (str, int, object, bool, str) -> None
         # key: データを一意に特定するための名前
         # length: 何フレーム分保存しておくか
         # default: 初期化時に配列を埋めるのに利用するデータ
-        if not key in self._context:
-            self._context[key] = [default for _ in range(length)]
-            self._default_value[key] = default
+
+        _key = str(namespace) + "/" + str(key)
+
+        if not _key in self._context:
+            self._context[_key] = [default for _ in range(length)]
+            self._default_value[_key] = default
         else:
             if strict:
-                raise Exception("もう既に登録されたコンテキストのkeyです:" + key)
+                raise Exception("もう既に登録されたコンテキストのkeyです:" + _key)
             else:
                 pass
 
@@ -47,9 +50,9 @@ class ContextBase(object):
         self.update("__last_loop_time__", rospy.Time.now())
         self._updated = True
 
-        for key in self._new_context:
-            self._context[key].append(copy.deepcopy(self._new_context[key]))
-            self._context[key].pop(0)
+        for _key in self._new_context:
+            self._context[_key].append(copy.deepcopy(self._new_context[_key]))
+            self._context[_key].pop(0)
         self._new_context = {}
 
     def is_valid(self):
@@ -57,30 +60,34 @@ class ContextBase(object):
         # handle_loop_callbackを毎ループ呼ぶ必要がある。
         return self._updated
 
-    def update(self, key, new_value):
+    def update(self, key, new_value, namespace=""):
         # type: (str, object) -> None
         # 次のデータを登録する。実際の更新の実行は１ループ終了時に
         # fire_one_loop_eventが呼ばれたときのみに行われる。
-        self._new_context[key] = new_value
 
-    def force_update(self, key, new_value):
+        _key = str(namespace) + "/" + str(key)
+        self._new_context[_key] = new_value
+
+    def force_update(self, key, new_value, namespace=""):
         # type: (str, object) -> None
         # 1ループ1回までの制限にかからず、強制的にアップデートする。
         # これを使うなら値の管理は自己責任で。
-        self._new_context[key] = new_value
-        self._context[key].append(copy.deepcopy(self._new_context[key]))
-        self._context[key].pop(0)
+        _key = str(namespace) + "/" + str(key)
+        self._new_context[_key] = new_value
+        self._context[_key].append(copy.deepcopy(self._new_context[_key]))
+        self._context[_key].pop(0)
 
-    def reset(self, key, default=None):
+    def reset(self, key, default=None, namespace=""):
         # type: (str, object) -> None
         # リセットする。defaultが指定されていればそちらの値でリセットする。
+        _key = str(namespace) + "/" + str(key)
         if default:
             default_value = default
         else:
-            default_value = self._default_value[key]
+            default_value = self._default_value[_key]
 
-        length = len(self._context[key])
-        self._context[key] = [default_value for _ in range(length)]
+        length = len(self._context[_key])
+        self._context[_key] = [default_value for _ in range(length)]
 
     def get_dt(self):
         # type: () -> float
@@ -88,21 +95,24 @@ class ContextBase(object):
         rostimes = self.get_all("__last_loop_time__")  # type: List[rospy.Time]
         return (rostimes[-1] - rostimes[-2]).to_sec()
 
-    def get_all(self, key):
+    def get_all(self, key, namespace=""):
         # type: (str) -> object
         # 保存している情報をリストで全て返す。先頭が最も古いもの。最後が最も新しいもの。
-        return self._context[key]
+        _key = str(namespace) + "/" + str(key)
+        return self._context[_key]
 
-    def get_last(self, key):
+    def get_last(self, key, namespace=""):
         # type: (str) -> object
         # 一つ前のループのデータを取得できる。１ループが終了し、
         # fire_one_loop_eventが呼ばれるまで更新されない。
-        return self._context[key][-1]
+        _key = str(namespace) + "/" + str(key)
+        return self._context[_key][-1]
 
-    def get_oldest(self, key):
+    def get_oldest(self, key, namespace=""):
         # type: (str) -> object
         # 最も古いデータを取得する関数
-        return self._context[key][0]
+        _key = str(namespace) + "/" + str(key)
+        return self._context[_key][0]
 
 
 class RobotContext(ContextBase):
