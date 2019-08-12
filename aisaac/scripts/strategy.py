@@ -121,3 +121,18 @@ class StopStaticStrategy(StaticStrategy):
 
         for robot_id in self._all_robot_status.keys():
             self._all_robot_status[robot_id] = copy.deepcopy(status)
+
+class HaltStaticStrategy(StaticStrategy):
+    """
+    HALT指示に対するStrategy
+    """
+
+    def __init__(self, robot_ids=range(config.NUM_FRIEND_ROBOT)):
+        # type: (List[int]) -> None
+        super(HaltStaticStrategy, self).__init__(robot_ids)
+
+        status = _get_default_status()
+        status.status = 'halt'
+
+        for robot_id in self._all_robot_status.keys():
+            self._all_robot_status[robot_id] = copy.deepcopy(status)

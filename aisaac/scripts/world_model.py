@@ -7,6 +7,8 @@ from objects import Objects
 
 import strategy
 from normal_start_strategy_calcurator import NormalStartStrategyCalcurator
+from direct_free_blue_strategy_calcurator import DirectFreeBlue
+from indirect_free_blue_strategy_calcurator import IndirectFreeBlue
 from context import StrategyContext
 from world_model_status_publisher import WorldModelStatusPublisher
 
@@ -31,7 +33,9 @@ class WorldModel(object):
         """---Referee---"""
         self._referee = Referee(self._objects)
         self._stcalcurator = {
-            'normal_start': NormalStartStrategyCalcurator(self._objects)
+            'normal_start': NormalStartStrategyCalcurator(self._objects),
+            'direct_free_blue': DirectFreeBlue(self._objects),
+            'indirect_free_blue': IndirectFreeBlue(self._objects)
         }
         self._status_publisher = WorldModelStatusPublisher(
             self._team_color, robot_ids=self._objects.get_robot_ids())
@@ -100,9 +104,9 @@ if __name__ == "__main__":
             for enemy in world_model.get_objects().enemy:
                 identity_filter(enemy)
 
-            # referee_branch = referee.get_referee_branch()
-            referee_branch = "NORMAL_START"
-            strat = strategy.StopStaticStrategy()
+            referee_branch = referee.get_referee_branch()
+            # referee_branch = "NORMAL_START"
+            #strat = strategy.StopStaticStrategy()
 
             if referee_branch == "HALT":
                 strat = strategy.HaltStaticStrategy()
@@ -116,8 +120,16 @@ if __name__ == "__main__":
                 strat = strategy.KickOffStaticStrategy()
             elif referee_branch == "DEFENCE":
                 strat = strategy.DefenceStaticStrategy()
+            elif referee_branch == "DIRECT_FREE_BLUE":
+                strat_calcrator = world_model.get_strategy_calcurator(
+                    'direct_free_blue')
+                strat = strat_calcrator.calcurate(strat_ctx)
+            elif referee_branch == "INDIRECT_FREE_BLUE":
+                strat_calcrator = world_model.get_strategy_calcurator(
+                    'indirect_free_blue')
+                strat = strat_calcrator.calcurate(strat_ctx)
 
-            # status_publisher.publish_all(strat)
+            status_publisher.publish_all(strat)
             world_model.trigger_loop_events()
             loop_rate.sleep()
     except Exception as e:

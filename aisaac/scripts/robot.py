@@ -151,6 +151,8 @@ class Robot(object):
             elif self.status.robot_status == "stop":
                 self.reset_cmd()
                 self.status.robot_status = "none"
+            elif self.status.robot_status == "halt":
+                self.reset_cmd()
 
             self.store_and_publish_commands()
             loop_rate.sleep()
