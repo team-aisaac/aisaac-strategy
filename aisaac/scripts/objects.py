@@ -29,7 +29,7 @@ class Objects(object):
         self.robot = [entity.Robot(id=i) for i in self._robot_ids]  # type: typing.List[entity.Robot]
         self.enemy = [entity.Robot() for i in self._enemy_ids]  # type: typing.List[entity.Robot]
 
-        roles = ["OFR", "OFL", "DFR", "DFL", "GK"]
+        roles = ["RFW", "LFW", "RDF", "LDF", "GK"]
         for robot, role in zip(self.robot, roles):
             robot.set_role(role)
 
