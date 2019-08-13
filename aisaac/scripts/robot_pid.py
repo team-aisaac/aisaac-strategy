@@ -33,9 +33,9 @@ class RobotPid(object):
         # self.Kdv = 1.9759837181620452
         # self.Kdr = 3.0
         self.Kpv = 3.112
-        self.Kpr = 5.037
+        self.Kpr = 3.0
         self.Kdv = 5.437
-        self.Kdr = 4.78
+        self.Kdr = 2.0
         # param_dict = {'Kdv': 4.210412653218034, 'Kpv': 3.9577989929770307, 'Kpr': 7.492985949699556, 'Kdr': 5.743020391472334}
         # self.Kpr = param_dict['Kpr']
         # self.Kpv = param_dict['Kpv']
@@ -446,7 +446,8 @@ class RobotPid(object):
         Vy = self.Kpv * self.pid_p_y + self.Kdv * self.pid_d_y / self.dt.to_sec()
         Vr = self.Kpr * self.pid_p_theta + self.Kdr * self.pid_d_theta / self.dt.to_sec()
 
-        max_velocity = config.ROBOT_MAX_VELOCITY # m/s 機体の最高速度
+
+        max_velocity = rospy.get_param("/robot_max_velocity", default=config.ROBOT_MAX_VELOCITY) # m/s 機体の最高速度
         vel_vector = np.array([Vx, Vy])
         vel_vector_norm = np.linalg.norm(vel_vector)
         if vel_vector_norm > max_velocity:

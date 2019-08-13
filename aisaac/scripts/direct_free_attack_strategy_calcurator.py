@@ -19,7 +19,7 @@ except:
 
 class DirectFreeAttack(StrategyCalcuratorBase):
     """
-    referee_branchがDIRECT_FREE_BLUEの場合のCalcurator。
+    referee_branchがDIRECT_FREE_ATTACKの場合のCalcurator。
     """
     def __init__(self, objects):
         self.friend = objects.robot
@@ -32,14 +32,14 @@ class DirectFreeAttack(StrategyCalcuratorBase):
         active_robot_ids = self._get_active_robot_ids()
         status = Status()
         for idx, robot_id in enumerate(active_robot_ids):
-            if idx == 4:
+            if idx == 3:
                 status.status = "pass"
-                status.pass_target_pos_x = self.friend[5].get_current_position()[0]
-                status.pass_target_pos_y = self.friend[5].get_current_position()[1]
-            elif idx == 5:
+                status.pass_target_pos_x = self.friend[3].get_current_position()[0]
+                status.pass_target_pos_y = self.friend[3].get_current_position()[1]
+            elif idx == 4:
                 status.status = "receive"
-                status.pass_target_pos_x = self.friend[5].get_current_position()[0]
-                status.pass_target_pos_y = self.friend[5].get_current_position()[1]
+                status.pass_target_pos_x = self.friend[4].get_current_position()[0]
+                status.pass_target_pos_y = self.friend[4].get_current_position()[1]
             else:
                 status.status = "none"
             self._dynamic_strategy.set_robot_status(robot_id, status)

@@ -6,6 +6,8 @@ from nav_msgs.msg import Odometry
 from aisaac.msg import Ball_sub_params
 import tf
 import functions
+import config
+import copy
 
 
 class Objects(object):
@@ -27,7 +29,7 @@ class Objects(object):
         self._enemy_ids = range(self.enemy_total)
 
         self.robot = [entity.Robot(id=i) for i in self._robot_ids]  # type: typing.List[entity.Robot]
-        self.enemy = [entity.Robot() for i in self._enemy_ids]  # type: typing.List[entity.Robot]
+        self.enemy = [entity.Robot(id=i) for i in self._enemy_ids]  # type: typing.List[entity.Robot]
 
         roles = ["RFW", "LFW", "RDF", "LDF", "GK"]
         for robot, role in zip(self.robot, roles):
@@ -42,9 +44,14 @@ class Objects(object):
         self.odom_listener()
 
     def get_robot_ids_sorted_by_distance_to_ball(self, robot_ids=None):
+        # type: (typing.List[int]) -> typing.List[int]
         return self.get_robot_ids_sorted_by_distance(self.ball.get_current_position(), robot_ids)
 
+    def get_enemy_ids_sorted_by_distance_to_ball(self, enemy_ids=None):
+        return self.get_enemy_ids_sorted_by_distance(self.ball.get_current_position(), enemy_ids)
+
     def get_robot_ids_sorted_by_distance(self, target_xy, robot_ids=None):
+        # type: (typing.List[float], typing.List[int]) -> typing.List[int]
         target_x = target_xy[0]
         target_y = target_xy[1]
 
@@ -57,6 +64,21 @@ class Objects(object):
                                key=lambda robot: functions.distance_btw_two_points(robot.get_current_position(),
                                                                                    (target_x, target_y)))
         sorted_ids = map(lambda robot: robot.get_id(), sorted_robots)
+        return sorted_ids
+
+    def get_enemy_ids_sorted_by_distance(self, target_xy, enemy_ids=None):
+        target_x = target_xy[0]
+        target_y = target_xy[1]
+
+        if enemy_ids is None:
+            enemys = self.enemy
+        else:
+            enemys = [self.enemy[i] for i in enemy_ids]
+
+        sorted_enemys = sorted(enemys,
+                               key=lambda enemy: functions.distance_btw_two_points(enemy.get_current_position(),
+                                                                                   (target_x, target_y)))
+        sorted_ids = map(lambda enemy: enemy.get_id(), sorted_enemys)
         return sorted_ids
 
     def get_robot_ids(self):
@@ -83,37 +105,26 @@ class Objects(object):
             if robot.get_role() == role:
                 return robot.get_id()
 
-    def set_first_positions(self):
-        self.robot[0].set_future_position(x=-5.5, y=0., theta=0.)
-        self.robot[1].set_future_position(x=-4.5, y=1., theta=0.)
-        self.robot[2].set_future_position(x=-4.5, y=-1., theta=0.)
-        self.robot[3].set_future_position(x=-2., y=2.5, theta=0.)
-        self.robot[4].set_future_position(x=-2., y=-2.5, theta=0.)
-        self.robot[5].set_future_position(x=1.5, y=2.5, theta=0.)
-        self.robot[6].set_future_position(x=1.5, y=-2.5, theta=0.)
-        self.robot[7].set_future_position(x=2.5, y=0., theta=0.)
+    def get_active_robot_ids(self):
+        # TODO: active_robot_ids実装
+        return copy.deepcopy(self._robot_ids)
 
-    """---4台用守備時(20181216練習会用に作られた)---"""
-    def set_first_positions_4robots(self):
-        self.robot[0].set_future_position(x=-5.5, y=0., theta=0.)
-        self.robot[1].set_future_position(x=-4.5, y=1., theta=0.)
-        self.robot[2].set_future_position(x=-4.5, y=-1., theta=0.)
-        self.robot[3].set_future_position(x=-2., y=0., theta=0.)
-        #self.robot[4].set_future_position(x=-5.5, y=0., theta=0.)
-        #self.robot[5].set_future_position(x=-4.5, y=5., theta=0.)
-        #self.robot[6].set_future_position(x=-4., y=5., theta=0.)
-        #self.robot[7].set_future_position(x=-3.5, y=5., theta=0.)
+    def get_has_a_ball(self, robot_id, threshold=None):
+        robot_ids = self.get_active_robot_ids()
+        sorted_ids = self.get_robot_ids_sorted_by_distance_to_ball(robot_ids)
+        if sorted_ids[0] != robot_id:
+            return False
 
-    """---4台用攻撃時(20181216練習会用に作られた)---"""
-    def set_first_position_4robots_attack(self):
-        self.robot[0].set_future_position(x=-5.5, y=0., theta=0.)
-        self.robot[1].set_future_position(x=-4.5, y=1., theta=0.)
-        self.robot[2].set_future_position(x=-4.5, y=-1., theta=0.)
-        self.robot[3].set_future_position(x=0.-self.robot[3].robot_r, y=0., theta=0.)
-        #self.robot[4].set_future_position(x=-5.5, y=0., theta=0.)
-        #self.robot[5].set_future_position(x=-4.5, y=5., theta=0.)
-        #self.robot[6].set_future_position(x=-4., y=5., theta=0.)
-        #self.robot[7].set_future_position(x=-3.5, y=5., theta=0.)
+        if threshold is None:
+            threshold = config.HAS_A_BALL_DISTANCE_THRESHOLD
+
+        area = threshold + self.robot[0].size_r
+        if functions.distance_btw_two_points(
+                self.robot[robot_id].get_current_position(), self.ball) \
+                > area:
+            return False
+
+        return True
 
     """---Visionから現在地をもらうsubscriberの起動--"""
     def odom_listener(self):

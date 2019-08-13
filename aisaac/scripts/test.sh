@@ -16,7 +16,7 @@ echo
 
 echo '座標 [1.0, -3.0] でパス受け'
 robot_id=1
-status_msg='{ status: "receive", pid_goal_pos_x: 0.0, pid_goal_pos_y: 0.0, pid_goal_theta: 0.0, pid_circle_center_x: 0.0, pid_circle_center_y: 0.0, pass_target_pos_x: 1.0, pass_target_pos_y: -3.0 }'
+status_msg='{ status: "receive", pid_goal_pos_x: 1.0, pid_goal_pos_y: -3.0, pid_goal_theta: 0.0, pid_circle_center_x: 0.0, pid_circle_center_y: 0.0, pass_target_pos_x: 0.0, pass_target_pos_y: 0.0 }'
 cmd="rostopic pub -1 /blue/robot_${robot_id}/status aisaac/Status '"${status_msg}"'"
 echo -e "command:\n${cmd}\n"
 echo ${cmd} | bash &
@@ -44,7 +44,7 @@ echo
 
 echo '座標 [-2.0, 0.0] でパス受け'
 robot_id=0
-status_msg='{ status: "receive", pid_goal_pos_x: 0.0, pid_goal_pos_y: 0.0, pid_goal_theta: 0.0, pid_circle_center_x: 0.0, pid_circle_center_y: 0.0, pass_target_pos_x: -2.0, pass_target_pos_y: 0.0 }'
+status_msg='{ status: "receive", pid_goal_pos_x: -2.0, pid_goal_pos_y: 0.0, pid_goal_theta: 0.0, pid_circle_center_x: 0.0, pid_circle_center_y: 0.0, pass_target_pos_x: 0.0, pass_target_pos_y: 0.0}'
 cmd="rostopic pub -1 /blue/robot_${robot_id}/status aisaac/Status '"${status_msg}"'"
 echo -e "command:\n${cmd}\n"
 echo ${cmd} | bash &

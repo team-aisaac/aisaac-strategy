@@ -7,8 +7,10 @@ from abc import ABCMeta, abstractmethod
 from strategy import StrategyBase, InitialStaticStrategy, StopStaticStrategy, DynamicStrategy
 from context import StrategyContext
 from objects import Objects
+from world_state import WorldState 
 from aisaac.msg import Status
 import functions
+import config
 import copy
 
 try:
@@ -81,13 +83,12 @@ class StrategyCalcuratorBase(object):
 
     def _get_active_robot_ids(self):
         # type: () -> List[int]
-        active_robot_ids = copy.deepcopy(self._robot_ids)
-        # TODO: アクティブな味方ロボットのIDリストにする
+        active_robot_ids = self._objects.get_active_robot_ids()
         return active_robot_ids
 
     def _get_active_enemy_ids(self):
         # type: () -> List[int]
-        active_enemy_ids = self._enemy_ids
+        active_enemy_ids = copy.deepcopy(self._enemy_ids)
         # TODO: アクティブな敵ロボットのIDリストにする
         return active_enemy_ids
 
@@ -132,6 +133,27 @@ class StrategyCalcuratorBase(object):
             who_has_a_ball = "free"
 
         return who_has_a_ball
+
+    def _get_free_enemy_id(self, exception_robot_id, exception_enemy_id):
+        # type: () -> List[int]
+        #フリーで最もゴールに近い敵idを返す
+        active_robot_ids = self._get_active_robot_ids()
+        active_enemy_ids = self._get_active_enemy_ids()
+        sorted_enemy_ids = self._objects.get_enemy_ids_sorted_by_distance(config.GOAL_CENTER, active_enemy_ids)
+
+        for i in sorted_enemy_ids:
+            free_flag = True
+            if i !=  exception_enemy_id:
+                for j in active_robot_ids:
+                    if (j != exception_robot_id) and (Util.get_distance(self._enemy[i].get_current_position(), self._robot[j].get_current_position()) < 1.):
+                        free_flag = False
+                        break
+                if free_flag == True:
+                    return i
+        if sorted_enemy_ids[0] != exception_enemy_id:
+            return sorted_enemy_ids[0]
+        else:
+            return sorted_enemy_ids[1]
 
     @abstractmethod
     def calcurate(self, strategy_context=None):
