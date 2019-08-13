@@ -7,7 +7,7 @@ from abc import ABCMeta, abstractmethod
 from strategy import StrategyBase, InitialStaticStrategy, StopStaticStrategy, DynamicStrategy
 from context import StrategyContext
 from objects import Objects
-from world_state import WorldState 
+from world_state import WorldState
 from aisaac.msg import Status
 import functions
 import config
@@ -101,29 +101,18 @@ class StrategyCalcuratorBase(object):
     def _get_who_has_a_ball(self):
         # type: () -> str
         ball_position = self._objects.ball.get_current_position()
-        size_r = self._objects.robot.size_r
+        #size_r = self._objects.robot.size_r
         flag = 0
-        area = 0.015
+        area = config.HAS_A_BALL_DISTANCE_THRESHOLD + self._objects.robot[0].size_r
 
-        for i in self._objects.get_robot_ids():
-            robot_position = self._robot[i].get_current_position()
-            if Util.get_distance(ball_position, robot_position) \
-                    < math.sqrt((size_r + area)**2):
-                self._robot[i].has_a_ball = True
-                # print("check:",i)
+        for robot_id in self._objects.get_robot_ids():
+            if self._objects.get_has_a_ball(robot_id):
                 flag = flag + 1
-            else:
-                self._robot[i].has_a_ball = False
 
-        for i in self._objects.get_enemy_ids():
-            enemy_position = self._enemy[i].get_current_position()
-
-            if Util.get_distance(ball_position, enemy_position) \
-                    < math.sqrt((size_r + area)**2):
-                self._enemy[i].has_a_ball = True
+        for enemy_id in self._objects.get_enemy_ids():
+            enemy_position = self._objects.enemy[enemy_id].get_current_position()
+            if functions.distance_btw_two_points(ball_position, enemy_position) < area:
                 flag = flag - 1
-            else:
-                self._enemy[i].has_a_ball = False
 
         if flag > 0:
             who_has_a_ball = "robots"

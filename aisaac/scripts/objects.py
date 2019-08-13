@@ -120,7 +120,7 @@ class Objects(object):
 
         area = threshold + self.robot[0].size_r
         if functions.distance_btw_two_points(
-                self.robot[robot_id].get_current_position(), self.ball) \
+                self.robot[robot_id].get_current_position(), self.ball.get_current_position()) \
                 > area:
             return False
 
