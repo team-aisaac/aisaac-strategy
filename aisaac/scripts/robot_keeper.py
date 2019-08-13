@@ -14,7 +14,7 @@ class RobotKeeper(object):
         self.enemy = kick.pid.enemy
         self.ball_params = kick.ball_params
         self.kick = kick
-        self.team_side =  str(rospy.get_param("team_side"))
+        self.team_side = "left" # CONSAIが変換してくれることが発覚したため常にleft
         self.goal_right = [6, -0.620]
         self.goal_left = [6, 0.620]
         self.r_offset = self.ctrld_robot.size_r

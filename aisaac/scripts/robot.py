@@ -197,29 +197,24 @@ class Robot(object):
                          Def_pos, self.defence.def_pos_callback)
 
 
-if __name__ == "__main__":
-    is_single_thread = True
+def run_robot():
+    robot = Robot()
+    try:
+        robot.run()
+    except:
+        import traceback
+        traceback.print_exc()
+        print("Robot color:" + robot.robot_color)
+        print("Robot id   :" + robot.robot_id)
 
-    if is_single_thread:
-        robot = Robot()
+
+if __name__ == "__main__":
+    while True and not rospy.is_shutdown():
         try:
-            robot.run()
+            run_robot()
         except:
             import traceback
             traceback.print_exc()
-            print("Robot color:" + robot.robot_color)
-            print("Robot id   :" + robot.robot_id)
-    else:
-        import threading
-        robots = []
-        for i in range(config.NUM_FRIEND_ROBOT):
-            robot = Robot(str(i))
-            th = threading.Thread(target=robot.run)
-            th.setDaemon(True)
-            th.start()
-
-        while not rospy.is_shutdown():
-            pass
 
 
 """

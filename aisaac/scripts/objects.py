@@ -27,7 +27,7 @@ class Objects(object):
         self._enemy_ids = range(self.enemy_total)
 
         self.robot = [entity.Robot(id=i) for i in self._robot_ids]  # type: typing.List[entity.Robot]
-        self.enemy = [entity.Robot() for i in self._enemy_ids]  # type: typing.List[entity.Robot]
+        self.enemy = [entity.Robot(id=i) for i in self._enemy_ids]  # type: typing.List[entity.Robot]
 
         self.ball = entity.Ball()
 
@@ -38,9 +38,14 @@ class Objects(object):
         self.odom_listener()
 
     def get_robot_ids_sorted_by_distance_to_ball(self, robot_ids=None):
+        # type: (typing.List[int]) -> typing.List[int]
         return self.get_robot_ids_sorted_by_distance(self.ball.get_current_position(), robot_ids)
 
+    def get_enemy_ids_sorted_by_distance_to_ball(self, enemy_ids=None):
+        return self.get_enemy_ids_sorted_by_distance(self.ball.get_current_position(), enemy_ids)
+
     def get_robot_ids_sorted_by_distance(self, target_xy, robot_ids=None):
+        # type: (typing.List[float], typing.List[int]) -> typing.List[int]
         target_x = target_xy[0]
         target_y = target_xy[1]
 
@@ -53,6 +58,21 @@ class Objects(object):
                                key=lambda robot: functions.distance_btw_two_points(robot.get_current_position(),
                                                                                    (target_x, target_y)))
         sorted_ids = map(lambda robot: robot.get_id(), sorted_robots)
+        return sorted_ids
+
+    def get_enemy_ids_sorted_by_distance(self, target_xy, enemy_ids=None):
+        target_x = target_xy[0]
+        target_y = target_xy[1]
+
+        if enemy_ids is None:
+            enemys = self.enemy
+        else:
+            enemys = [self.enemy[i] for i in enemy_ids]
+
+        sorted_enemys = sorted(enemys,
+                               key=lambda enemy: functions.distance_btw_two_points(enemy.get_current_position(),
+                                                                                   (target_x, target_y)))
+        sorted_ids = map(lambda enemy: enemy.get_id(), sorted_enemys)
         return sorted_ids
 
     def get_robot_ids(self):
