@@ -118,7 +118,7 @@ class Robot(Entity):
         return self._id
 
     def has_a_ball(self, ball_x, ball_y):
-        if (self.get_current_position()[0] - ball_x) ** 2 + (self.get_current_position()[1] - ball_y) ** 2 < (self.size_r + 0.003) **2
+        if (self.get_current_position()[0] - ball_x) ** 2 + (self.get_current_position()[1] - ball_y) ** 2 < (self.size_r + 0.003) **2:
             return True
         else:
             return False
