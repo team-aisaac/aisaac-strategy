@@ -132,8 +132,8 @@ class Robot(object):
                                     self.ctrld_robot.get_pass_target_position()[1],
                                     should_wait=True)
             elif self.status.robot_status == "receive":
-                self.kick.receive_ball(self.ctrld_robot.get_pass_target_position()[0],
-                                       self.ctrld_robot.get_pass_target_position()[1])
+                self.kick.receive_ball(self.ctrld_robot.get_future_position()[0],
+                                       self.ctrld_robot.get_future_position()[1])
             elif self.status.robot_status == "defence1":
                 self.defence.move_defence(
                     self.defence.def1_pos_x, self.defence.def1_pos_y)

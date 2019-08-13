@@ -7,6 +7,7 @@ from objects import Objects
 
 import strategy
 from normal_start_strategy_calcurator import NormalStartStrategyCalcurator, NormalStartKickOffStrategyCalcurator
+from stop_strategy_calcurator import StopStrategyCalculator
 from direct_free_attack_strategy_calcurator import DirectFreeAttack
 from direct_free_defence_strategy_calcurator import DirectFreeDefence
 from indirect_free_attack_strategy_calcurator import IndirectFreeAttack
@@ -37,6 +38,7 @@ class WorldModel(object):
         self._stcalcurator = {
             'normal_start_normal': NormalStartStrategyCalcurator(self._objects),
             'normal_start_kickoff': NormalStartKickOffStrategyCalcurator(self._objects),
+            'stop': StopStrategyCalculator(self._objects),
             'direct_free_attack': DirectFreeAttack(self._objects),
             'direct_free_defence': DirectFreeDefence(self._objects),
             'indirect_free_attack': IndirectFreeAttack(self._objects),
@@ -54,7 +56,9 @@ class WorldModel(object):
         self._strategy_context.register_new_context(
             "normal_strat_state", 2, 0, namespace="normal_strat")
         self._strategy_context.register_new_context(
-            "kickoff_complete", 2, False, namespace="world_model")
+            "kickoff_complete", 1, False, namespace="world_model")
+        self._strategy_context.register_new_context(
+            "referee_branch", 1, "NONE", namespace="world_model")
         self._loop_events = []
 
     def add_loop_event_listener(self, callback):
@@ -88,6 +92,10 @@ class WorldModel(object):
 def run_world_model():
     world_model = WorldModel()
     loop_rate = rospy.Rate(config.WORLD_LOOP_RATE)
+
+    rospy.loginfo("setting global param")
+    rospy.set_param("/robot_max_velocity", config.ROBOT_MAX_VELOCITY)
+
     rospy.loginfo("start world model node")
     # assignment_x = [-4, -3, -2, -1, 0, 1, 2, 3]
     # assignment_y = [1, 1, 1, 1, 1, 1, 1, 1]
@@ -118,14 +126,15 @@ def run_world_model():
                 identity_filter(enemy)
 
             referee_branch = referee.get_referee_branch()
-            # referee_branch = "KICKOFF"
+            # referee_branch = "STOP"
             #strat = strategy.StopStaticStrategy()
 
             if referee_branch == "HALT":
                 strat = strategy.HaltStaticStrategy()
 
             elif referee_branch == "STOP":
-                strat = strategy.StopStaticStrategy()
+                strat_calcrator = world_model.get_strategy_calcurator("stop")
+                strat = strat_calcrator.calcurate(strat_ctx)
 
             elif referee_branch == "NORMAL_START":
                 if not strat_ctx.get_last("kickoff_complete", namespace="world_model") \
@@ -161,8 +170,11 @@ def run_world_model():
                     'indirect_free_defence')
                 strat = strat_calcrator.calcurate(strat_ctx)
 
+            # referee_branchが変更されたときに呼び出される
             if tmp_last_referee_branch != referee_branch:
+                rospy.set_param("/robot_max_velocity", config.ROBOT_MAX_VELOCITY)
                 last_referee_branch = tmp_last_referee_branch
+                strat_ctx.update("referee_branch", tmp_last_referee_branch, namespace="world_model")
 
             tmp_last_referee_branch = referee_branch
 
