@@ -217,3 +217,57 @@ class NormalStartKickOffStrategyCalcurator(StrategyCalcuratorBase):
 
         result = self._dynamic_strategy
         return result
+
+class NormalStartKickOffDefenceStrategyCalcurator(StrategyCalcuratorBase):
+    """
+    referee_branchがKICKOFF_DEFENCEの場合のCalcurator。
+    """
+    def __init__(self, objects):
+        self._robot = objects.robot
+        self._enemy = objects.enemy
+        self._robot_ids = objects.get_robot_ids()
+        self._enemy_ids = objects.get_enemy_ids()
+        self._ball_params = objects.ball
+        self._dynamic_strategy = DynamicStrategy()
+        self._objects = objects
+
+    def calcurate(self, strategy_context=None):
+        # type: (StrategyContext) -> StrategyBase
+
+        active_robot_ids = self._get_active_robot_ids()
+        active_enemy_ids = self._get_active_enemy_ids()
+        status = Status()
+        nearest_enemy_id = self._objects.get_enemy_ids_sorted_by_distance_to_ball(active_enemy_ids)[0]
+        for idx, robot_id in enumerate(active_robot_ids):
+            if idx == 0:
+                status.status = "keeper"
+            elif idx == 1:
+                status.status = "defence1"
+            elif idx == 2:
+                status.status = "defence2"
+            elif idx == 3:
+                #敵kickerとballの延長線上に移動
+                status.status = "move_linear"
+                if nearest_enemy_id != None:
+                    status.pid_goal_pos_x, status.pid_goal_pos_y = functions.calculate_internal_dividing_point(self._enemy[nearest_enemy_id].get_current_position()[0], self._enemy[nearest_enemy_id].get_current_position()[1], self._ball_params.get_current_position()[0], self._ball_params.get_current_position()[1], functions.distance_btw_two_points(self._enemy[nearest_enemy_id].get_current_position(), self._ball_params.get_current_position()) + 0.8, -0.8)
+                    status.pid_goal_theta = math.atan2((self._ball_params.get_current_position()[1] - self._robot[3].get_current_position()[1]) , (self._ball_params.get_current_position()[0] - self._robot[2].get_current_position()[0]))
+                    if status.pid_goal_pos_x >= -0.2 and status.pid_goal_pos_y >= 0:
+                        status.pid_goal_pos_x = -0.2
+                        status.pid_goal_pos_y = 0.8
+                    elif status.pid_goal_pos_x >= -0.2 and status.pid_goal_pos_y < 0:
+                        status.pid_goal_pos_x = -0.2
+                        status.pid_goal_pos_y = -0.8
+            elif idx == 4:
+                #固定位置
+                status.status = "move_linear"
+                free_enemy_id = self._get_free_enemy_id(4, nearest_enemy_id)
+                status.pid_goal_pos_x = -3.
+                status.pid_goal_pos_y = 0.
+                status.pid_goal_theta = math.atan2( (self._ball_params.get_current_position()[1] - self._robot[4].get_current_position()[1]) , (self._ball_params.get_current_position()[0] - self._robot[4].get_current_position()[0]) )
+            else:
+                status.status = "none"
+            self._dynamic_strategy.set_robot_status(robot_id, status)
+
+
+        result = self._dynamic_strategy
+        return result
