@@ -61,6 +61,12 @@ class Objects(object):
     def get_enemy_ids(self):
         return self._enemy_ids
 
+    def get_robot_by_id(self, robot_id):
+        robots = [self.robot[i] for i in self._robot_ids]
+        for i, id in enumerate(self._robot_ids):
+            if id == robot_id:
+                return robots[i]
+
     def set_first_positions(self):
         self.robot[0].set_future_position(x=-5.5, y=0., theta=0.)
         self.robot[1].set_future_position(x=-4.5, y=1., theta=0.)
