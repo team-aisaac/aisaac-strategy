@@ -6,6 +6,8 @@ from nav_msgs.msg import Odometry
 from aisaac.msg import Ball_sub_params
 import tf
 import functions
+import config
+import copy
 
 
 class Objects(object):
@@ -81,37 +83,26 @@ class Objects(object):
     def get_enemy_ids(self):
         return self._enemy_ids
 
-    def set_first_positions(self):
-        self.robot[0].set_future_position(x=-5.5, y=0., theta=0.)
-        self.robot[1].set_future_position(x=-4.5, y=1., theta=0.)
-        self.robot[2].set_future_position(x=-4.5, y=-1., theta=0.)
-        self.robot[3].set_future_position(x=-2., y=2.5, theta=0.)
-        self.robot[4].set_future_position(x=-2., y=-2.5, theta=0.)
-        self.robot[5].set_future_position(x=1.5, y=2.5, theta=0.)
-        self.robot[6].set_future_position(x=1.5, y=-2.5, theta=0.)
-        self.robot[7].set_future_position(x=2.5, y=0., theta=0.)
+    def get_active_robot_ids(self):
+        # TODO: active_robot_ids実装
+        return copy.deepcopy(self._robot_ids)
 
-    """---4台用守備時(20181216練習会用に作られた)---"""
-    def set_first_positions_4robots(self):
-        self.robot[0].set_future_position(x=-5.5, y=0., theta=0.)
-        self.robot[1].set_future_position(x=-4.5, y=1., theta=0.)
-        self.robot[2].set_future_position(x=-4.5, y=-1., theta=0.)
-        self.robot[3].set_future_position(x=-2., y=0., theta=0.)
-        #self.robot[4].set_future_position(x=-5.5, y=0., theta=0.)
-        #self.robot[5].set_future_position(x=-4.5, y=5., theta=0.)
-        #self.robot[6].set_future_position(x=-4., y=5., theta=0.)
-        #self.robot[7].set_future_position(x=-3.5, y=5., theta=0.)
+    def get_has_a_ball(self, robot_id, threshold=None):
+        robot_ids = self.get_active_robot_ids()
+        sorted_ids = self.get_robot_ids_sorted_by_distance_to_ball(robot_ids)
+        if sorted_ids[0] != robot_id:
+            return False
 
-    """---4台用攻撃時(20181216練習会用に作られた)---"""
-    def set_first_position_4robots_attack(self):
-        self.robot[0].set_future_position(x=-5.5, y=0., theta=0.)
-        self.robot[1].set_future_position(x=-4.5, y=1., theta=0.)
-        self.robot[2].set_future_position(x=-4.5, y=-1., theta=0.)
-        self.robot[3].set_future_position(x=0.-self.robot[3].robot_r, y=0., theta=0.)
-        #self.robot[4].set_future_position(x=-5.5, y=0., theta=0.)
-        #self.robot[5].set_future_position(x=-4.5, y=5., theta=0.)
-        #self.robot[6].set_future_position(x=-4., y=5., theta=0.)
-        #self.robot[7].set_future_position(x=-3.5, y=5., theta=0.)
+        if threshold is None:
+            threshold = config.HAS_A_BALL_DISTANCE_THRESHOLD
+
+        area = threshold + self.robot[0].size_r
+        if functions.distance_btw_two_points(
+                self.robot[robot_id].get_current_position(), self.ball) \
+                > area:
+            return False
+
+        return True
 
     """---Visionから現在地をもらうsubscriberの起動--"""
     def odom_listener(self):
