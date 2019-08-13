@@ -173,6 +173,8 @@ class IndirectFreeAttack(StrategyCalcuratorBase):
         print 'received_3_flg:', self.received_3_flg
         """ハーフラインより左側の戦略"""
         ball_x, ball_y = self._objects.ball.get_current_position()
+        active_enemy_ids = self._get_active_enemy_ids()
+        nearest_enemy_id = self._objects.get_enemy_ids_sorted_by_distance_to_ball(active_enemy_ids)[0]
         for robot_id in self._robot_ids:
             status = Status()
             robot = self._objects.get_robot_by_id(robot_id)
@@ -226,7 +228,10 @@ class IndirectFreeAttack(StrategyCalcuratorBase):
 
             elif robot_id == self.position_2_nearest_id:
                 if self.passed_3_flg:
-
+                    status.status = "move_linear"
+                    if nearest_enemy_id != None:
+                        status.pid_goal_pos_x, status.pid_goal_pos_y = functions.calculate_internal_dividing_point(self._enemy[nearest_enemy_id].get_current_position()[0], self._enemy[nearest_enemy_id].get_current_position()[1], self._ball_params.get_current_position()[0], self._ball_params.get_current_position()[1], functions.distance_btw_two_points(self._enemy[nearest_enemy_id].get_current_position(), self._ball_params.get_current_position()) + 0.55, -0.55)
+                        status.pid_goal_theta = math.atan2( (self._ball_params.get_current_position()[1] - self._robot[3].get_current_position()[1]) , (self._ball_params.get_current_position()[0] - self._robot[2].get_current_position()[0]) )
                 elif self.received_3_flg:
                     status.status = "pass"
                     if self.position_3[1] > 0.:
