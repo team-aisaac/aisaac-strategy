@@ -102,7 +102,7 @@ class Robot(Entity):
 
         self._robot_context = None  # type: context.RobotContext
 
-        self._role = "" # GK DF1 DF2 OF1 OF2
+        self._role = "" # GK などのポジション
         self.velocity_surge = 0
         self.velocity_sway = 0
         self.omega = 0
