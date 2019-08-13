@@ -19,8 +19,7 @@ except:
 
 class IndirectFreeAttack(StrategyCalcuratorBase):
     """
-    referee_branchがINDIRECT_FREE_BLUEで自分もBLUE、または
-    referee_branchがINDIRECT_FREE_YELLOWで自分もYELLOW の場合のCalcurator。
+    referee_branchがINDIRECT_FREE_ATTACKの場合のCalcurator。
     """
     def __init__(self, objects):
         self.objects = objects

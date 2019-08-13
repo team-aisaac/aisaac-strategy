@@ -19,7 +19,7 @@ except:
 
 class DirectFreeAttack(StrategyCalcuratorBase):
     """
-    referee_branchがDIRECT_FREE_BLUEの場合のCalcurator。
+    referee_branchがDIRECT_FREE_ATTACKの場合のCalcurator。
     """
     def __init__(self, objects):
         self.friend = objects.robot
