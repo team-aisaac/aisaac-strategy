@@ -70,11 +70,11 @@ class Referee:
         elif (self._command == "data: 4" and self.team_color == 'yellow') or (self._command == "data: 5" and self.team_color == 'blue'):
             # PREPARE_KICKOFF_YELLOW = 4;
 		    #The blue team may move into kickoff position.
-            referee_branch = "KICKOFF"
+            referee_branch = "KICKOFF_ATTACK"
         elif (self._command == "data: 4" and self.team_color == 'blue') or (self._command == "data: 5" and self.team_color == 'yellow'):
             # PREPARE_KICKOFF_BLUE = 5;
 		    # The yellow team may move into penalty position.
-            referee_branch = "DEFENCE"
+            referee_branch = "KICKOFF_DEFENCE"
         elif (self._command == "data: 6" and self.team_color == 'yellow') or (self._command == "data: 7" and self.team_color == 'blue'):
             # PREPARE_PENALTY_YELLOW = 6;
 		    # The blue team may move into penalty position.
@@ -82,7 +82,7 @@ class Referee:
         elif (self._command == "data: 6"  and self.team_color == 'blue') or (self._command == "data: 7" and self.team_color == 'yellow'):
             # PREPARE_PENALTY_BLUE = 7;
 		    # The yellow team may take a direct free kick.
-            referee_branch = "PENALTY_DIFFENCE"
+            referee_branch = "PENALTY_DIFENCE"
         elif (self._command == "data: 8" and self.team_color == 'yellow') or (self._command == "data: 9" and self.team_color == 'blue'):
             # DIRECT_FREE_YELLOW = 8;
 		    # The blue team may take a direct free kick.
