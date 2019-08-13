@@ -72,19 +72,16 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
         # InitialStaticStrategyを元に組み立てる
         self._dynamic_strategy.clone_from(self._static_strategies['initial'])
 
-        # 生きてるロボットにだけ新たな指示を出す例
-        active_robot_ids = self._get_active_robot_ids()
+        not_assigned_robot_ids = self._get_active_robot_ids()
 
-        not_assigned_robot_ids = active_robot_ids
-
-        if len(active_robot_ids) >= 5:
+        if len(not_assigned_robot_ids) >= 5:
             # 残り5台以上の場合
             # Defence系を先にアサイン
             not_assigned_ops = ["keeper", "defence3", "defence4"]
-        elif len(active_robot_ids) == 4:
+        elif len(not_assigned_robot_ids) == 4:
             # 残り4台の場合
             not_assigned_ops = ["keeper", "defence3"]
-        elif len(active_robot_ids) == 3:
+        elif len(not_assigned_robot_ids) == 3:
             # 残り3台の場合
             not_assigned_ops = ["keeper"]
         else:
@@ -133,8 +130,8 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
                     else:
                         status.status = "receive"
                         self._receiver_id = robot_id
-                    status.pass_target_pos_x = pass_positions[cur_state][0]
-                    status.pass_target_pos_y = pass_positions[cur_state][1]
+                    status.pid_goal_pos_x = pass_positions[cur_state][0]
+                    status.pid_goal_pos_y = pass_positions[cur_state][1]
                     not_assigned_robot_ids.remove(robot_id)
 
                 self._dynamic_strategy.set_robot_status(robot_id, status)
@@ -176,20 +173,52 @@ class NormalStartKickOffStrategyCalcurator(StrategyCalcuratorBase):
         self._kicker_id = None
 
     def calcurate(self, strategy_context=None):
-        self._dynamic_strategy.clone_from(self._static_strategies['initial'])
-        robot_ids = self._objects.get_robot_ids_sorted_by_distance_to_ball(self._get_active_robot_ids())
-
         pass_pos = [-0.3, -2.0]
         succeeded_area = self._objects.robot[0].size_r + 0.3
 
-        target_pos = pass_pos
         ball_pos = self._objects.ball.get_current_position()
+        target_pos = pass_pos
         distance = functions.distance_btw_two_points(ball_pos, target_pos)
 
         if distance < succeeded_area:
             strategy_context.update("kickoff_complete", True, namespace="world_model")
 
-        for idx, robot_id in enumerate(robot_ids[:2]):
+        self._dynamic_strategy.clone_from(self._static_strategies['initial'])
+
+        not_assigned_robot_ids = self._get_active_robot_ids()
+
+        if len(not_assigned_robot_ids) >= 5:
+            # 残り5台以上の場合
+            # Defence系を先にアサイン
+            not_assigned_ops = ["keeper", "defence3", "defence4"]
+        elif len(not_assigned_robot_ids) == 4:
+            # 残り4台の場合
+            not_assigned_ops = ["keeper", "defence3"]
+        elif len(not_assigned_robot_ids) == 3:
+            # 残り3台の場合
+            not_assigned_ops = ["keeper"]
+        else:
+            # 残り3台未満の場合
+            not_assigned_ops = ["keeper"]
+
+        # for文で消えないようコピー
+        sorted_not_assigned_robot_ids = sorted(not_assigned_robot_ids, reverse=True)
+
+        # Defence系をアサイン
+        for robot_id in sorted_not_assigned_robot_ids:
+            if not_assigned_ops == []:
+                break
+            status = Status()
+            status.status = not_assigned_ops[0]
+
+            self._dynamic_strategy.set_robot_status(robot_id, status)
+
+            not_assigned_ops.pop(0)
+            not_assigned_robot_ids.remove(robot_id)
+
+        robot_ids = self._objects.get_robot_ids_sorted_by_distance_to_ball(not_assigned_robot_ids)
+
+        for idx, robot_id in enumerate(robot_ids):
             status = Status()
             if idx == 0:
                 status.status = "pass"
@@ -205,14 +234,8 @@ class NormalStartKickOffStrategyCalcurator(StrategyCalcuratorBase):
             elif idx == 1:
                 status.status = "receive"
                 self._receiver_id = robot_id
-                status.pass_target_pos_x = pass_pos[0]
-                status.pass_target_pos_y = pass_pos[1]
-            self._dynamic_strategy.set_robot_status(robot_id, status)
-
-        ops = ["keeper", "defence3", "defence4"]
-        for idx, robot_id in enumerate(robot_ids[2:]):
-            status = Status()
-            status.status = ops[idx]
+                status.pid_goal_pos_x = pass_pos[0]
+                status.pid_goal_pos_y = pass_pos[1]
             self._dynamic_strategy.set_robot_status(robot_id, status)
 
         result = self._dynamic_strategy

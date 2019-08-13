@@ -5,12 +5,12 @@ import math
 import matplotlib.pyplot as plt
 import functions
 import rospy
+import functions
 
 
 class RobotKick(object):
     def __init__(self, pid, cmd, status):
-        # type: (entity.Ball, entity.Robot, robot_pid.RobotPid,
-        #        aisaac.msg.Status, robot_status.RobotStatus) -> None
+        # type: (robot_pid.RobotPid, aisaac.msg.Status, robot_status.RobotStatus) -> None
         self.kick_power_x = 10
         self.kick_power_z = 0
 
@@ -139,7 +139,24 @@ class RobotKick(object):
         b = np.clip(b,-1.0e+308,1.0e+308)
         return a, b
 
-    def receive_ball(self, target_x, target_y):     
+    def receive_ball(self, target_x, target_y):
+        self._recieve_ball((target_x, target_y),
+                           self.ball_params.get_current_position())
+
+    def auto_kick_receive_ball(self, target_xy, next_target_xy=None):
+        self._recieve_ball((target_x, target_y), self.ball_params.get_current_position(), auto_kick=True)
+
+    def _recieve_ball(self, target_xy, next_target_xy, auto_kick=False):
+        # type: (typing.Tuple[float], typing.Tuple[float]) -> None
+        """
+        Parameters
+        ----------
+        target_xy: (x, y) パス目標地点
+        next_target_xy: (x, y) 受け取り時にロボットが向いているべき方向
+        """
+        target_x = target_xy[0]
+        target_y = target_xy[1]
+
         line_a = self.ball_params.get_line_a()
         line_b = self.ball_params.get_line_b()
         # 本来のパス目標地点とフィッティング直線Lとの距離計算
@@ -151,18 +168,20 @@ class RobotKick(object):
         hy = line_a * (line_a * (target_y - line_b) + target_x) \
             / (line_a**2 + 1) + line_b
 
-        # 機体の速度・加速度から間に合うかどうか判断
-        # 未実装
+        # TODO: 機体の速度・加速度から間に合うかどうか判断
 
         # 距離だけで諦めるかどうか判断
         if (d < 2.0) and  (line_a != 0):
-            pose_theta = math.atan2( (self.ball_params.get_current_position()[1] - hy) , (self.ball_params.get_current_position()[0] - hx) )
-            # pose_theta = math.atan2( (self.ball_params.get_current_position()[1]) , (self.ball_params.get_current_position()[0]) )
+            pose_theta = math.atan2( (next_target_xy[1] - hy) , (next_target_xy[0] - hx) )
+            # pose_theta = math.atan2( (next_target_xy[1]) , (next_target_xy[0]) )
             self.pid.pid_linear(hx, hy, pose_theta)
         else:
-            pose_theta = math.atan2( (self.ball_params.get_current_position()[1] - target_y) , (self.ball_params.get_current_position()[0] - target_x) )
-            # pose_theta = math.atan2( (self.ball_params.get_current_position()[1]) , (self.ball_params.get_current_position()[0]) )
+            pose_theta = math.atan2( (next_target_xy[1] - target_y) , (next_target_xy[0] - target_x) )
+            # pose_theta = math.atan2( (next_target_xy[1]) , (next_target_xy[0]) )
             self.pid.pid_linear(target_x, target_y, pose_theta)
+
+        if auto_kick:
+            self.cmd.kick_speed_x = functions.distance_btw_two_points((target_x, target_y), next_target_xy) * self.const
 
         # # 垂線テキスト座標
         # if self.ctrld_robot.get_id() == 0:
@@ -178,4 +197,7 @@ class RobotKick(object):
         #     #self.lines3.set_data([self.ball_params.ball_future_x, hx], [self.ball_params.ball_future_y, hy])
         #     #self.lines4.set_data([self.ball_params.ball_future_x, target_x], [self.ball_params.ball_future_y, target_y])
         #     plt.pause(.01)
+
+
+
 
