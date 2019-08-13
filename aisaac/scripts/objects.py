@@ -29,6 +29,10 @@ class Objects(object):
         self.robot = [entity.Robot(id=i) for i in self._robot_ids]  # type: typing.List[entity.Robot]
         self.enemy = [entity.Robot() for i in self._enemy_ids]  # type: typing.List[entity.Robot]
 
+        roles = ["OFR", "OFL", "DFR", "DFL", "GK"]
+        for robot, role in zip(self.robot, roles):
+            robot.set_role(role)
+
         self.ball = entity.Ball()
 
         """---ボール軌道の考慮時間幅(linear Regressionで軌道予測するため)---"""
@@ -66,6 +70,18 @@ class Objects(object):
         for i, id in enumerate(self._robot_ids):
             if id == robot_id:
                 return robots[i]
+
+    def get_robot_by_role(self, role):
+        robots = [self.robot[i] for i in self._robot_ids]
+        for i, robot in enumerate(robots):
+            if robot.get_role() == role:
+                return robots[i]
+
+    def get_robot_id_by_role(self, role):
+        robots = [self.robot[i] for i in self._robot_ids]
+        for i, robot in enumerate(robots):
+            if robot.get_role() == role:
+                return robot.get_id()
 
     def set_first_positions(self):
         self.robot[0].set_future_position(x=-5.5, y=0., theta=0.)

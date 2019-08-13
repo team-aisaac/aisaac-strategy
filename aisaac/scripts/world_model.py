@@ -105,7 +105,7 @@ if __name__ == "__main__":
                 identity_filter(enemy)
 
             referee_branch = referee.get_referee_branch()
-            referee_branch = "NORMAL_START"
+            #referee_branch = "INDIRECT_FREE_ATTACK"
             #strat = strategy.StopStaticStrategy()
 
             if referee_branch == "HALT":
