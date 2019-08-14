@@ -72,8 +72,23 @@ class RobotKick(object):
         self.pid.pid_linear(self.ball_params.get_current_position()[0], self.ball_params.get_current_position()[1], self.pose_theta)
         #self.cmd.vel_surge = 3
 
-    def shoot_ball(self, should_wait=False):
-        self.pass_ball(config.GOAL_ENEMY_CENTER[0], config.GOAL_ENEMY_CENTER[1], should_wait=should_wait, is_shoot=True)
+    def shoot_ball(self, should_wait=False, target="random"):
+        _candidates = ["left", "right", "center"]
+
+        if target in _candidates:
+            _target = target
+        else:
+            _target = np.random.choice(_candidates)
+
+        post_offset = 0.2
+
+        if _target == "center":
+            self.pass_ball(config.GOAL_ENEMY_CENTER[0], config.GOAL_ENEMY_CENTER[1], should_wait=should_wait, is_shoot=True)
+        elif _target == "left":
+            self.pass_ball(config.GOAL_ENEMY_LEFT[0], config.GOAL_ENEMY_LEFT[1] - post_offset, should_wait=should_wait, is_shoot=True)
+        elif _target == "right":
+            self.pass_ball(config.GOAL_ENEMY_RIGHT[0], config.GOAL_ENEMY_RIGHT[1] + post_offset, should_wait=should_wait, is_shoot=True)
+
 
     def pass_ball(self, target_x, target_y, should_wait=False, is_shoot=False, is_tip_kick=False):
         distance = math.sqrt((target_x - self.ball_params.get_current_position()[0])**2 + (target_y - self.ball_params.get_current_position()[1])**2)
