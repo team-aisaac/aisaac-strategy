@@ -8,6 +8,7 @@ from aisaac.msg import Status
 import copy
 import numpy as np
 import rospy
+import config
 
 class StopStrategyCalculator(StrategyCalcuratorBase):
     def __init__(self, objects):
@@ -33,7 +34,7 @@ class StopStrategyCalculator(StrategyCalcuratorBase):
             if distance <= (target_distance + offset): 
                 status = Status()
                 status.status = "move_linear"
-                vector = np.array(robot.get_current_position()) - np.array(ball.get_current_position())
+                vector = np.array(config.GOAL_CENTER) - np.array(ball.get_current_position())
                 vector = (target_distance / np.linalg.norm(vector)) * vector
                 vector = np.array(ball.get_current_position()) + vector
                 status.pid_goal_pos_x = vector[0]
