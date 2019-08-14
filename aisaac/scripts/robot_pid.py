@@ -384,7 +384,79 @@ class RobotPid(object):
 
         return 1
 
-    def pid_linear(self, goal_pos_x, goal_pos_y, goal_pos_theta):
+
+    def _clip_penalty_area(self, goal_pos_x, goal_pos_y):
+
+        in_penalty_area = functions.in_penalty_area((goal_pos_x, goal_pos_y))
+
+        if not in_penalty_area:
+            return goal_pos_x, goal_pos_y
+
+        penalty_area_points_l = {
+            'left_bot': [-6.0, -1.2],
+            'right_bot': [-4.8, -1.2],
+            'right_top': [-4.8, 1.2],
+            'left_top': [-6.0, 1.2],
+        }
+        penalty_area_points_r = {
+            'right_top': [6.0, 1.2],
+            'left_top': [4.8, 1.2],
+            'left_bot': [4.8, -1.2],
+            'right_bot': [6.0, -1.2],
+        }
+
+        robo_x, robo_y = self.ctrld_robot.get_current_position()
+        line_robo_to_goal = \
+            functions.line_parameters(robo_x, robo_y, goal_pos_x, goal_pos_y)
+
+        line_penal_l = {}
+        line_penal_l['front'] = functions.line_parameters_vector_args(
+            penalty_area_points_l['right_bot'],
+            penalty_area_points_l['right_top']
+        )
+        line_penal_l['top'] = functions.line_parameters_vector_args(
+            penalty_area_points_l['left_top'],
+            penalty_area_points_l['right_top'],
+        )
+        line_penal_l['bot'] = functions.line_parameters_vector_args(
+            penalty_area_points_l['left_bot'],
+            penalty_area_points_l['right_bot'],
+        )
+
+        line_penal_r = {}
+        line_penal_r['front'] = functions.line_parameters_vector_args(
+            penalty_area_points_r['left_bot'],
+            penalty_area_points_r['left_top']
+        )
+        line_penal_r['top'] = functions.line_parameters_vector_args(
+            penalty_area_points_r['left_top'],
+            penalty_area_points_r['right_top']
+        )
+        line_penal_r['bot'] = functions.line_parameters_vector_args(
+            penalty_area_points_r['left_bot'],
+            penalty_area_points_r['right_bot']
+        )
+
+        if in_penalty_area == "friend":
+            line_penal = line_penal_l
+        else:
+            line_penal = line_penal_r
+
+        clip_pos_xys = []
+        for key in line_penal.keys():
+            clip_pos_xys.append(functions.cross_point(line_penal[key],
+                                                      line_robo_to_goal))
+
+        sorted_clip_pos_xys = sorted(clip_pos_xys,
+                                     key=lambda clip_pos_xy: functions.distance_btw_two_points(
+                                         clip_pos_xy,
+                                         self.ctrld_robot.get_current_position()))
+
+        if self.ctrld_robot.get_id() == 0:
+            print(str(sorted_clip_pos_xys[0]))
+        return sorted_clip_pos_xys[0]
+
+    def pid_linear(self, goal_pos_x, goal_pos_y, goal_pos_theta, ignore_penalty_area=False):
         """
         self.recursion_count = 0
         next_pos_x, next_pos_y = self.path_plan(goal_pos_x, goal_pos_y)
@@ -400,10 +472,19 @@ class RobotPid(object):
 
         if self.goal_pos_init_flag == True:
             self.recursion_count = 0
-            
-            self.next_pos_x, self.next_pos_y = self.avoid_penalty_area(goal_pos_x, goal_pos_y)
-            self.next_pos_x, self.next_pos_y = self.avoid_goal(self.next_pos_x, self.next_pos_y)
-            self.next_pos_x, self.next_pos_y = self.path_plan(self.next_pos_x, self.next_pos_y)
+
+            tmp_x = goal_pos_x
+            tmp_y = goal_pos_y
+
+            if not ignore_penalty_area:
+                tmp_x, tmp_y = self._clip_penalty_area(tmp_x, tmp_y)
+
+            tmp_x, tmp_y = self.avoid_penalty_area(tmp_x, tmp_y)
+            tmp_x, tmp_y = self.avoid_goal(tmp_x, tmp_y)
+            tmp_x, tmp_y = self.path_plan(tmp_x, tmp_y)
+
+            self.next_pos_x = tmp_x
+            self.next_pos_y = tmp_y
             """
             if goal_pos_x != next_pos_x or goal_pos_y != next_pos_y:
                 goal_pos_x = next_pos_x
