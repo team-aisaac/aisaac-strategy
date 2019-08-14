@@ -125,6 +125,10 @@ class Robot(object):
             elif self.status.robot_status == "pass":
                 self.kick.pass_ball(self.ctrld_robot.get_pass_target_position()[0],
                                     self.ctrld_robot.get_pass_target_position()[1])
+            elif self.status.robot_status == "pass_chip":
+                self.kick.pass_ball(self.ctrld_robot.get_pass_target_position()[0],
+                                    self.ctrld_robot.get_pass_target_position()[1], 
+                                    is_tip_kick=True)
             elif self.status.robot_status == "prepare_pass":
                 self.kick.pass_ball(self.ctrld_robot.get_pass_target_position()[0],
                                     self.ctrld_robot.get_pass_target_position()[1],
