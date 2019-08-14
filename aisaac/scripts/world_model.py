@@ -69,7 +69,11 @@ class WorldModel(object):
             "placed_ball_position", 1, [0, 0], namespace="world_model")
         self._strategy_context.register_new_context(
             "indirect_finish", 1, False, namespace="world_model")
+        self._strategy_context.register_new_context(
+            "direct_finish", 1, False, namespace="world_model")
+
         self._loop_events = []
+
 
 
     def add_loop_event_listener(self, callback):
@@ -197,9 +201,14 @@ def run_world_model():
                 strat = strat_calcrator.calcurate(strat_ctx, referee_branch)
 
             elif referee_branch == "DIRECT_FREE_ATTACK":
-                strat_calcrator = world_model.get_strategy_calcurator(
-                    'direct_free_attack')
+                if not strat_ctx.get_last("direct_finish", namespace="world_model"):
+                    strat_calcrator = world_model.get_strategy_calcurator(
+                        'direct_free_attack')
+                else:
+                    strat_calcrator = world_model.get_strategy_calcurator(
+                        'normal_start_normal')
                 strat = strat_calcrator.calcurate(strat_ctx)
+
             elif referee_branch == "DIRECT_FREE_DEFENCE":
                     # enemy_kick終了してない場合
                 if not strat_ctx.get_last("enemy_kick", namespace="world_model"):
@@ -246,6 +255,11 @@ def run_world_model():
                     strat_calcrator = world_model.get_strategy_calcurator(
                         'indirect_free_attack').reset()
                     strat_ctx.update("indirect_finish", False, namespace="world_model")
+                if referee_branch == "DIRECT_FREE_ATTACK":
+                    strat_calcrator = world_model.get_strategy_calcurator(
+                        'direct_free_attack').reset()
+                    strat_ctx.update("direct_finish", False, namespace="world_model")
+
 
 
             tmp_last_referee_branch = referee_branch
