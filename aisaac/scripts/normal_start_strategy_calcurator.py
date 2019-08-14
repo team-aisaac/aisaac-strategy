@@ -27,6 +27,11 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
         self._robots_near_to_ball = None
 
     def _attack_strategy1(self, strategy_context=None):
+
+        #ball喪失時、防御へ移行
+        if self._get_who_has_a_ball() == "enemy":
+                strategy_context.update("defence_or_attack", False, namespace="world_model")
+
         pass_positions = [
             [1.0, 2.0],
             [2.0, -2.0],
@@ -157,6 +162,11 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
 
 
     def _defence_strategy(self, strategy_context=None):
+
+        #ball取得時、攻撃へ移行
+        if self._get_who_has_a_ball() == "robots":
+                strategy_context.update("defence_or_attack", True, namespace="world_model")
+
         active_robot_ids = self._get_active_robot_ids()
         active_enemy_ids = self._get_active_enemy_ids()
         status = Status()

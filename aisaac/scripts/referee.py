@@ -118,13 +118,13 @@ class Referee:
             # Equivalent to STOP, but the yellow team must pick up the ball and
 		    # drop it in the Designated Position.
             referee_branch = "STOP"
-        elif self._command == "data: 16":
+        elif (self._command == "data: 16" and self.team_color == 'yellow') or (self._command == "data: 17" and self.team_color == 'blue'):
             #BALL_PLACEMENT_YELLOW = 16;
 	        #Equivalent to STOP, but the blue team must pick up the ball and drop
 		    # it in the Designated Position.
-            referee_branch = "STOP"
-        elif self._command == "data: 17":
+            referee_branch = "BALL_PLACEMENT_ROBOT"
+        elif (self._command == "data: 16" and self.team_color == 'blue') or (self._command == "data: 17" and self.team_color == 'yellow'):
             #BALL_PLACEMENT_BLUE = 17;
-            referee_branch = "STOP"
+            referee_branch = "BALL_PLACEMENT_ENEMY"
 
         return referee_branch

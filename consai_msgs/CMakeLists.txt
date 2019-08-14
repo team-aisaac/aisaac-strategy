@@ -23,6 +23,7 @@ find_package(catkin REQUIRED COMPONENTS
    RefereeTeamInfo.msg
    ReplaceRobot.msg
    ReplaceBall.msg
+   PlaceBall.msg
    FieldLineSegment.msg
    FieldCircularArc.msg
    GeometryFieldSize.msg

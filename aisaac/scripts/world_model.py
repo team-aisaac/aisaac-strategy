@@ -198,6 +198,14 @@ def run_world_model():
                     strat_calcrator = world_model.get_strategy_calcurator(
                         'normal_start_normal')
                 strat = strat_calcrator.calcurate(strat_ctx)
+            elif referee_branch == "BALL_PLACEMENT_ROBOT":
+                strat_ctx.update("enemy_kick", False, namespace="world_model")
+                strat_calcrator = world_model.get_strategy_calcurator("stop")
+                strat = strat_calcrator.calcurate(strat_ctx)
+            elif referee_branch == "BALL_PLACEMENT_ENEMY":
+                strat_ctx.update("enemy_kick", False, namespace="world_model")
+                strat_calcrator = world_model.get_strategy_calcurator("stop")
+                strat = strat_calcrator.calcurate(strat_ctx)
 
             # referee_branchが変更されたときに呼び出される
             if tmp_last_referee_branch != referee_branch:

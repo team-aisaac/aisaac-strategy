@@ -14,7 +14,7 @@
     <!-- <include file="$(find ai_core)/launch/real.launch" /> -->
 
     <!-- Run Refbox -->
-    <node name="refbox" pkg="ssl_refbox_wrapper" type="ssl_refbox_wrapper_node.py" required="true">
+    <node name="refbox" pkg="ssl_refbox_wrapper" type="ssl_refbox_wrapper_node.py" required="true" output="screen">
       <param name="multicast_addr" value="224.5.23.1" />
       <param name="multicast_port" value="10003" />
     </node>

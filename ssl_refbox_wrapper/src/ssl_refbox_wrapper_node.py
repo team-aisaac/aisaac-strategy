@@ -5,7 +5,7 @@ import multicast
 
 from std_msgs.msg import Int8
 from std_msgs.msg import Duration
-from consai_msgs.msg import RefereeTeamInfo
+from consai_msgs.msg import RefereeTeamInfo, PlaceBall
 
 
 def convert_team_info(data):
@@ -40,6 +40,7 @@ if  __name__ == '__main__':
     pub_command_duration   =  rospy.Publisher('~command_duration', Duration, queue_size = 10)
     pub_blue_info = rospy.Publisher('~blue_info', RefereeTeamInfo, queue_size = 10)
     pub_yellow_info = rospy.Publisher('~yellow_info', RefereeTeamInfo, queue_size = 10)
+    pub_place_ball_position = rospy.Publisher('~place_ball_position', PlaceBall, queue_size = 10)
 
     r = rospy.Rate(60)
     while not   rospy.is_shutdown():
@@ -51,9 +52,9 @@ if  __name__ == '__main__':
 
         protobuf.ParseFromString(buf)
 
-        pub_stage.publish(Int8(protobuf.stage));
+        pub_stage.publish(Int8(protobuf.stage))
         # pub_stage_duration.publish(Duration());
-        pub_command.publish(Int8(protobuf.command));
+        pub_command.publish(Int8(protobuf.command))
         # pub_command_duration.publish(Int8(protobuf.stage);
 
         blue_info = convert_team_info(protobuf.blue)
@@ -62,3 +63,7 @@ if  __name__ == '__main__':
         yellow_info = convert_team_info(protobuf.yellow)
         pub_yellow_info.publish(yellow_info)
 
+        place_ball_position = PlaceBall()
+        place_ball_position.x = float(protobuf.designated_position.x) / 1000.
+        place_ball_position.y = float(protobuf.designated_position.y) / 1000.
+        pub_place_ball_position.publish(place_ball_position)
