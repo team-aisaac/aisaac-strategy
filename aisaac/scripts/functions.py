@@ -66,7 +66,7 @@ def calculate_internal_dividing_point_vector_args(point_0, point_1, m, n):
     y_1 = point_1[1]
     return calculate_internal_dividing_point(x_0, y_0, x_1, y_1, m, n)
 
-def in_penalty_area(point_xy):
+def in_penalty_area(point_xy, offset=0.0):
     x = point_xy[0]
     y = point_xy[1]
 
@@ -79,11 +79,11 @@ def in_penalty_area(point_xy):
         [-1.2, 1.2]
     ]
 
-    if penalty_area_range_l[0][0] < x < penalty_area_range_l[0][1] \
-            and penalty_area_range_l[1][0] < y < penalty_area_range_l[1][1]:
+    if penalty_area_range_l[0][0] - offset < x < penalty_area_range_l[0][1] + offset \
+            and penalty_area_range_l[1][0] - offset < y < penalty_area_range_l[1][1] + offset:
         return "friend"
-    if penalty_area_range_r[0][0] < x < penalty_area_range_r[0][1] \
-            and penalty_area_range_r[1][0] < y < penalty_area_range_r[1][1]:
+    if penalty_area_range_r[0][0] - offset < x < penalty_area_range_r[0][1] + offset \
+            and penalty_area_range_r[1][0] - offset < y < penalty_area_range_r[1][1] + offset:
         return "enemy"
     return False
 
