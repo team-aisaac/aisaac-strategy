@@ -338,3 +338,66 @@ class NormalStartKickOffDefenceStrategyCalcurator(StrategyCalcuratorBase):
 
         result = self._dynamic_strategy
         return result
+
+class NormalStartPenaltyDefenceStrategyCalcurator(StrategyCalcuratorBase):
+    """
+    referee_branchがPENALTY_DEFENCEの場合のCalcurator。
+    """
+    def __init__(self, objects):
+        self._robot = objects.robot
+        self._enemy = objects.enemy
+        self._robot_ids = objects.get_robot_ids()
+        self._enemy_ids = objects.get_enemy_ids()
+        self._ball_params = objects.ball
+        self._dynamic_strategy = DynamicStrategy()
+        self._objects = objects
+
+    def calcurate(self, strategy_context=None, referee_branch="PENALTY_DEFENCE"):
+        # type: (StrategyContext) -> StrategyBase
+
+        if referee_branch == "NORMAL_START":
+            if self._detect_enemy_kick(strategy_context):
+                strategy_context.update("enemy_kick", True, namespace="world_model")
+                strategy_context.update("defence_or_attack", False, namespace="world_model")
+        else:
+            strategy_context.update("placed_ball_position", self._ball_params.get_current_position(), namespace="world_model")
+
+        active_robot_ids = self._get_active_robot_ids()
+        active_enemy_ids = self._get_active_enemy_ids()
+        nearest_enemy_id = self._objects.get_enemy_ids_sorted_by_distance_to_ball(active_enemy_ids)[0]
+        for robot_id in active_robot_ids:
+            status = Status()
+            robot = self._objects.get_robot_by_id(robot_id)
+            if robot.get_role() == "GK":
+                status.status = "keeper"
+            elif robot.get_role() == "LDF":
+                #固定値へ移動
+                status.status = "move_linear"
+                status.pid_goal_pos_x = -4.4
+                status.pid_goal_pos_y = 1.2
+                status.pid_goal_theta = math.atan2( (self._ball_params.get_current_position()[1] - self._robot[1].get_current_position()[1]) , (self._ball_params.get_current_position()[0] - self._robot[1].get_current_position()[0]) )
+            elif robot.get_role() == "RDF":
+                #固定値へ移動
+                status.status = "move_linear"
+                status.pid_goal_pos_x = -4.4
+                status.pid_goal_pos_y = 0.4
+                status.pid_goal_theta = math.atan2( (self._ball_params.get_current_position()[1] - self._robot[2].get_current_position()[1]) , (self._ball_params.get_current_position()[0] - self._robot[2].get_current_position()[0]) )
+            elif robot.get_role() == "LFW":
+                #固定値へ移動
+                status.status = "move_linear"
+                status.pid_goal_pos_x = -4.4
+                status.pid_goal_pos_y = -0.4
+                status.pid_goal_theta = math.atan2( (self._ball_params.get_current_position()[1] - self._robot[3].get_current_position()[1]) , (self._ball_params.get_current_position()[0] - self._robot[3].get_current_position()[0]) )
+            elif robot.get_role() == "RFW":
+                #固定値へ移動
+                status.status = "move_linear"
+                status.pid_goal_pos_x = -4.4
+                status.pid_goal_pos_y = -1.2
+                status.pid_goal_theta = math.atan2( (self._ball_params.get_current_position()[1] - self._robot[4].get_current_position()[1]) , (self._ball_params.get_current_position()[0] - self._robot[4].get_current_position()[0]) )
+            else:
+                status.status = "none"
+            self._dynamic_strategy.set_robot_status(robot_id, status)
+
+
+        result = self._dynamic_strategy
+        return result

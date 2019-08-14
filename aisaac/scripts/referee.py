@@ -82,7 +82,7 @@ class Referee:
         elif (self._command == "data: 6"  and self.team_color == 'blue') or (self._command == "data: 7" and self.team_color == 'yellow'):
             # PREPARE_PENALTY_BLUE = 7;
 		    # The yellow team may take a direct free kick.
-            referee_branch = "PENALTY_DIFENCE"
+            referee_branch = "PENALTY_DEFENCE"
         elif (self._command == "data: 8" and self.team_color == 'yellow') or (self._command == "data: 9" and self.team_color == 'blue'):
             # DIRECT_FREE_YELLOW = 8;
 		    # The blue team may take a direct free kick.
