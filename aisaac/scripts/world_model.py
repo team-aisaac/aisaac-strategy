@@ -6,7 +6,7 @@ from referee import Referee
 from objects import Objects
 
 import strategy
-from normal_start_strategy_calcurator import NormalStartStrategyCalcurator, NormalStartKickOffStrategyCalcurator, NormalStartKickOffDefenceStrategyCalcurator
+from normal_start_strategy_calcurator import NormalStartStrategyCalcurator, NormalStartKickOffStrategyCalcurator, NormalStartKickOffDefenceStrategyCalcurator, NormalStartPenaltyDefenceStrategyCalcurator
 from stop_strategy_calcurator import StopStrategyCalculator
 from direct_free_attack_strategy_calcurator import DirectFreeAttack
 from direct_free_defence_strategy_calcurator import DirectFreeDefence
@@ -40,6 +40,7 @@ class WorldModel(object):
             'normal_start_kickoff': NormalStartKickOffStrategyCalcurator(self._objects),
             'normal_start_kickoff_defence': NormalStartKickOffDefenceStrategyCalcurator(self._objects),
             'stop': StopStrategyCalculator(self._objects),
+            'penalty_defence': NormalStartPenaltyDefenceStrategyCalcurator(self._objects),
             'direct_free_attack': DirectFreeAttack(self._objects),
             'direct_free_defence': DirectFreeDefence(self._objects),
             'indirect_free_attack': IndirectFreeAttack(self._objects),
@@ -165,20 +166,40 @@ def run_world_model():
                     strat_calcrator = world_model.get_strategy_calcurator(
                         'normal_start_kickoff_defence')
                     strat = strat_calcrator.calcurate(strat_ctx, referee_branch)
+                elif not strat_ctx.get_last("enemy_kick", namespace="world_model") \
+                        and last_referee_branch == "PENALTY_DEFENCE":
+                    strat_calcrator = world_model.get_strategy_calcurator(
+                        'penalty_defence')
+                    strat = strat_calcrator.calcurate(strat_ctx, referee_branch)
                 else:
                     strat_calcrator = world_model.get_strategy_calcurator(
                         'normal_start_normal')
                     strat = strat_calcrator.calcurate(strat_ctx)
 
+            elif referee_branch == "FORCE_START":
+                strat_ctx.update("defence_or_attack", True, namespace="world_model")
+                strat_calcrator = world_model.get_strategy_calcurator(
+                    'normal_start_normal')
+                strat = strat_calcrator.calcurate(strat_ctx)
+
             elif referee_branch == "KICKOFF_ATTACK":
                 strat_ctx.update("kickoff_complete", False, namespace="world_model")
                 strat = strategy.InitialStaticStrategy()
-
             elif referee_branch == "KICKOFF_DEFENCE":
                 strat_ctx.update("enemy_kick", False, namespace="world_model")
                 strat_calcrator = world_model.get_strategy_calcurator(
                     'normal_start_kickoff_defence')
                 strat = strat_calcrator.calcurate(strat_ctx, referee_branch)
+
+            elif referee_branch == "PENALTY_ATTACK":
+                strat_calcrator = world_model.get_strategy_calcurator(
+                    'direct_free_attack')
+                strat = strat_calcrator.calcurate(strat_ctx)
+            elif referee_branch == "PENALTY_DEFENCE":
+                strat_calcrator = world_model.get_strategy_calcurator(
+                    'penalty_defence')
+                strat = strat_calcrator.calcurate(strat_ctx, referee_branch)
+
             elif referee_branch == "DIRECT_FREE_ATTACK":
                 if not strat_ctx.get_last("direct_finish", namespace="world_model"):
                     strat_calcrator = world_model.get_strategy_calcurator(
@@ -189,9 +210,15 @@ def run_world_model():
                 strat = strat_calcrator.calcurate(strat_ctx)
 
             elif referee_branch == "DIRECT_FREE_DEFENCE":
-                strat_calcrator = world_model.get_strategy_calcurator(
-                    'direct_free_defence')
+                    # enemy_kick終了してない場合
+                if not strat_ctx.get_last("enemy_kick", namespace="world_model"):
+                    strat_calcrator = world_model.get_strategy_calcurator(
+                        'direct_free_defence')
+                else:
+                    strat_calcrator = world_model.get_strategy_calcurator(
+                        'normal_start_normal')
                 strat = strat_calcrator.calcurate(strat_ctx)
+
             elif referee_branch == "INDIRECT_FREE_ATTACK":
                 if not strat_ctx.get_last("indirect_finish", namespace="world_model"):
                     strat_calcrator = world_model.get_strategy_calcurator(
@@ -200,10 +227,23 @@ def run_world_model():
                     strat_calcrator = world_model.get_strategy_calcurator(
                         'normal_start_normal')
                 strat = strat_calcrator.calcurate(strat_ctx)
-
             elif referee_branch == "INDIRECT_FREE_DEFENCE":
-                strat_calcrator = world_model.get_strategy_calcurator(
-                    'indirect_free_defence')
+                    # enemy_kick終了してない場合
+                if not strat_ctx.get_last("enemy_kick", namespace="world_model"):
+                    strat_calcrator = world_model.get_strategy_calcurator(
+                        'indirect_free_defence')
+                else:
+                    strat_calcrator = world_model.get_strategy_calcurator(
+                        'normal_start_normal')
+                strat = strat_calcrator.calcurate(strat_ctx)
+
+            elif referee_branch == "BALL_PLACEMENT_ROBOT":
+                strat_ctx.update("enemy_kick", False, namespace="world_model")
+                strat_calcrator = world_model.get_strategy_calcurator("stop")
+                strat = strat_calcrator.calcurate(strat_ctx)
+            elif referee_branch == "BALL_PLACEMENT_ENEMY":
+                strat_ctx.update("enemy_kick", False, namespace="world_model")
+                strat_calcrator = world_model.get_strategy_calcurator("stop")
                 strat = strat_calcrator.calcurate(strat_ctx)
 
             # referee_branchが変更されたときに呼び出される
