@@ -67,6 +67,16 @@ def calculate_internal_dividing_point_vector_args(point_0, point_1, m, n):
     return calculate_internal_dividing_point(x_0, y_0, x_1, y_1, m, n)
 
 def in_penalty_area(point_xy, offset=0.0):
+    """
+    Parameters
+    ----------
+    point_xy: (float, float) 判定したい座標
+    offset: float            offsetメートル分ペナルティエリアが各辺に対して広いと仮定して計算する
+
+    Return
+    ----------
+    "friend"/"enemy"/False
+    """
     x = point_xy[0]
     y = point_xy[1]
 
@@ -91,8 +101,12 @@ def cross_point(line_1, line_2):
     """
     Parameters
     ----------
-    line_1: (a, b, c): ax + by + c = 0のa, b, cのリスト
-    line_2: (a, b, c): ax + by + c = 0のa, b, cのリスト
+    line_1 (a, b, c): (float,float,float) ax + by + c = 0のa, b, cのリスト
+    line_2 (a, b, c): (float,float,float) ax + by + c = 0のa, b, cのリスト
+
+    Return
+    ----------
+    x, y: (float, float) line_1とline_2の交点の座標
     """
     l1a = line_1[0]
     l1b = line_1[1]

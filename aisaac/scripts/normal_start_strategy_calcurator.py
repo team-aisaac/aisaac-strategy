@@ -12,6 +12,7 @@ from aisaac.msg import Status
 import copy
 import functions
 import rospy
+import numpy as np
 
 try:
     from typing import Tuple, List, Dict
@@ -26,18 +27,40 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
         self._kicker_id = None
         self._robots_near_to_ball = None
 
+        self._prepare_pass = False
+        self._prepare_pass_start_time = rospy.Time.now()
+
+        self._pass_positions = None
+        self._random_fake_position = self._generate_pass_position()
+
+    def _generate_pass_position(self):
+        tmp_x = 2.6 + 4.0 * (-0.5 + np.random.rand())
+        tmp_y = 0.0 + 3.0 * (-0.5 + np.random.rand())
+        return tmp_x, tmp_y
+
+    def _generate_pass_positions(self):
+        length_pass_stage = np.random.choice([0,1,2])
+        pass_positions = []
+        for i in range(length_pass_stage):
+            tmp_x = 2.6 + 4.0 * (-0.5 + np.random.rand())
+            tmp_y = 0.0 + 3.0 * (-0.5 + np.random.rand())
+            pass_positions.append(self._generate_pass_position())
+        pass_positions.append([6.0, 0.0])
+
+        return pass_positions
+
     def _attack_strategy1(self, strategy_context=None):
 
         #ball喪失時、防御へ移行
         if self._get_who_has_a_ball() == "enemy":
                 strategy_context.update("defence_or_attack", False, namespace="world_model")
 
-        pass_positions = [
-            [3.0, 1.0],
-            [1.0, -1.0],
-            [6.0, 0.0],
-        ]
-        succeeded_area = self._objects.robot[0].size_r + 0.3
+        if self._pass_positions is None:
+            self._pass_positions = self._generate_pass_positions()
+
+        pass_positions = self._pass_positions
+
+        succeeded_area = self._objects.robot[0].size_r + 0.62
 
         last_state = strategy_context.get_last("normal_strat_state", namespace="normal_strat")
 
@@ -58,6 +81,7 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
         change_state = False
         if distance < succeeded_area and len(pass_positions) > cur_state:
             cur_state = cur_state + 1
+            self._random_fake_position = self._generate_pass_position()
             change_state = True
 
         # 最後のpass_positionsだったらシュート
@@ -82,9 +106,10 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
         self._dynamic_strategy.clone_from(self._static_strategies['initial'])
 
         not_assigned_robot_ids = self._get_active_robot_ids()
+        tmp_not_assigned_robot_ids = copy.deepcopy(not_assigned_robot_ids)
 
         # Defence系をアサイン
-        for robot_id in not_assigned_robot_ids:
+        for robot_id in tmp_not_assigned_robot_ids:
             status = Status()
             role = self._objects.get_robot_by_id(robot_id).get_role()
             if role == 'GK':
@@ -92,11 +117,11 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
                 self._dynamic_strategy.set_robot_status(robot_id, status)
                 not_assigned_robot_ids.remove(robot_id)
             elif role == 'LDF':
-                status.status = "defence3"
+                status.status = "defence1"
                 self._dynamic_strategy.set_robot_status(robot_id, status)
                 not_assigned_robot_ids.remove(robot_id)
             elif role == 'RDF':
-                status.status = "defence4"
+                status.status = "defence2"
                 self._dynamic_strategy.set_robot_status(robot_id, status)
                 not_assigned_robot_ids.remove(robot_id)
 
@@ -104,6 +129,7 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
         # ステートが変わるときに近い順を更新
         if self._robots_near_to_ball is None or change_state:
             self._robots_near_to_ball = self._objects.get_robot_ids_sorted_by_distance_to_ball(not_assigned_robot_ids)
+
 
         if len(self._robots_near_to_ball) >= 2: # 2台以上攻撃に割ける場合
             # 残りをボールに近い順にアサイン
@@ -118,7 +144,15 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
                         receiver_pos = self._objects.robot[self._receiver_id].get_current_position()
                         receiver_area = 1.0
                         if functions.distance_btw_two_points(pass_positions[cur_state], receiver_pos) > receiver_area:
-                            status.status = "prepare_pass"
+                            if not self._prepare_pass:
+                                self._prepare_pass_start_time = rospy.Time.now()
+                                self._prepare_pass = True
+                            if (rospy.Time.now() - self._prepare_pass_start_time).to_sec() > 1.0:
+                                status.status = "pass"
+                            else:
+                                status.status = "prepare_pass"
+                        else:
+                            self._prepare_pass = False
 
                     self._kicker_id = robot_id
                     status.pass_target_pos_x = pass_positions[cur_state][0]
@@ -126,19 +160,25 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
                     not_assigned_robot_ids.remove(robot_id)
                 elif idx == 1:
                     if is_shoot:
-                        status.status = "stop"
+                        status.status = "receive"
+                        if self._kicker_id is not None:
+                            # 適当な位置に移動
+                            x, y = self._random_fake_position
+                            status.pid_goal_pos_x = x
+                            status.pid_goal_pos_y = y
                         self._receiver_id = None
                     else:
-                        if pre_shoot:
-                            status.status = "receive_direct_shoot"
-                        else:
-                            status.status = "receive"
+                        # if pre_shoot:
+                        #     status.status = "receive_direct_shoot"
+                        # else:
+                        #     status.status = "receive"
+                        status.status = "receive"
                         self._receiver_id = robot_id
                         if not should_reset:
                             status.pass_target_pos_x = pass_positions[cur_state+1][0]
                             status.pass_target_pos_y = pass_positions[cur_state+1][1]
-                    status.pid_goal_pos_x = pass_positions[cur_state][0]
-                    status.pid_goal_pos_y = pass_positions[cur_state][1]
+                        status.pid_goal_pos_x = pass_positions[cur_state][0]
+                        status.pid_goal_pos_y = pass_positions[cur_state][1]
                     not_assigned_robot_ids.remove(robot_id)
 
                 self._dynamic_strategy.set_robot_status(robot_id, status)
@@ -156,6 +196,7 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
             # シュートしたらリセット
             strategy_context.update("normal_strat_state", 0, namespace="normal_strat")
             self._receiver_id = None
+            self._pass_positions = None
         else:
             strategy_context.update("normal_strat_state", cur_state, namespace="normal_strat")
 
@@ -220,6 +261,9 @@ class NormalStartKickOffStrategyCalcurator(StrategyCalcuratorBase):
         self._receiver_id = None
         self._kicker_id = None
 
+        self._prepare_pass = False
+        self._prepare_pass_start_time = rospy.Time.now()
+
     def calcurate(self, strategy_context=None):
         pass_pos = [-0.3, -2.0]
         succeeded_area = self._objects.robot[0].size_r + 0.3
@@ -235,8 +279,9 @@ class NormalStartKickOffStrategyCalcurator(StrategyCalcuratorBase):
         self._dynamic_strategy.clone_from(self._static_strategies['initial'])
 
         not_assigned_robot_ids = self._get_active_robot_ids()
+        tmp_not_assigned_robot_ids = copy.deepcopy(not_assigned_robot_ids)
 
-        for robot_id in not_assigned_robot_ids:
+        for robot_id in tmp_not_assigned_robot_ids:
             status = Status()
             role = self._objects.get_robot_by_id(robot_id).get_role()
             if role == 'GK':
@@ -244,11 +289,11 @@ class NormalStartKickOffStrategyCalcurator(StrategyCalcuratorBase):
                 self._dynamic_strategy.set_robot_status(robot_id, status)
                 not_assigned_robot_ids.remove(robot_id)
             elif role == 'LDF':
-                status.status = "defence3"
+                status.status = "defence1"
                 self._dynamic_strategy.set_robot_status(robot_id, status)
                 not_assigned_robot_ids.remove(robot_id)
             elif role == 'RDF':
-                status.status = "defence4"
+                status.status = "defence2"
                 self._dynamic_strategy.set_robot_status(robot_id, status)
                 not_assigned_robot_ids.remove(robot_id)
 
@@ -262,7 +307,15 @@ class NormalStartKickOffStrategyCalcurator(StrategyCalcuratorBase):
                     receiver_pos = self._objects.robot[self._receiver_id].get_current_position()
                     receiver_area = 1.0
                     if functions.distance_btw_two_points(pass_pos, receiver_pos) > receiver_area:
-                        status.status = "prepare_pass"
+                        if not self._prepare_pass:
+                            self._prepare_pass_start_time = rospy.Time.now()
+                            self._prepare_pass = True
+                        if (rospy.Time.now() - self._prepare_pass_start_time).to_sec() > 1.0:
+                            status.status = "pass"
+                        else:
+                            status.status = "prepare_pass"
+                    else:
+                        self._prepare_pass = False
 
                 self._kicker_id = robot_id
                 status.pass_target_pos_x = pass_pos[0]
