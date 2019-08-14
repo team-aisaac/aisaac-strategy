@@ -59,7 +59,11 @@ class WorldModel(object):
         self._strategy_context.register_new_context(
             "kickoff_complete", 1, False, namespace="world_model")
         self._strategy_context.register_new_context(
+            "enemy_kick", 1, False, namespace="world_model")
+        self._strategy_context.register_new_context(
             "referee_branch", 1, "NONE", namespace="world_model")
+        self._strategy_context.register_new_context(
+            "defence_or_attack", 1, False, namespace="world_model")
         self._loop_events = []
 
     def add_loop_event_listener(self, callback):
@@ -142,22 +146,30 @@ def run_world_model():
             elif referee_branch == "NORMAL_START":
                 if not strat_ctx.get_last("kickoff_complete", namespace="world_model") \
                         and last_referee_branch == "KICKOFF_ATTACK":
-                    # 前のreferee_branchがKICKOFFかつkickoff終了してない場合
+                    # 前のreferee_branchがKICKOFF_ATTACKかつkickoff終了してない場合
                     strat_calcrator = world_model.get_strategy_calcurator(
                         'normal_start_kickoff')
+                    strat = strat_calcrator.calcurate(strat_ctx)
+                    # 前のreferee_branchがKICKOFF_DEFENCEかつenemy_kick終了してない場合
+                elif not strat_ctx.get_last("enemy_kick", namespace="world_model") \
+                        and last_referee_branch == "KICKOFF_DEFENCE":
+                    strat_calcrator = world_model.get_strategy_calcurator(
+                        'normal_start_kickoff_defence')
+                    strat = strat_calcrator.calcurate(strat_ctx, referee_branch)
                 else:
                     strat_calcrator = world_model.get_strategy_calcurator(
                         'normal_start_normal')
-                strat = strat_calcrator.calcurate(strat_ctx)
+                    strat = strat_calcrator.calcurate(strat_ctx)
 
             elif referee_branch == "KICKOFF_ATTACK":
                 strat_ctx.update("kickoff_complete", False, namespace="world_model")
                 strat = strategy.InitialStaticStrategy()
 
             elif referee_branch == "KICKOFF_DEFENCE":
+                strat_ctx.update("enemy_kick", False, namespace="world_model")
                 strat_calcrator = world_model.get_strategy_calcurator(
                     'normal_start_kickoff_defence')
-                strat = strat_calcrator.calcurate(strat_ctx)
+                strat = strat_calcrator.calcurate(strat_ctx, referee_branch)
             elif referee_branch == "DIRECT_FREE_ATTACK":
                 strat_calcrator = world_model.get_strategy_calcurator(
                     'direct_free_attack')

@@ -70,8 +70,10 @@ class StrategyCalcuratorBase(object):
         self._objects = objects # type: Objects
         self._robot = self._objects.robot # type: entity.
         self._enemy = self._objects.enemy
+        self._ball_params = self._objects.ball
         self._robot_ids = self._objects.get_robot_ids()
         self._enemy_ids = self._objects.get_enemy_ids()
+        self.placed_ball_position = 0
 
         # 毎ループnewするのは重いので辞書に格納しておく
         self._static_strategies = {
@@ -122,6 +124,15 @@ class StrategyCalcuratorBase(object):
             who_has_a_ball = "free"
 
         return who_has_a_ball
+
+    def _set_placed_ball_position(self, ball_position):
+        self.placed_ball_position = ball_position
+
+    def _detect_enemy_kick(self):
+        if Util.get_distance(self.placed_ball_position, self._ball_params.get_current_position()) > 0.5:
+            return True
+        else:
+            return False
 
     def _get_free_enemy_id(self, exception_robot_id, exception_enemy_id):
         # type: () -> List[int]
