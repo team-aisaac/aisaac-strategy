@@ -53,7 +53,7 @@ class RobotKick(object):
         self.ax.set_xlim(-7, 7)
         self.ax.set_ylim(-7, 7)
 
-    def kick_xz(self, power_x=10.0, power_z=0.0):
+    def kick_xz(self, power_x=10.0, power_z=0.0, ignore_penalty_area=False):
         area = 1.0
         elapsed_time = rospy.Time.now() - self._kick_start_time
         if functions.distance_btw_two_points(self.ball_params.get_current_position(),
@@ -69,7 +69,7 @@ class RobotKick(object):
 
         self.cmd.kick_speed_x = power_x
         self.cmd.kick_speed_z = power_z
-        self.pid.pid_linear(self.ball_params.get_current_position()[0], self.ball_params.get_current_position()[1], self.pose_theta)
+        self.pid.pid_linear(self.ball_params.get_current_position()[0], self.ball_params.get_current_position()[1], self.pose_theta, ignore_penalty_area=ignore_penalty_area)
         #self.cmd.vel_surge = 3
 
     def shoot_ball(self, should_wait=False, target="random"):
@@ -96,7 +96,7 @@ class RobotKick(object):
             self.pass_ball(config.GOAL_ENEMY_RIGHT[0], config.GOAL_ENEMY_RIGHT[1] + post_offset, should_wait=should_wait, is_shoot=True)
 
 
-    def pass_ball(self, target_x, target_y, should_wait=False, is_shoot=False, is_tip_kick=False):
+    def pass_ball(self, target_x, target_y, should_wait=False, is_shoot=False, is_tip_kick=False, ignore_penalty_area=False):
         """
         Parameters
         ----------
@@ -147,7 +147,7 @@ class RobotKick(object):
                         self._kick_start_time = rospy.Time.now()
                         self.pass_stage = 1
 
-                self.pid.pid_linear(pose_x, pose_y, pose_theta)
+                self.pid.pid_linear(pose_x, pose_y, pose_theta, ignore_penalty_area=ignore_penalty_area)
 
             elif self.pass_stage == 1:
                 if not is_shoot:
@@ -157,9 +157,9 @@ class RobotKick(object):
                     kick_power_x = math.sqrt(12.0) * self.const
                 if is_tip_kick:
                     kick_power_z = math.sqrt(distance) * self.const
-                    self.kick_xz(power_x=kick_power_x, power_z=kick_power_z)
+                    self.kick_xz(power_x=kick_power_x, power_z=kick_power_z, ignore_penalty_area=ignore_penalty_area)
                 else:
-                    self.kick_xz(power_x=kick_power_x)
+                    self.kick_xz(power_x=kick_power_x, ignore_penalty_area=ignore_penalty_area)
 
             """
             if self.pass_stage == 1:
