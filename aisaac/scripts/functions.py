@@ -63,7 +63,7 @@ def calculate_internal_dividing_point(x_0, y_0, x_1, y_1, m, n):
         y = ((n * y_0) + (m * y_1)) / (m + n)
         return x, y
 
-def in_penalty_area(self, point_xy):
+def in_penalty_area(point_xy):
     x = point_xy[0]
     y = point_xy[1]
 
