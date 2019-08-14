@@ -12,6 +12,7 @@ import tf
 import time
 from statistics import mean, median,variance,stdev
 import config
+import functions
 
 WORLD_LOOP_RATE = config.WORLD_LOOP_RATE
 
@@ -317,8 +318,8 @@ class Calculation():
         if (ball_x > 0) and (((self.line_up_r_y - self.line_down_r_y)**2 + (self.line_up_r_x - self.line_down_r_x)**2) <= 4.0*((self.L_G + self.robot_r)**2)):
             def1_pos_y = (self.line_up_r_y + self.line_down_r_y)/2.0
             def1_pos_x = (self.line_up_r_x + self.line_down_r_x)/2.0
-            def2_pos_y = 0.0
-            def2_pos_x = 0.0
+            def2_pos_y = functions.calculate_internal_dividing_point_vector_args(self.ball_params.get_current_position(), config.GOAL_CENTER, 1, 1)[1]
+            def2_pos_x = functions.calculate_internal_dividing_point_vector_args(self.ball_params.get_current_position(), config.GOAL_CENTER, 1, 1)[0]
 
         # ボールがハーフラインよりも味方陣側（壁が二台）かつ2台で守れる範囲：パターン2-1,2
         elif (ball_x <= 0) and (((self.line_up_r_y - self.line_down_r_y)**2 + (self.line_up_r_x - self.line_down_r_x)**2) <= 16.0*((self.L_G + self.robot_r)**2)):
@@ -349,14 +350,14 @@ class Calculation():
                 if ball_y > 0:
                     def1_pos_y = self.line_down_r_y + (self.line_up_r_y - self.line_down_r_y)*t_2
                     def1_pos_x = self.line_up_r_x + (self.line_down_r_x - self.line_up_r_x)*t_2
-                    def2_pos_y = 0.0
-                    def2_pos_x = -1.0
+                    def2_pos_y = functions.calculate_internal_dividing_point_vector_args(self.ball_params.get_current_position(), config.GOAL_CENTER, 1, 1)[1]
+                    def2_pos_x = functions.calculate_internal_dividing_point_vector_args(self.ball_params.get_current_position(), config.GOAL_CENTER, 1, 1)[0]
                 # 左サイドにボールがある
                 else:
                     def1_pos_y = self.line_up_r_y + (self.line_down_r_y - self.line_up_r_y)*t_2
                     def1_pos_x = self.line_down_r_x + (self.line_up_r_x - self.line_down_r_x)*t_2
-                    def2_pos_y = 0.0
-                    def2_pos_x = -1.0
+                    def2_pos_y = functions.calculate_internal_dividing_point_vector_args(self.ball_params.get_current_position(), config.GOAL_CENTER, 1, 1)[1]
+                    def2_pos_x = functions.calculate_internal_dividing_point_vector_args(self.ball_params.get_current_position(), config.GOAL_CENTER, 1, 1)[0]
             # 2台の時
             else:
                 # 右サイドにボールがある
