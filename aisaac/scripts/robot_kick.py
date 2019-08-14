@@ -73,6 +73,12 @@ class RobotKick(object):
         #self.cmd.vel_surge = 3
 
     def shoot_ball(self, should_wait=False, target="random"):
+        """
+        Parameters
+        ----------
+        should_wait: boolean TrueならKick準備完了後、Kick直前でKickせず待機
+        target:      str     "ramdom"ならleft/right/centerからランダムで選択、それ以外ならleft/right/centerにシュート
+        """
         _candidates = ["left", "right", "center"]
 
         if target in _candidates:
@@ -91,6 +97,13 @@ class RobotKick(object):
 
 
     def pass_ball(self, target_x, target_y, should_wait=False, is_shoot=False, is_tip_kick=False):
+        """
+        Parameters
+        ----------
+        should_wait: boolean TrueならKick準備完了後、Kick直前でKickせず待機
+        is_shoot:    boolean Trueならshootの威力でKick、Falseならpassの威力でKick
+        is_tip_kick  boolean Trueならtip kick
+        """
         distance = math.sqrt((target_x - self.ball_params.get_current_position()[0])**2 + (target_y - self.ball_params.get_current_position()[1])**2)
         if distance != 0:
             #print self.pass_stage
@@ -178,13 +191,21 @@ class RobotKick(object):
                            next_target_xy,
                            auto_kick=True, is_shoot=False)
 
-    def _recieve_ball(self, target_xy, next_target_xy, auto_kick=False, is_shoot=False):
+    def receive_ball_keeper(self, target_xy):
+        self._recieve_ball(target_xy,
+                           self.ball_params.get_current_position(),
+                           auto_kick=True, is_shoot=True, ignore_penalty_area=True)
+
+    def _recieve_ball(self, target_xy, next_target_xy, auto_kick=False, is_shoot=False, ignore_penalty_area=False):
         # type: (typing.Tuple[float], typing.Tuple[float]) -> None
         """
         Parameters
         ----------
-        target_xy: (x, y) パス目標地点
-        next_target_xy: (x, y) 受け取り時にロボットが向いているべき方向
+        target_xy: (x, y)       パス目標地点
+        next_target_xy: (x, y)  受け取り時にロボットが向いているべき方向
+        auto_kick: boolean      Trueならキッカーに当たったらそのままキック、Falseなら受けるだけ
+        is_shoot: boolean       auto_kickがTrueのときにのみ利用され、Trueならshootの威力でキック、Falseならpassの威力でキック
+        ignore_penalty_area: boolean Trueならペナルティエリアに進入する、Falseなら進入しない
         """
         target_x = target_xy[0]
         target_y = target_xy[1]
@@ -206,11 +227,11 @@ class RobotKick(object):
         if (d < 2.0) and  (line_a != 0):
             pose_theta = math.atan2( (next_target_xy[1] - hy) , (next_target_xy[0] - hx) )
             # pose_theta = math.atan2( (next_target_xy[1]) , (next_target_xy[0]) )
-            self.pid.pid_linear(hx, hy, pose_theta)
+            self.pid.pid_linear(hx, hy, pose_theta, ignore_penalty_area=ignore_penalty_area)
         else:
             pose_theta = math.atan2( (next_target_xy[1] - target_y) , (next_target_xy[0] - target_x) )
             # pose_theta = math.atan2( (next_target_xy[1]) , (next_target_xy[0]) )
-            self.pid.pid_linear(target_x, target_y, pose_theta)
+            self.pid.pid_linear(target_x, target_y, pose_theta, ignore_penalty_area=ignore_penalty_area)
 
         if auto_kick:
             distance = functions.distance_btw_two_points((target_x, target_y), next_target_xy)

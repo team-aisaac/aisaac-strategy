@@ -386,6 +386,16 @@ class RobotPid(object):
 
 
     def _clip_penalty_area(self, goal_pos_x, goal_pos_y, offset=0.0):
+        """
+        Parameters
+        ----------
+        goal_pos_x, goal_pos_y 省略
+        offset: float offsetメートル分ペナルティエリアが各辺に対して広いと仮定して計算する
+
+        Return
+        ----------
+        goal_pos_x, goal_pos_y: (float, float) 自分-目的地の直線とペナルティエリアの交点の座標を返す
+        """
 
         in_penalty_area = functions.in_penalty_area((goal_pos_x, goal_pos_y), offset=offset)
 
@@ -456,11 +466,18 @@ class RobotPid(object):
                                          clip_pos_xy,
                                          self.ctrld_robot.get_current_position()))
 
-        if self.ctrld_robot.get_id() == 0:
-            print(str(sorted_clip_pos_xys[0]))
         return sorted_clip_pos_xys[0]
 
     def pid_linear(self, goal_pos_x, goal_pos_y, goal_pos_theta, ignore_penalty_area=False):
+        """
+        Parameters
+        ----------
+        goal_pos_x: float 目的地のx座標
+        goal_pos_y: float 目的地のy座標
+        goal_pos_theta: float 目的の角度
+        ignore_penalty_area: boolean Trueならペナルティエリアに進入する、Falseなら進入しない
+        """
+
         """
         self.recursion_count = 0
         next_pos_x, next_pos_y = self.path_plan(goal_pos_x, goal_pos_y)
