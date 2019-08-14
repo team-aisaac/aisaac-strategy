@@ -65,6 +65,8 @@ class WorldModel(object):
         self._strategy_context.register_new_context(
             "defence_or_attack", 1, False, namespace="world_model")
         self._strategy_context.register_new_context(
+            "placed_ball_position", 1, [0, 0], namespace="world_model")
+        self._strategy_context.register_new_context(
             "indirect_finish", 1, False, namespace="world_model")
         self._loop_events = []
 
