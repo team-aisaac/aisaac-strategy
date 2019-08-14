@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import functions
 import rospy
 import functions
+import config
 
 
 class RobotKick(object):
@@ -19,15 +20,15 @@ class RobotKick(object):
         self.pid = pid
         self.status = status
         self.cmd = cmd
-        self.dispersion1 = [10] * 2
-        self.dispersion2 = [10] * 2
-        self.rot_dispersion = [10] * 2
+        self.dispersion1 = [10] * 5
+        self.dispersion2 = [10] * 5
+        self.rot_dispersion = [10] * 5
 
-        self.access_threshold1 = 0.05
-        self.access_threshold2 = 0.25
-        self.feint_threshold1 = 0.10
-        self.feint_threshold2 = 0.50
-        self.rot_access_threshold = 0.05
+        self.access_threshold1 = 0.1
+        self.access_threshold2 = 0.5
+        self.feint_threshold1 = 0.2
+        self.feint_threshold2 = 0.75
+        self.rot_access_threshold = 0.015
         self.pass_stage = 0
         self._kick_start_time = rospy.Time.now()
 
@@ -52,7 +53,7 @@ class RobotKick(object):
         self.ax.set_xlim(-7, 7)
         self.ax.set_ylim(-7, 7)
 
-    def kick_x(self):
+    def kick_xz(self, power_x=10.0, power_z=0.0):
         area = 1.0
         elapsed_time = rospy.Time.now() - self._kick_start_time
         if functions.distance_btw_two_points(self.ball_params.get_current_position(),
@@ -66,11 +67,15 @@ class RobotKick(object):
             self.pass_stage = 0
             return
 
-        self.cmd.kick_speed_x = self.kick_power_x
+        self.cmd.kick_speed_x = power_x
+        self.cmd.kick_speed_z = power_z
         self.pid.pid_linear(self.ball_params.get_current_position()[0], self.ball_params.get_current_position()[1], self.pose_theta)
         #self.cmd.vel_surge = 3
 
-    def pass_ball(self, target_x, target_y, should_wait=False):
+    def shoot_ball(self, should_wait=False):
+        self.pass_ball(config.GOAL_ENEMY_CENTER[0], config.GOAL_ENEMY_CENTER[1], should_wait=should_wait, is_shoot=True)
+
+    def pass_ball(self, target_x, target_y, should_wait=False, is_shoot=False):
         distance = math.sqrt((target_x - self.ball_params.get_current_position()[0])**2 + (target_y - self.ball_params.get_current_position()[1])**2)
         if distance != 0:
             #print self.pass_stage
@@ -107,7 +112,6 @@ class RobotKick(object):
                 # print("{} {}".format(dispersion_average, rot_dispersion_average))
 
                 if dispersion_average1 < self.access_threshold1 and dispersion_average2 < self.access_threshold2 and rot_dispersion_average < self.rot_access_threshold:
-                    self.kick_power_x = math.sqrt(distance) * self.const
                     self.pose_theta = pose_theta
                     # self.status.robot_status = "kick"
                     if not should_wait:
@@ -117,7 +121,12 @@ class RobotKick(object):
                 self.pid.pid_linear(pose_x, pose_y, pose_theta)
 
             elif self.pass_stage == 1:
-                self.kick_x()
+                if not is_shoot:
+                    kick_power_x = math.sqrt(distance) * self.const
+                else:
+                    # 12.0: フィールドの横幅
+                    kick_power_x = math.sqrt(12.0) * self.const
+                self.kick_xz(power_x=kick_power_x)
 
             """
             if self.pass_stage == 1:
@@ -125,9 +134,6 @@ class RobotKick(object):
                 self.pose_theta = pose_theta
                 self.status.robot_status = "kick"
             """
-
-    def kick_z(self):
-        pass
 
     def reg1dim(self, x, y, n):
         x = np.clip(x,-6.5,6.5)
@@ -143,10 +149,17 @@ class RobotKick(object):
         self._recieve_ball((target_x, target_y),
                            self.ball_params.get_current_position())
 
-    def auto_kick_receive_ball(self, target_xy, next_target_xy=None):
-        self._recieve_ball((target_x, target_y), self.ball_params.get_current_position(), auto_kick=True)
+    def receive_and_direct_shoot(self, target_xy):
+        self._recieve_ball(target_xy,
+                           config.GOAL_ENEMY_CENTER,
+                           auto_kick=True, is_shoot=True)
 
-    def _recieve_ball(self, target_xy, next_target_xy, auto_kick=False):
+    def receive_and_direct_pass(self, target_xy, next_target_xy):
+        self._recieve_ball(target_xy,
+                           next_target_xy,
+                           auto_kick=True, is_shoot=False)
+
+    def _recieve_ball(self, target_xy, next_target_xy, auto_kick=False, is_shoot=False):
         # type: (typing.Tuple[float], typing.Tuple[float]) -> None
         """
         Parameters
@@ -181,7 +194,13 @@ class RobotKick(object):
             self.pid.pid_linear(target_x, target_y, pose_theta)
 
         if auto_kick:
-            self.cmd.kick_speed_x = functions.distance_btw_two_points((target_x, target_y), next_target_xy) * self.const
+            distance = functions.distance_btw_two_points((target_x, target_y), next_target_xy)
+            if not is_shoot:
+                kick_power_x = math.sqrt(distance) * self.const
+            else:
+                # 12.0: フィールドの横幅
+                kick_power_x = math.sqrt(12.0) * self.const
+            self.cmd.kick_speed_x = kick_power_x
 
         # # 垂線テキスト座標
         # if self.ctrld_robot.get_id() == 0:

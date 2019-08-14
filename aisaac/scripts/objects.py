@@ -107,7 +107,7 @@ class Objects(object):
 
     def get_active_robot_ids(self):
         # TODO: active_robot_ids実装
-        return copy.deepcopy(self._robot_ids)
+        return copy.deepcopy(self.get_robot_ids())
 
     def get_has_a_ball(self, robot_id, threshold=None):
         robot_ids = self.get_active_robot_ids()
