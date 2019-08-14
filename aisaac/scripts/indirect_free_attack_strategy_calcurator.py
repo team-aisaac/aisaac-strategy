@@ -87,7 +87,7 @@ class IndirectFreeAttack(StrategyCalcuratorBase):
         self.passed_3_flg =False
         self.received_3_flg = False
 
-        self.history_who_has_a_ball = False
+        self.history_who_has_a_ball = ["robots" for i in range(10)]
 
         self.ball_position_x = self._objects.ball.get_current_position()[0]
         self.ball_position_y = self._objects.ball.get_current_position()[1]
@@ -96,7 +96,7 @@ class IndirectFreeAttack(StrategyCalcuratorBase):
         # position_1はFW_1が行く場所 (ボールが2mラインより左側にいるときに利用する、右側の時は使わない)
         # position2はFW2が行く場所
         # position3はFW1がボールを蹴ったあとに行く場所
-        if self.ball_position_x <= 2.:
+        if self.ball_position_x <= 5.:
             if self.ball_position_y <= 0.:
                 positions_1 = self._upper_positions_1
                 positions_2 = self._lower_positions_2
@@ -140,28 +140,26 @@ class IndirectFreeAttack(StrategyCalcuratorBase):
         self.GK_id = self._objects.get_robot_id_by_role("GK")
         self.LDF_id = self._objects.get_robot_id_by_role("LDF")
         self.RDF_id = self._objects.get_robot_id_by_role("RDF")
+        self.last_calcurate = "calcurate_1"
 
     def calcurate(self, strategy_context=None):
         # type: (StrategyContext) -> StrategyBase
         if self._get_who_has_a_ball() == "free":
             pass
         elif self._get_who_has_a_ball() == "robots":
-            self.history_who_has_a_ball = "robots"
+            self.history_who_has_a_ball.pop(0)
+            self.history_who_has_a_ball.append("robots")
         else:
-            self.history_who_has_a_ball = "enemy"
+            self.history_who_has_a_ball.pop(0)
+            self.history_who_has_a_ball.append("enemy")
 
-        if self._get_who_has_a_ball() != "enemy":
-            if self.history_who_has_a_ball == "enemy":
-                self.reset()
-            print "attack"
-            result = self.calculate_1()
-            return result
+        if self.history_who_has_a_ball.count("enemy") > 5:
+            strategy_context.update("indirect_finish", True, namespace="world_model")
+            strategy_context.update("defence_or_attack", False, namespace="world_model")
 
-        else:
-            #self.reset()
-            print "defense"
-            result = self.calculate_defense()
-            return result
+        result = self.calculate_1()
+        return result
+
 
 
     def calculate_1(self, strategy_context=None):
@@ -171,7 +169,7 @@ class IndirectFreeAttack(StrategyCalcuratorBase):
         print 'received_2_flg:', self.received_2_flg
         print 'passed_3_flg:', self.passed_3_flg
         print 'received_3_flg:', self.received_3_flg
-        """ハーフラインより左側の戦略"""
+        """ハーフラインより左側の戦略（の予定）"""
         ball_x, ball_y = self._objects.ball.get_current_position()
         active_enemy_ids = self._get_active_enemy_ids()
         nearest_enemy_id = self._objects.get_enemy_ids_sorted_by_distance_to_ball(active_enemy_ids)[0]
@@ -182,8 +180,10 @@ class IndirectFreeAttack(StrategyCalcuratorBase):
             if self.ball_position_nearest_id == robot_id:
                 if self.passed_1_flg:
                     # パス完了した場合
-                    status.status = "defence3"
-                    print status.status, self._objects.robot[robot_id].get_role()
+                    if self._objects.robot[robot_id].get_role() == "LDF":
+                        status.status = "defence1"
+                    else:
+                        status.status = "defence2"
                 else:
                     # パス完了する前 パス先をposition1にする、パス完了したら完了flgを立てる
                     status.status = "pass"
@@ -244,7 +244,6 @@ class IndirectFreeAttack(StrategyCalcuratorBase):
                         self.passed_3_flg = True
                 else:
                     status.status = "receive"
-                    print "check"
                     status.pid_goal_pos_x = self.position_2[0]
                     status.pid_goal_pos_y = self.position_2[1]
                     if self._objects.get_has_a_ball(robot_id):
