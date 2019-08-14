@@ -31,6 +31,10 @@ class Objects(object):
         self.robot = [entity.Robot(id=i) for i in self._robot_ids]  # type: typing.List[entity.Robot]
         self.enemy = [entity.Robot(id=i) for i in self._enemy_ids]  # type: typing.List[entity.Robot]
 
+        roles = ["RFW", "LFW", "RDF", "LDF", "GK"]
+        for robot, role in zip(self.robot, roles):
+            robot.set_role(role)
+
         self.ball = entity.Ball()
 
         """---ボール軌道の考慮時間幅(linear Regressionで軌道予測するため)---"""
@@ -83,6 +87,24 @@ class Objects(object):
     def get_enemy_ids(self):
         return self._enemy_ids
 
+    def get_robot_by_id(self, robot_id):
+        robots = [self.robot[i] for i in self._robot_ids]
+        for i, id in enumerate(self._robot_ids):
+            if id == robot_id:
+                return robots[i]
+
+    def get_robot_by_role(self, role):
+        robots = [self.robot[i] for i in self._robot_ids]
+        for i, robot in enumerate(robots):
+            if robot.get_role() == role:
+                return robots[i]
+
+    def get_robot_id_by_role(self, role):
+        robots = [self.robot[i] for i in self._robot_ids]
+        for i, robot in enumerate(robots):
+            if robot.get_role() == role:
+                return robot.get_id()
+
     def get_active_robot_ids(self):
         # TODO: active_robot_ids実装
         return copy.deepcopy(self._robot_ids)
@@ -98,7 +120,7 @@ class Objects(object):
 
         area = threshold + self.robot[0].size_r
         if functions.distance_btw_two_points(
-                self.robot[robot_id].get_current_position(), self.ball) \
+                self.robot[robot_id].get_current_position(), self.ball.get_current_position()) \
                 > area:
             return False
 

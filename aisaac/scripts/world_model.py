@@ -132,6 +132,8 @@ def run_world_model():
 
             referee_branch = referee.get_referee_branch()
             # referee_branch = "STOP"
+            #referee_branch = "INDIRECT_FREE_ATTACK"
+
             #strat = strategy.StopStaticStrategy()
 
             if referee_branch == "HALT":

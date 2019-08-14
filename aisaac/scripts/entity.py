@@ -102,7 +102,7 @@ class Robot(Entity):
 
         self._robot_context = None  # type: context.RobotContext
 
-        self.position = ""
+        self._role = "" # GK などのポジション
         self.velocity_surge = 0
         self.velocity_sway = 0
         self.omega = 0
@@ -117,8 +117,17 @@ class Robot(Entity):
     def get_id(self):
         return self._id
 
-    def has_a_ball(self):
-        return self._has_a_ball
+    def get_role(self):
+        return self._role
+
+    def set_role(self, role):
+        self._role = role
+
+    def has_a_ball(self, ball_x, ball_y):
+        if (self.get_current_position()[0] - ball_x) ** 2 + (self.get_current_position()[1] - ball_y) ** 2 < (self.size_r + 0.003) **2:
+            return True
+        else:
+            return False
 
     def set_pass_target_position(self, x, y):
         self._pass_target_pos_x = x
