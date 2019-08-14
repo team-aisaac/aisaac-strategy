@@ -75,7 +75,7 @@ class RobotKick(object):
     def shoot_ball(self, should_wait=False):
         self.pass_ball(config.GOAL_ENEMY_CENTER[0], config.GOAL_ENEMY_CENTER[1], should_wait=should_wait, is_shoot=True)
 
-    def pass_ball(self, target_x, target_y, should_wait=False, is_shoot=False):
+    def pass_ball(self, target_x, target_y, should_wait=False, is_shoot=False, is_tip_kick=False):
         distance = math.sqrt((target_x - self.ball_params.get_current_position()[0])**2 + (target_y - self.ball_params.get_current_position()[1])**2)
         if distance != 0:
             #print self.pass_stage
@@ -126,7 +126,11 @@ class RobotKick(object):
                 else:
                     # 12.0: フィールドの横幅
                     kick_power_x = math.sqrt(12.0) * self.const
-                self.kick_xz(power_x=kick_power_x)
+                if is_tip_kick:
+                    kick_power_z = math.sqrt(distance) * self.const
+                    self.kick_xz(power_x=kick_power_x, power_z=kick_power_z)
+                else:
+                    self.kick_xz(power_x=kick_power_x)
 
             """
             if self.pass_stage == 1:
