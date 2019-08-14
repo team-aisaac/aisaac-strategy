@@ -31,10 +31,15 @@ include_directories(
   include/${PROJECT_NAME}
 )
 
+add_executable(command_senders
+    src/command_senders.cpp
+)
 add_executable(command_sender
     src/command_sender.cpp
 )
-
+target_link_libraries(command_senders
+    ${catkin_LIBRARIES}
+)
 target_link_libraries(command_sender
     ${catkin_LIBRARIES}
 )
