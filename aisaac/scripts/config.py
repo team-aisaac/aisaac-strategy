@@ -24,3 +24,5 @@ FIELD_SIZE = [12., 9]
 GOAL_CENTER = [-6., 0]
 GOAL_LEFT = [-6., 0.62]
 GOAL_RIGHT = [-6., -0.62]
+
+GOAL_ENEMY_CENTER = [6., 0.]

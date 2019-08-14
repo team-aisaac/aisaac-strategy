@@ -122,8 +122,6 @@ class Robot(object):
                                     self.ctrld_robot.get_future_position()[0],
                                     self.ctrld_robot.get_future_position()[1],
                                     self.ctrld_robot.get_future_orientation())
-            elif self.status.robot_status == "kick":
-                self.kick.kick_x()
             elif self.status.robot_status == "pass":
                 self.kick.pass_ball(self.ctrld_robot.get_pass_target_position()[0],
                                     self.ctrld_robot.get_pass_target_position()[1])
@@ -131,9 +129,18 @@ class Robot(object):
                 self.kick.pass_ball(self.ctrld_robot.get_pass_target_position()[0],
                                     self.ctrld_robot.get_pass_target_position()[1],
                                     should_wait=True)
+            elif self.status.robot_status == "shoot":
+                self.kick.shoot_ball()
+            elif self.status.robot_status == "prepare_shoot":
+                self.kick.shoot_ball(should_wait=True)
             elif self.status.robot_status == "receive":
                 self.kick.receive_ball(self.ctrld_robot.get_future_position()[0],
                                        self.ctrld_robot.get_future_position()[1])
+            elif self.status.robot_status == "receive_direct_pass":
+                self.kick.receive_and_direct_pass(self.ctrld_robot.get_future_position(),
+                                                  self.ctrld_robot.get_pass_target_position())
+            elif self.status.robot_status == "receive_direct_shoot":
+                self.kick.receive_and_direct_shoot(self.ctrld_robot.get_future_position())
             elif self.status.robot_status == "defence1":
                 self.defence.move_defence(
                     self.defence.def1_pos_x, self.defence.def1_pos_y)
