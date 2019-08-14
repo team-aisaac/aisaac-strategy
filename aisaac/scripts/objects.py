@@ -109,6 +109,9 @@ class Objects(object):
         # TODO: active_robot_ids実装
         return copy.deepcopy(self.get_robot_ids())
 
+    def get_ball_in_penalty_area(self):
+        return functions.in_penalty_area(self.ball.get_current_position())
+
     def get_has_a_ball(self, robot_id, threshold=None):
         robot_ids = self.get_active_robot_ids()
         sorted_ids = self.get_robot_ids_sorted_by_distance_to_ball(robot_ids)
