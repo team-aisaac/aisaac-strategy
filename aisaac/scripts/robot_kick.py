@@ -26,9 +26,9 @@ class RobotKick(object):
 
         self.access_threshold1 = 0.1
         self.access_threshold2 = 0.5
-        self.feint_threshold1 = 0.2
-        self.feint_threshold2 = 0.75
-        self.rot_access_threshold = 0.015
+        self.feint_threshold1 = 0.3
+        self.feint_threshold2 = 1.5
+        self.rot_access_threshold = 0.02
         self.pass_stage = 0
         self._kick_start_time = rospy.Time.now()
 
@@ -108,8 +108,9 @@ class RobotKick(object):
         if distance != 0:
             #print self.pass_stage
             if self.pass_stage == 0:
-                pose_x = (- 0.3 * target_x + (0.3 + distance) * self.ball_params.get_current_position()[0]) / distance
-                pose_y = (- 0.3 * target_y + (0.3 + distance) * self.ball_params.get_current_position()[1]) / distance
+                prepare_offset = 0.4
+                pose_x = (- prepare_offset * target_x + (prepare_offset + distance) * self.ball_params.get_current_position()[0]) / distance
+                pose_y = (- prepare_offset * target_y + (prepare_offset + distance) * self.ball_params.get_current_position()[1]) / distance
                 pose_theta = math.atan2( (target_y - self.ctrld_robot.get_current_position()[1]) , (target_x - self.ctrld_robot.get_current_position()[0]) )
 
                 a, b, c = functions.line_parameters(self.ball_params.get_current_position()[0], self.ball_params.get_current_position()[1], target_x, target_y)

@@ -31,14 +31,20 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
         self._prepare_pass_start_time = rospy.Time.now()
 
         self._pass_positions = None
+        self._random_fake_position = self._generate_pass_position()
+
+    def _generate_pass_position(self):
+        tmp_x = 2.6 + 4.0 * (-0.5 + np.random.rand())
+        tmp_y = 0.0 + 3.0 * (-0.5 + np.random.rand())
+        return tmp_x, tmp_y
 
     def _generate_pass_positions(self):
-        length_pass_stage = np.random.choice([1,2,3,4])
+        length_pass_stage = np.random.choice([0,1,2])
         pass_positions = []
         for i in range(length_pass_stage):
-            tmp_x = 3.0 + 4.0 * (-0.5 + np.random.rand())
-            tmp_y = 0.0 + 4.0 * (-0.5 + np.random.rand())
-            pass_positions.append([tmp_x, tmp_y])
+            tmp_x = 2.6 + 4.0 * (-0.5 + np.random.rand())
+            tmp_y = 0.0 + 3.0 * (-0.5 + np.random.rand())
+            pass_positions.append(self._generate_pass_position())
         pass_positions.append([6.0, 0.0])
 
         return pass_positions
@@ -75,6 +81,7 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
         change_state = False
         if distance < succeeded_area and len(pass_positions) > cur_state:
             cur_state = cur_state + 1
+            self._random_fake_position = self._generate_pass_position()
             change_state = True
 
         # 最後のpass_positionsだったらシュート
@@ -153,10 +160,12 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
                     not_assigned_robot_ids.remove(robot_id)
                 elif idx == 1:
                     if is_shoot:
-                        status.status = "move_linear"
+                        status.status = "receive"
                         if self._kicker_id is not None:
-                            status.pid_goal_pos_x = self._objects.robot[self._kicker_id].get_current_position()[0]
-                            status.pid_goal_pos_y = -self._objects.robot[self._kicker_id].get_current_position()[1]
+                            # 適当な位置に移動
+                            x, y = self._random_fake_position
+                            status.pid_goal_pos_x = x
+                            status.pid_goal_pos_y = y
                         self._receiver_id = None
                     else:
                         # if pre_shoot:
