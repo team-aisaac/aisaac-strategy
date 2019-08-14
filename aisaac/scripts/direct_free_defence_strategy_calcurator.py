@@ -33,6 +33,11 @@ class DirectFreeDefence(StrategyCalcuratorBase):
 
     def calcurate(self, strategy_context=None):
         # type: (StrategyContext) -> StrategyBase
+
+        if self._detect_enemy_kick(strategy_context):
+            strategy_context.update("enemy_kick", True, namespace="world_model")
+            strategy_context.update("defence_or_attack", False, namespace="world_model")
+
         active_robot_ids = self._get_active_robot_ids()
         active_enemy_ids = self._get_active_enemy_ids()
         nearest_enemy_id = self._objects.get_enemy_ids_sorted_by_distance_to_ball(active_enemy_ids)[0]
