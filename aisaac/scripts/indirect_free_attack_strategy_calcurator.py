@@ -70,14 +70,14 @@ class IndirectFreeAttack(StrategyCalcuratorBase):
         ]
 
         self._upper_positions_3 = [
-            [5.0, 0.5],
-            [5.0, 0.6],
-            [5.0, 0.4],
+            [4.0, 0.5],
+            [4.0, 0.6],
+            [4.0, 0.4],
         ]
         self._lower_positions_3 = [
-            [5.0, -0.5],
-            [5.0, -0.6],
-            [5.0, -0.4],
+            [4.0, -0.5],
+            [4.0, -0.6],
+            [4.0, -0.4],
         ]
 
         self.passed_1_flg = False
@@ -141,6 +141,13 @@ class IndirectFreeAttack(StrategyCalcuratorBase):
         self.LDF_id = self._objects.get_robot_id_by_role("LDF")
         self.RDF_id = self._objects.get_robot_id_by_role("RDF")
         self.last_calcurate = "calcurate_1"
+
+        # ここから下はdirect用
+        self.ckl_flg = False
+        self.ckr_flg = False
+        lr  = ["LFW", "RFW"]
+        self.lfw_or_rfw = np.random.choice(lr)
+
 
     def calcurate(self, strategy_context=None):
         # type: (StrategyContext) -> StrategyBase
