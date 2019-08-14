@@ -125,11 +125,8 @@ class StrategyCalcuratorBase(object):
 
         return who_has_a_ball
 
-    def _set_placed_ball_position(self, ball_position):
-        self.placed_ball_position = ball_position
-
-    def _detect_enemy_kick(self):
-        if Util.get_distance(self.placed_ball_position, self._ball_params.get_current_position()) > 0.5:
+    def _detect_enemy_kick(self, strategy_context=None):
+        if Util.get_distance(strategy_context.get_last("placed_ball_position", namespace="world_model"), self._ball_params.get_current_position()) > 0.5:
             return True
         else:
             return False

@@ -15,6 +15,7 @@ class StopStrategyCalculator(StrategyCalcuratorBase):
 
     def calcurate(self, strategy_context=None):
         # (context.StrategyContext) -> strategy.StrategyBase
+        strategy_context.update("placed_ball_position", self._ball_params.get_current_position(), namespace="world_model")
         self._dynamic_strategy.clone_from(self._static_strategies['initial'])
 
         rospy.set_param("/robot_max_velocity", 1.5)
