@@ -355,5 +355,5 @@ class RobotKeeper(object):
             shel = self.sort_sheltered_area(shel_r, shel_l)
             defense_point_x, defense_point_y = self.culc_defense_point(shel)
         x, y, theta = self.calc_keeper_position(defense_point_x, defense_point_y)
-        self.kick.receive_ball(x, y)
+        self.kick.receive_and_clear((x, y))
 

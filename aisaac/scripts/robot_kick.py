@@ -163,7 +163,12 @@ class RobotKick(object):
                            next_target_xy,
                            auto_kick=True, is_shoot=False)
 
-    def _recieve_ball(self, target_xy, next_target_xy, auto_kick=False, is_shoot=False):
+    def receive_and_clear(self, target_xy):
+        self._recieve_ball(target_xy,
+                           self.ball_params.get_current_position(),
+                           auto_kick=True, is_shoot=False, is_tip_kick=True)
+
+    def _recieve_ball(self, target_xy, next_target_xy, auto_kick=False, is_shoot=False, is_tip_kick=False):
         # type: (typing.Tuple[float], typing.Tuple[float]) -> None
         """
         Parameters
@@ -171,6 +176,10 @@ class RobotKick(object):
         target_xy: (x, y) パス目標地点
         next_target_xy: (x, y) 受け取り時にロボットが向いているべき方向
         """
+
+        self.cmd.kick_speed_x = 0
+        self.cmd.kick_speed_z = 0
+
         target_x = target_xy[0]
         target_y = target_xy[1]
 
@@ -204,6 +213,11 @@ class RobotKick(object):
             else:
                 # 12.0: フィールドの横幅
                 kick_power_x = math.sqrt(12.0) * self.const
+
+            if is_tip_kick:
+                kick_power_x = math.sqrt(12.0) * self.const
+                self.cmd.kick_speed_z = kick_power_x
+
             self.cmd.kick_speed_x = kick_power_x
 
         # # 垂線テキスト座標
