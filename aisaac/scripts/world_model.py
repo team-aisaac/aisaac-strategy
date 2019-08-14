@@ -67,7 +67,10 @@ class WorldModel(object):
             "defence_or_attack", 1, False, namespace="world_model")
         self._strategy_context.register_new_context(
             "placed_ball_position", 1, [0, 0], namespace="world_model")
+        self._strategy_context.register_new_context(
+            "indirect_finish", 1, False, namespace="world_model")
         self._loop_events = []
+
 
     def add_loop_event_listener(self, callback):
         self._loop_events.append(callback)
@@ -143,7 +146,6 @@ def run_world_model():
                 strat = strategy.HaltStaticStrategy()
 
             elif referee_branch == "STOP":
-                strat_ctx.update("enemy_kick", False, namespace="world_model")
                 strat_calcrator = world_model.get_strategy_calcurator("stop")
                 strat = strat_calcrator.calcurate(strat_ctx)
 
@@ -180,6 +182,7 @@ def run_world_model():
                 strat_ctx.update("kickoff_complete", False, namespace="world_model")
                 strat = strategy.InitialStaticStrategy()
             elif referee_branch == "KICKOFF_DEFENCE":
+                strat_ctx.update("enemy_kick", False, namespace="world_model")
                 strat_calcrator = world_model.get_strategy_calcurator(
                     'normal_start_kickoff_defence')
                 strat = strat_calcrator.calcurate(strat_ctx, referee_branch)
@@ -208,8 +211,12 @@ def run_world_model():
                 strat = strat_calcrator.calcurate(strat_ctx)
 
             elif referee_branch == "INDIRECT_FREE_ATTACK":
-                strat_calcrator = world_model.get_strategy_calcurator(
-                    'indirect_free_attack')
+                if not strat_ctx.get_last("indirect_finish", namespace="world_model"):
+                    strat_calcrator = world_model.get_strategy_calcurator(
+                        'indirect_free_attack')
+                else:
+                    strat_calcrator = world_model.get_strategy_calcurator(
+                        'normal_start_normal')
                 strat = strat_calcrator.calcurate(strat_ctx)
             elif referee_branch == "INDIRECT_FREE_DEFENCE":
                     # enemy_kick終了してない場合
@@ -235,6 +242,11 @@ def run_world_model():
                 rospy.set_param("/robot_max_velocity", config.ROBOT_MAX_VELOCITY)
                 last_referee_branch = tmp_last_referee_branch
                 strat_ctx.update("referee_branch", tmp_last_referee_branch, namespace="world_model")
+                if referee_branch == "INDIRECT_FREE_ATTACK":
+                    strat_calcrator = world_model.get_strategy_calcurator(
+                        'indirect_free_attack').reset()
+                    strat_ctx.update("indirect_finish", False, namespace="world_model")
+
 
             tmp_last_referee_branch = referee_branch
 

@@ -33,9 +33,8 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
                 strategy_context.update("defence_or_attack", False, namespace="world_model")
 
         pass_positions = [
-            [1.0, 2.0],
-            [2.0, -2.0],
-            [3.0, 2.0],
+            [3.0, 1.0],
+            [1.0, -1.0],
             [6.0, 0.0],
         ]
         succeeded_area = self._objects.robot[0].size_r + 0.3
@@ -66,6 +65,11 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
         if len(pass_positions) - 1 == cur_state:
             is_shoot = True
 
+        # 最後の一つ前のpass_positionsだったらシュートのためのレシーブ
+        pre_shoot = False
+        if len(pass_positions) - 2 == cur_state:
+            pre_shoot = True
+
         # シュートが終了したらリセット
         should_reset = False
         if len(pass_positions) == cur_state:
@@ -79,34 +83,23 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
 
         not_assigned_robot_ids = self._get_active_robot_ids()
 
-        if len(not_assigned_robot_ids) >= 5:
-            # 残り5台以上の場合
-            # Defence系を先にアサイン
-            not_assigned_ops = ["keeper", "defence3", "defence4"]
-        elif len(not_assigned_robot_ids) == 4:
-            # 残り4台の場合
-            not_assigned_ops = ["keeper", "defence3"]
-        elif len(not_assigned_robot_ids) == 3:
-            # 残り3台の場合
-            not_assigned_ops = ["keeper"]
-        else:
-            # 残り3台未満の場合
-            not_assigned_ops = ["keeper"]
-
-        # for文で消えないようコピー
-        sorted_not_assigned_robot_ids = sorted(not_assigned_robot_ids, reverse=True)
-
         # Defence系をアサイン
-        for robot_id in sorted_not_assigned_robot_ids:
-            if not_assigned_ops == []:
-                break
+        for robot_id in not_assigned_robot_ids:
             status = Status()
-            status.status = not_assigned_ops[0]
+            role = self._objects.get_robot_by_id(robot_id).get_role()
+            if role == 'GK':
+                status.status = "keeper"
+                self._dynamic_strategy.set_robot_status(robot_id, status)
+                not_assigned_robot_ids.remove(robot_id)
+            elif role == 'LDF':
+                status.status = "defence3"
+                self._dynamic_strategy.set_robot_status(robot_id, status)
+                not_assigned_robot_ids.remove(robot_id)
+            elif role == 'RDF':
+                status.status = "defence4"
+                self._dynamic_strategy.set_robot_status(robot_id, status)
+                not_assigned_robot_ids.remove(robot_id)
 
-            self._dynamic_strategy.set_robot_status(robot_id, status)
-
-            not_assigned_ops.pop(0)
-            not_assigned_robot_ids.remove(robot_id)
 
         # ステートが変わるときに近い順を更新
         if self._robots_near_to_ball is None or change_state:
@@ -117,7 +110,10 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
             for idx, robot_id in enumerate(self._robots_near_to_ball):
                 status = Status()
                 if idx == 0:
-                    status.status = "pass"
+                    if is_shoot:
+                        status.status = "shoot"
+                    else:
+                        status.status = "pass"
                     if self._receiver_id is not None:
                         receiver_pos = self._objects.robot[self._receiver_id].get_current_position()
                         receiver_area = 1.0
@@ -133,8 +129,14 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
                         status.status = "stop"
                         self._receiver_id = None
                     else:
-                        status.status = "receive"
+                        if pre_shoot:
+                            status.status = "receive_direct_shoot"
+                        else:
+                            status.status = "receive"
                         self._receiver_id = robot_id
+                        if not should_reset:
+                            status.pass_target_pos_x = pass_positions[cur_state+1][0]
+                            status.pass_target_pos_y = pass_positions[cur_state+1][1]
                     status.pid_goal_pos_x = pass_positions[cur_state][0]
                     status.pid_goal_pos_y = pass_positions[cur_state][1]
                     not_assigned_robot_ids.remove(robot_id)
@@ -144,7 +146,7 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
         else: # 1台以下の場合あまりがいればとりあえずゴールにシュート
             for robot_id in self._robots_near_to_ball:
                 status = Status()
-                status.status = "pass"
+                status.status = "shoot"
                 status.pass_target_pos_x = pass_positions[-1][0]
                 status.pass_target_pos_y = pass_positions[-1][1]
                 self._dynamic_strategy.set_robot_status(robot_id, status)
@@ -234,38 +236,25 @@ class NormalStartKickOffStrategyCalcurator(StrategyCalcuratorBase):
 
         not_assigned_robot_ids = self._get_active_robot_ids()
 
-        if len(not_assigned_robot_ids) >= 5:
-            # 残り5台以上の場合
-            # Defence系を先にアサイン
-            not_assigned_ops = ["keeper", "defence3", "defence4"]
-        elif len(not_assigned_robot_ids) == 4:
-            # 残り4台の場合
-            not_assigned_ops = ["keeper", "defence3"]
-        elif len(not_assigned_robot_ids) == 3:
-            # 残り3台の場合
-            not_assigned_ops = ["keeper"]
-        else:
-            # 残り3台未満の場合
-            not_assigned_ops = ["keeper"]
-
-        # for文で消えないようコピー
-        sorted_not_assigned_robot_ids = sorted(not_assigned_robot_ids, reverse=True)
-
-        # Defence系をアサイン
-        for robot_id in sorted_not_assigned_robot_ids:
-            if not_assigned_ops == []:
-                break
+        for robot_id in not_assigned_robot_ids:
             status = Status()
-            status.status = not_assigned_ops[0]
+            role = self._objects.get_robot_by_id(robot_id).get_role()
+            if role == 'GK':
+                status.status = "keeper"
+                self._dynamic_strategy.set_robot_status(robot_id, status)
+                not_assigned_robot_ids.remove(robot_id)
+            elif role == 'LDF':
+                status.status = "defence3"
+                self._dynamic_strategy.set_robot_status(robot_id, status)
+                not_assigned_robot_ids.remove(robot_id)
+            elif role == 'RDF':
+                status.status = "defence4"
+                self._dynamic_strategy.set_robot_status(robot_id, status)
+                not_assigned_robot_ids.remove(robot_id)
 
-            self._dynamic_strategy.set_robot_status(robot_id, status)
+        robots_near_to_ball = self._objects.get_robot_ids_sorted_by_distance_to_ball(not_assigned_robot_ids)
 
-            not_assigned_ops.pop(0)
-            not_assigned_robot_ids.remove(robot_id)
-
-        robot_ids = self._objects.get_robot_ids_sorted_by_distance_to_ball(not_assigned_robot_ids)
-
-        for idx, robot_id in enumerate(robot_ids):
+        for idx, robot_id in enumerate(robots_near_to_ball):
             status = Status()
             if idx == 0:
                 status.status = "pass"
