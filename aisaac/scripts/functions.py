@@ -37,11 +37,7 @@ def line_parameters_vector_args(point_1, point_2):
     y_1 = point_1[1]
     x_2 = point_2[0]
     y_2 = point_2[1]
-
-    a = y_1 - y_2
-    b = x_2 - x_1
-    c = x_1 * y_2 - x_2 * y_1
-    return a, b, c
+    return line_parameters(x_1, y_1, x_2, y_2)
 
 """---速度から遠心力を計算---"""
 def calculate_centrifugalforce(vel_x_before, vel_y_before, vel_x_after, vel_y_after):
@@ -62,6 +58,13 @@ def calculate_internal_dividing_point(x_0, y_0, x_1, y_1, m, n):
         x = ((n * x_0) + (m * x_1)) / (m + n)
         y = ((n * y_0) + (m * y_1)) / (m + n)
         return x, y
+
+def calculate_internal_dividing_point_vector_args(point_0, point_1, m, n):
+    x_0 = point_0[0]
+    y_0 = point_0[1]
+    x_1 = point_1[0]
+    y_1 = point_1[1]
+    return calculate_internal_dividing_point(x_0, y_0, x_1, y_1, m, n)
 
 def in_penalty_area(point_xy):
     x = point_xy[0]
