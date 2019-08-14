@@ -444,8 +444,9 @@ class RobotPid(object):
 
         clip_pos_xys = []
         for key in line_penal.keys():
-            clip_pos_xys.append(functions.cross_point(line_penal[key],
-                                                      line_robo_to_goal))
+            tmp_cross_point = functions.cross_point(line_penal[key], line_robo_to_goal)
+            if functions.in_penalty_area(tmp_cross_point, offset=0.1):
+                clip_pos_xys.append(tmp_cross_point)
 
         sorted_clip_pos_xys = sorted(clip_pos_xys,
                                      key=lambda clip_pos_xy: functions.distance_btw_two_points(
