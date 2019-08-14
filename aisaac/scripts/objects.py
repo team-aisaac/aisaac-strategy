@@ -109,26 +109,8 @@ class Objects(object):
         # TODO: active_robot_ids実装
         return copy.deepcopy(self.get_robot_ids())
 
-    def get_if_in_penalty_area(self, point_xy):
-        x = point_xy[0]
-        y = point_xy[1]
-
-        penalty_area_range_l = [
-            [-6.0, -4.8],
-            [-1.2, 1.2]
-        ]
-        penalty_area_range_r = [
-            [4.8, 6.0],
-            [-1.2, 1.2]
-        ]
-
-        if penalty_area_range_l[0][0] < x < penalty_area_range_l[0][1] \
-                and penalty_area_range_l[1][0] < y < penalty_area_range_l[1][1]:
-            return "friend"
-        if penalty_area_range_r[0][0] < x < penalty_area_range_r[0][1] \
-                and penalty_area_range_r[1][0] < y < penalty_area_range_r[1][1]:
-            return "enemy"
-        return False
+    def get_ball_in_penalty_area(self):
+        return functions.in_penalty_area(self.ball.get_current_position())
 
     def get_has_a_ball(self, robot_id, threshold=None):
         robot_ids = self.get_active_robot_ids()
