@@ -45,10 +45,10 @@ class DirectFreeAttack(IndirectFreeAttack):
 
         ball_x, ball_y = self._objects.ball.get_current_position()
 
-        if functions.distance_btw_two_points([ball_x, ball_y], [6., 4.5]) < 0.1:
+        if functions.distance_btw_two_points([ball_x, ball_y], [5.8, 4.3]) < 0.1:
             self.ckl_flg =  True
             self.ckr_flg =  False
-        if functions.distance_btw_two_points([ball_x, ball_y], [6., -4.5]) < 0.1:
+        if functions.distance_btw_two_points([ball_x, ball_y], [5.8, -4.3]) < 0.1:
             self.ckl_flg =  False
             self.ckr_flg =  True
 
@@ -96,7 +96,6 @@ class DirectFreeAttack(IndirectFreeAttack):
         return result
 
     def calculate_corner_kick_left(self):
-        print ("ckl")
         active_robot_ids = self._get_active_robot_ids()
         for robot_id in active_robot_ids:
             status = Status()
@@ -129,9 +128,10 @@ class DirectFreeAttack(IndirectFreeAttack):
                     status.pid_goal_pos_x = 2.0
                     status.pid_goal_pos_y = 1.5
                 if self.received_2_flg:
-                    status.status = "pass"
-                    status.pass_target_pos_x = 6.0
-                    status.pass_target_pos_y = 0.50
+                    status.status = "shoot_left"
+                    # status.status = "pass"
+                    # status.pass_target_pos_x = 6.0
+                    # status.pass_target_pos_y = 0.50
                     if self._objects.get_has_a_ball(robot_id) == False:
                         self.passed_2_flg = True
                 else:
@@ -151,9 +151,10 @@ class DirectFreeAttack(IndirectFreeAttack):
                     status.pid_goal_pos_x = 2.0
                     status.pid_goal_pos_y = -1.5
                 if self.received_3_flg:
-                    status.status = "pass"
-                    status.pass_target_pos_x = 6.0
-                    status.pass_target_pos_y = -0.50
+                    status.status = "shoot_right"
+                    # status.status = "pass"
+                    # status.pass_target_pos_x = 6.0
+                    # status.pass_target_pos_y = -0.50
                     if self._objects.get_has_a_ball(robot_id) == False:
                         self.passed_3_flg = True
                 else:
@@ -170,7 +171,6 @@ class DirectFreeAttack(IndirectFreeAttack):
         return result
 
     def calculate_corner_kick_right(self):
-        print ("ckr")
         active_robot_ids = self._get_active_robot_ids()
         for robot_id in active_robot_ids:
             status = Status()
@@ -203,9 +203,10 @@ class DirectFreeAttack(IndirectFreeAttack):
                     status.pid_goal_pos_x = 2.0
                     status.pid_goal_pos_y = 1.5
                 if self.received_2_flg:
-                    status.status = "pass"
-                    status.pass_target_pos_x = 6.0
-                    status.pass_target_pos_y = 0.50
+                    status.status = "shoot_left"
+                    # status.status = "pass"
+                    # status.pass_target_pos_x = 6.0
+                    # status.pass_target_pos_y = 0.50
                     if self._objects.get_has_a_ball(robot_id) == False:
                         self.passed_2_flg = True
                 else:
@@ -225,9 +226,10 @@ class DirectFreeAttack(IndirectFreeAttack):
                     status.pid_goal_pos_x = 2.0
                     status.pid_goal_pos_y = -1.5
                 if self.received_3_flg:
-                    status.status = "pass"
-                    status.pass_target_pos_x = 6.0
-                    status.pass_target_pos_y = -0.50
+                    status.status = "shoot_right"
+                    # status.status = "pass"
+                    # status.pass_target_pos_x = 6.0
+                    # status.pass_target_pos_y = -0.50
                     if self._objects.get_has_a_ball(robot_id) == False:
                         self.passed_3_flg = True
                 else:
