@@ -24,10 +24,10 @@ class RobotKick(object):
         self.dispersion2 = [10] * 5
         self.rot_dispersion = [10] * 5
 
-        self.access_threshold1 = 0.1
-        self.access_threshold2 = 0.5
-        self.feint_threshold1 = 0.3
-        self.feint_threshold2 = 1.5
+        self.access_threshold1 = 0.05
+        self.access_threshold2 = 0.05
+        self.feint_threshold1 = 0.2
+        self.feint_threshold2 = 0.2
         self.rot_access_threshold = 0.02
         self.pass_stage = 0
         self._kick_start_time = rospy.Time.now()
