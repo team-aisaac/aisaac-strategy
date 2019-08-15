@@ -3,6 +3,7 @@
 import entity
 import rospy
 from nav_msgs.msg import Odometry
+from std_msgs.msg import UInt16MultiArray
 from aisaac.msg import Ball_sub_params
 import tf
 import functions
@@ -28,6 +29,9 @@ class Objects(object):
         self._robot_ids = range(self.robot_total)
         self._enemy_ids = range(self.enemy_total)
 
+        self._active_robot_ids = range(self.robot_total)
+        self._active_enemy_ids = range(self.robot_total)
+
         self.robot = [entity.Robot(id=i) for i in self._robot_ids]  # type: typing.List[entity.Robot]
         self.enemy = [entity.Robot(id=i) for i in self._enemy_ids]  # type: typing.List[entity.Robot]
 
@@ -42,6 +46,8 @@ class Objects(object):
         self.ball_dynamics = [[0., 0.] for i in range(self.ball_dynamics_window)]
 
         self.odom_listener()
+        self.existing_listener()
+
 
     def get_robot_ids_sorted_by_distance_to_ball(self, robot_ids=None):
         # type: (typing.List[int]) -> typing.List[int]
@@ -106,8 +112,11 @@ class Objects(object):
                 return robot.get_id()
 
     def get_active_robot_ids(self):
-        # TODO: active_robot_ids実装
-        return copy.deepcopy(self.get_robot_ids())
+        #return copy.deepcopy(self.active_robot_ids)
+        return copy.deepcopy(self._robot_ids)
+
+    def get_active_enemy_ids(self):
+        return copy.deepcopy(self._active_enemy_ids)
 
     def get_ball_in_penalty_area(self):
         return functions.in_penalty_area(self.ball.get_current_position())
@@ -176,3 +185,14 @@ class Objects(object):
         self.ball.set_line_a(msg.a)
         self.ball.set_line_b(msg.b)
         self.ball.set_future_position(msg.future_x, msg.future_y)
+
+    """---Existingしているrobotの情報を獲得--"""
+    def existing_listener(self):
+        rospy.Subscriber("/" + self.team_color + "/existing_friends_id", UInt16MultiArray, self.existing_friends_callback)
+        rospy.Subscriber("/" + self.team_color + "/existing_enemies_id", UInt16MultiArray, self.existing_enemies_callback)
+
+    def existing_friends_callback(self, msg):
+        self._active_robot_ids = [id for id in msg.data]
+
+    def existing_enemies_callback(self, msg):
+        self._active_enemy_ids = [id for id in msg.data]
