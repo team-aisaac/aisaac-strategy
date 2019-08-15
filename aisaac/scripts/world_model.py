@@ -32,7 +32,7 @@ class WorldModel(object):
 
         """----上の5つの変数、インスタンスをまとめたもの、callbackをもつ---"""
         self._objects = Objects(
-            self._team_color, config.NUM_FRIEND_ROBOT, config.NUM_ENEMY_ROBOT)
+            self._team_color, config.NUM_FRIEND_ROBOT, config.NUM_ENEMY_ROBOT, info="WorldModel")
 
         """---Referee---"""
         self._referee = Referee(self._objects)
@@ -49,7 +49,7 @@ class WorldModel(object):
             'indirect_free_defence': IndirectFreeDefence(self._objects)
         }
         self._status_publisher = WorldModelStatusPublisher(
-            self._team_color, robot_ids=self._objects.get_robot_ids())
+            self._team_color, self._objects)
 
         # 積分などに必要な情報を保存するオブジェクト
         self._strategy_context = StrategyContext()
@@ -287,6 +287,7 @@ def run_world_model():
 
 
 if __name__ == "__main__":
+    # if True:
     while True and not rospy.is_shutdown():
         try:
             run_world_model()

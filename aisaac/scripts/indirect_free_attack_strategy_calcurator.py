@@ -187,7 +187,7 @@ class IndirectFreeAttack(StrategyCalcuratorBase):
             if self.ball_position_nearest_id == robot_id:
                 if self.passed_1_flg:
                     # パス完了した場合
-                    if self._objects.robot[robot_id].get_role() == "LDF":
+                    if robot.get_role() == "LDF":
                         status.status = "defence4"
                     else:
                         status.status = "defence3"

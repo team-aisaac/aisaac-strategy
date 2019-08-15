@@ -42,7 +42,7 @@ class Calculation():
 
         # Composition
         self.objects = Objects(
-            self.robot_color, config.NUM_FRIEND_ROBOT, config.NUM_ENEMY_ROBOT)
+            self.robot_color, config.NUM_FRIEND_ROBOT, config.NUM_ENEMY_ROBOT, info="Calculation")
 
         # self.ctrld_robot = self.objects.robot[int(self.robot_id)]
 
@@ -400,6 +400,7 @@ def run_calculation():
         loop_rate.sleep()
 
 if __name__ == "__main__":
+    # if True:
     while True and not rospy.is_shutdown():
         try:
             run_calculation()

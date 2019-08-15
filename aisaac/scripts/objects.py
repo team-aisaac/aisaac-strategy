@@ -20,17 +20,18 @@ class Objects(object):
             cls.__instance = object.__new__(cls)
         return cls.__instance
 
-    def __init__(self, team_color, robot_total, enemy_total):
-        # type: (str, int, int) -> None
+    def __init__(self, team_color, robot_total, enemy_total, info=""):
+        # type: (str, int, int, str) -> None
         self.team_color = team_color
         self.robot_total = robot_total
         self.enemy_total = enemy_total
 
+        self._changed_friends_id = False
+        self._changed_enemies_id = False
         self.initialize_robots(range(self.robot_total))
         self.initialize_enemies(range(self.enemy_total))
 
-        self._last_existing_friends_id = []
-        self._last_existing_enemies_id = []
+        self._info = info # printデバッグに使える文字列
 
         self.ball = entity.Ball()
 
@@ -39,6 +40,13 @@ class Objects(object):
         self.ball_dynamics = [[0., 0.] for i in range(self.ball_dynamics_window)]
 
         self.odom_listener()
+
+    def get_a_robot(self):
+        """
+        size_rとかを使いたいとき用の適当にインスタンスとってくるやつ
+        """
+        for key in self.robot.keys():
+            return self.robot[key]
 
     def initialize_robots(self, new_ids):
         self._robot_ids = new_ids
@@ -142,9 +150,15 @@ class Objects(object):
         if threshold is None:
             threshold = config.HAS_A_BALL_DISTANCE_THRESHOLD
 
-        area = threshold + self.robot[0].size_r
+        area = threshold + self.get_a_robot().size_r
+
+        robot = self.get_robot_by_id(robot_id)
+
+        if robot is None:
+            return False
+
         if functions.distance_btw_two_points(
-                self.robot[robot_id].get_current_position(), self.ball.get_current_position()) \
+                robot.get_current_position(), self.ball.get_current_position()) \
                 > area:
             return False
 
@@ -166,15 +180,28 @@ class Objects(object):
 
     def existing_friends_id_callback(self, msg):
         data = list(msg.data)
+
         if not self._robot_ids == data:
             self.initialize_robots(data)
-            print("Changed friend ids: "+str(data))
+            rospy.loginfo(self._info+"> Changed friend ids: "+str(data))
+
+            #初回のみID変更OKそうでなかったら例外で無理やり立ち上げ直す
+            if self._changed_enemies_id:
+                raise Exception("Changed IDs")
+            self._changed_friends_id = True
 
     def existing_enemies_id_callback(self, msg):
         data = list(msg.data)
+
         if not self._enemy_ids == data:
             self.initialize_enemies(data)
-            print("Changed enemy ids: "+str(data))
+            rospy.loginfo(self._info+"> Changed enemy ids: "+str(data))
+
+            #初回のみID変更OKそうでなかったら例外で無理やり立ち上げ直す
+            if self._changed_enemies_id:
+                raise Exception("Changed IDs")
+            self._changed_enemies_id = True
+
 
     """---Visionからrobotの現在地をもらう---"""
     def robot_odom_callback(self, msg, id):

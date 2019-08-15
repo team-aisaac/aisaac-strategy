@@ -13,13 +13,13 @@ except:
 
 
 class WorldModelStatusPublisher(object):
-    def __init__(self, team_color, robot_ids=range(config.NUM_FRIEND_ROBOT)):
+    def __init__(self, team_color, objects):
         # type: (str, objects.Objects, List[int]) -> None
         self._team_color = team_color
-        self._robot_ids = robot_ids
+        self._objects = objects # type: objects.Objects
         self._status_publishers = {}  # type: Dict[int, rospy.Publisher]
 
-        for i in self._robot_ids:
+        for i in range(self._objects.robot_total):
             publisher = rospy.Publisher(
                 "/" + self._team_color + "/robot_"+str(i)+"/status",
                 Status,
@@ -30,6 +30,10 @@ class WorldModelStatusPublisher(object):
         # type: (StrategyBase) -> None
         all_robot_status = strat.get_all_robot_status()
 
-        for robot_id in all_robot_status.keys():
-            self._status_publishers[robot_id].publish(
-                all_robot_status[robot_id])
+        for robot_id in self._objects.get_robot_ids():
+            if robot_id in all_robot_status:
+                self._status_publishers[robot_id].publish(
+                    all_robot_status[robot_id])
+            #     rospy.loginfo("publishing strategy for: " + str(robot_id))
+            # else:
+            #     rospy.loginfo_throttle(1, str(robot_id) + "is not in strategy")

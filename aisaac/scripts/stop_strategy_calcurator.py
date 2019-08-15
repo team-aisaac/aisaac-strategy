@@ -25,9 +25,12 @@ class StopStrategyCalculator(StrategyCalcuratorBase):
         ball = self._objects.ball
 
         for robot_id in self._get_active_robot_ids():
-            robot = self._objects.robot[robot_id]
+            robot = self._objects.get_robot_by_id(robot_id)
 
-            target_distance = 0.5 + self._objects.robot[0].size_r
+            if robot is None:
+                continue
+
+            target_distance = 0.5 + self._objects.get_a_robot().size_r
             distance = functions.distance_btw_two_points(robot.get_current_position(), ball.get_current_position())
 
             # 閾値を超える/超えないで振動を防ぐためのoffset

@@ -15,7 +15,7 @@ class WorldState(object):
         #self.devision = "B"
 
         """---フィールドとロボットのパラメータ---"""
-        self.robot_r = objects.robot[0].size_r
+        self.robot_r = objects.get_a_robot().size_r
         if self.devision == "A":
             self.field_x_size = 12.
             self.field_y_size = 9.

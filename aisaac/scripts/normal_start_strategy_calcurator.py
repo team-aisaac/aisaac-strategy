@@ -60,13 +60,13 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
 
         pass_positions = self._pass_positions
 
-        succeeded_area = self._objects.robot[0].size_r + 0.62
+        succeeded_area = self._objects.get_a_robot().size_r + 0.62
 
         last_state = strategy_context.get_last("normal_strat_state", namespace="normal_strat")
 
         ball_pos = self._objects.ball.get_current_position()
 
-        if self._receiver_id is None:
+        if self._receiver_id is None or self._objects.get_robot_by_id(self._receiver_id) is None:
             target_pos = pass_positions[last_state]
         else:
             # パスの目標ではなく、受け取る側のロボットが実際にリーチした場所を目標とする
@@ -140,7 +140,7 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
                         status.status = "shoot"
                     else:
                         status.status = "pass"
-                    if self._receiver_id is not None:
+                    if (self._receiver_id is not None) and (self._objects.get_robot_by_id(self._receiver_id) is not None):
                         receiver_pos = self._objects.robot[self._receiver_id].get_current_position()
                         receiver_area = 1.0
                         if functions.distance_btw_two_points(pass_positions[cur_state], receiver_pos) > receiver_area:
@@ -266,7 +266,7 @@ class NormalStartKickOffStrategyCalcurator(StrategyCalcuratorBase):
 
     def calcurate(self, strategy_context=None):
         pass_pos = [-0.3, -2.0]
-        succeeded_area = self._objects.robot[0].size_r + 0.3
+        succeeded_area = self._objects.get_a_robot().size_r + 0.3
 
         ball_pos = self._objects.ball.get_current_position()
         target_pos = pass_pos
@@ -303,7 +303,7 @@ class NormalStartKickOffStrategyCalcurator(StrategyCalcuratorBase):
             status = Status()
             if idx == 0:
                 status.status = "pass"
-                if self._receiver_id is not None:
+                if (self._receiver_id is not None) and (self._objects.get_robot_by_id(self._receiver_id) is not None):
                     receiver_pos = self._objects.robot[self._receiver_id].get_current_position()
                     receiver_area = 1.0
                     if functions.distance_btw_two_points(pass_pos, receiver_pos) > receiver_area:

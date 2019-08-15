@@ -17,7 +17,7 @@ class DecisionMaker:
         self.ball_dynamics = objects.ball_dynamics
         self.referee_branch = referee.referee_branch
         self.status = status
-        self.robot_r = objects.robot[0].size_r
+        self.robot_r = objects.get_a_robot().size_r
 
         self.goal_keeper_x = self.world_state.field_x_min + 0.05
 

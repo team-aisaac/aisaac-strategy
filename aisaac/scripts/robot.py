@@ -44,7 +44,7 @@ class Robot(object):
         self._command_pub = RobotCommandPublisherWrapper(self.robot_color, self.robot_id)
 
         # Composition
-        self.objects = Objects(self.robot_color, self.robot_total, self.enemy_total)
+        self.objects = Objects(self.robot_color, self.robot_total, self.enemy_total, info="Robot_"+str(self.robot_id))
         self.ctrld_robot = self.objects.robot[int(self.robot_id)] # type: entity.Robot
 
         self.robot_friend = self.objects.robot
@@ -248,6 +248,7 @@ def run_robot():
 
 
 if __name__ == "__main__":
+    # if True:
     while True and not rospy.is_shutdown():
         try:
             run_robot()

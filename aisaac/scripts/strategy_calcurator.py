@@ -105,7 +105,7 @@ class StrategyCalcuratorBase(object):
         ball_position = self._objects.ball.get_current_position()
         #size_r = self._objects.robot.size_r
         flag = 0
-        area = config.HAS_A_BALL_DISTANCE_THRESHOLD + self._objects.robot[0].size_r
+        area = config.HAS_A_BALL_DISTANCE_THRESHOLD + self._objects.get_a_robot().size_r
 
         for robot_id in self._objects.get_robot_ids():
             if self._objects.get_has_a_ball(robot_id):

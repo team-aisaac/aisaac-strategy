@@ -42,7 +42,7 @@ class KickOffStrategyCalcurator(StrategyCalcuratorBase):
 
         self._reset_state()
 
-        area = self._objects.robot[0].size_r + 0.3
+        area = self._objects.get_a_robot().size_r + 0.3
 
         ball_pos = self._objects.ball.get_current_position()
         # if self._receiver_id is None:
