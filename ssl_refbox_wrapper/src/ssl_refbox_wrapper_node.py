@@ -1,6 +1,6 @@
 #!/usr/bin/env  python
 import rospy
-import referee_pb2
+import ssl_referee_pb2
 import multicast
 
 from std_msgs.msg import Int8
@@ -18,7 +18,7 @@ def convert_team_info(data):
     team_info.yellow_cards = data.yellow_cards
     team_info.timeouts = data.timeouts
     team_info.timeout_time = data.timeout_time
-    team_info.goalie = data.goalie
+    team_info.goalie = data.goalkeeper
 
     return team_info
 
@@ -31,7 +31,7 @@ if  __name__ == '__main__':
     multicast_port = rospy.get_param('~multicast_port', 10003)
 
     #make protobuf instance
-    protobuf = referee_pb2.SSL_Referee()
+    protobuf = ssl_referee_pb2.Referee()
     sock    = multicast.Multicast(multicast_addr, multicast_port)
 
     pub_stage       = rospy.Publisher('~stage', Int8, queue_size = 10)
