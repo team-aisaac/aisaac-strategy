@@ -139,9 +139,9 @@ def run_world_model():
         while not rospy.is_shutdown():
             # 恒等関数フィルタの適用
             # vision_positionからcurrent_positionを決定してつめる
-            for robot in world_model.get_objects().robot:
+            for robot in world_model.get_objects().robot.values():
                 identity_filter(robot)
-            for enemy in world_model.get_objects().enemy:
+            for enemy in world_model.get_objects().enemy.values():
                 identity_filter(enemy)
 
             referee_branch = referee.get_referee_branch()

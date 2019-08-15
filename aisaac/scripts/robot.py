@@ -104,13 +104,13 @@ class Robot(object):
 
             # カルマンフィルタ,恒等関数フィルタの適用
             # vision_positionからcurrent_positionを決定してつめる
-            for robot in self.robot_friend:
+            for robot in self.robot_friend.values():
                 if robot.get_id() == self.ctrld_robot.get_id():
                     kalman_filter(self.ctrld_robot)
                     #identity_filter(self.ctrld_robot)
                 else:
                     identity_filter(robot)
-            for enemy in self.robot_enemy:
+            for enemy in self.robot_enemy.values():
                 identity_filter(enemy)
 
 

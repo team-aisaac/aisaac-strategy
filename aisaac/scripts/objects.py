@@ -4,6 +4,7 @@ import entity
 import rospy
 from nav_msgs.msg import Odometry
 from aisaac.msg import Ball_sub_params
+from std_msgs.msg import UInt16MultiArray
 import tf
 import functions
 import config
@@ -25,15 +26,11 @@ class Objects(object):
         self.robot_total = robot_total
         self.enemy_total = enemy_total
 
-        self._robot_ids = range(self.robot_total)
-        self._enemy_ids = range(self.enemy_total)
+        self.initialize_robots(range(self.robot_total))
+        self.initialize_enemies(range(self.enemy_total))
 
-        self.robot = [entity.Robot(id=i) for i in self._robot_ids]  # type: typing.List[entity.Robot]
-        self.enemy = [entity.Robot(id=i) for i in self._enemy_ids]  # type: typing.List[entity.Robot]
-
-        roles = ["RFW", "LFW", "RDF", "LDF", "GK"]
-        for robot, role in zip(self.robot, roles):
-            robot.set_role(role)
+        self._last_existing_friends_id = []
+        self._last_existing_enemies_id = []
 
         self.ball = entity.Ball()
 
@@ -42,6 +39,26 @@ class Objects(object):
         self.ball_dynamics = [[0., 0.] for i in range(self.ball_dynamics_window)]
 
         self.odom_listener()
+
+    def initialize_robots(self, new_ids):
+        self._robot_ids = new_ids
+
+        self.robot = {}
+        for i in new_ids:
+            self.robot[i] = entity.Robot(id=i)
+
+        roles = ["RFW", "LFW", "RDF", "LDF", "GK"]
+        roles = roles[:len(self.robot)]
+
+        for robot, role in zip(self.robot.values(), roles):
+            robot.set_role(role)
+
+    def initialize_enemies(self, new_ids):
+        self._enemy_ids = new_ids
+
+        self.enemy = {}
+        for i in new_ids:
+            self.enemy[i] = entity.Robot(id=i)
 
     def get_robot_ids_sorted_by_distance_to_ball(self, robot_ids=None):
         # type: (typing.List[int]) -> typing.List[int]
@@ -109,6 +126,10 @@ class Objects(object):
         # TODO: active_robot_ids実装
         return copy.deepcopy(self.get_robot_ids())
 
+    def get_active_enemy_ids(self):
+        # TODO: active_robot_ids実装
+        return copy.deepcopy(self.get_enemy_ids())
+
     def get_ball_in_penalty_area(self):
         return functions.in_penalty_area(self.ball.get_current_position())
 
@@ -140,6 +161,20 @@ class Objects(object):
         rospy.Subscriber("/" + self.team_color + "/ball_observer/estimation", Odometry, self.ball_odom_callback)
         rospy.Subscriber("/" + self.team_color + "/ball_sub_params", Ball_sub_params, self.ball_sub_params_callback)
 
+        rospy.Subscriber("/" + self.team_color + "/existing_friends_id", UInt16MultiArray, self.existing_friends_id_callback)
+        rospy.Subscriber("/" + self.team_color + "/existing_enemies_id", UInt16MultiArray, self.existing_enemies_id_callback)
+
+    def existing_friends_id_callback(self, msg):
+        data = list(msg.data)
+        if not self._robot_ids == data:
+            self.initialize_robots(data)
+            print("Changed friend ids: "+str(data))
+
+    def existing_enemies_id_callback(self, msg):
+        data = list(msg.data)
+        if not self._enemy_ids == data:
+            self.initialize_enemies(data)
+            print("Changed enemy ids: "+str(data))
 
     """---Visionからrobotの現在地をもらう---"""
     def robot_odom_callback(self, msg, id):
@@ -149,6 +184,10 @@ class Objects(object):
         robot_v_x = msg.twist.twist.linear.x
         robot_v_y = msg.twist.twist.linear.y
         robot_v_t = msg.twist.twist.linear.z
+
+        if not id in self.robot.keys():
+            return
+
         self.robot[id].set_vision_position(x = robot_x, y = robot_y, theta=robot_t)
         self.robot[id].set_current_velocity(vx = robot_v_x, vy = robot_v_y, vtheta=robot_v_t)
 
@@ -160,6 +199,10 @@ class Objects(object):
         enemy_v_x = msg.twist.twist.linear.x
         enemy_v_y = msg.twist.twist.linear.y
         enemy_v_t = msg.twist.twist.linear.z
+
+        if not id in self.enemy.keys():
+            return
+
         self.enemy[id].set_vision_position(x = enemy_x, y = enemy_y, theta=enemy_t)
         self.enemy[id].set_current_velocity(vx = enemy_v_x, vy = enemy_v_y, vtheta=enemy_v_t)
 
