@@ -34,7 +34,7 @@ class StopStrategyCalculator(StrategyCalcuratorBase):
             if distance <= (target_distance + offset): 
                 status = Status()
                 status.status = "move_linear"
-                vector = np.array(robot.get_future_orientation()) - np.array(ball.get_current_position())
+                vector = np.array(robot.get_future_position()) - np.array(ball.get_current_position())
                 vector = (target_distance / np.linalg.norm(vector)) * vector
                 vector = np.array(ball.get_current_position()) + vector
                 status.pid_goal_pos_x = vector[0]

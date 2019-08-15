@@ -47,7 +47,7 @@ class WorldModel(object):
             'indirect_free_defence': IndirectFreeDefence(self._objects)
         }
         self._status_publisher = WorldModelStatusPublisher(
-            self._team_color, robot_ids=self._objects.get_robot_ids())
+            self._team_color, self._objects, robot_ids=self._objects.get_robot_ids())
 
         # 積分などに必要な情報を保存するオブジェクト
         self._strategy_context = StrategyContext()
