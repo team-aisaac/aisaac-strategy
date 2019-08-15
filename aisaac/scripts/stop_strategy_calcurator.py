@@ -31,7 +31,7 @@ class StopStrategyCalculator(StrategyCalcuratorBase):
             distance = functions.distance_btw_two_points(robot.get_current_position(), ball.get_current_position())
 
             # 閾値を超える/超えないで振動を防ぐためのoffset
-            offset = 0.2
+            offset = 0.0
             if distance <= (target_distance + offset):
                 status = Status()
                 status.status = "move_linear"
