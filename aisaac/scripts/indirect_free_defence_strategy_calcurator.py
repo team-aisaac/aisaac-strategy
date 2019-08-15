@@ -11,6 +11,7 @@ from context import StrategyContext
 from objects import Objects
 from aisaac.msg import Status
 import copy
+import config
 
 try:
     from typing import Tuple, List, Dict
@@ -41,7 +42,7 @@ class IndirectFreeDefence(StrategyCalcuratorBase):
         active_robot_ids = self._get_active_robot_ids()
         active_enemy_ids = self._get_active_enemy_ids()
         nearest_enemy_id = self._objects.get_enemy_ids_sorted_by_distance_to_ball(active_enemy_ids)[0]
-        second_nearest_enemy_id = self._objects.get_enemy_ids_sorted_by_distance_to_ball(active_enemy_ids)[1]
+        third_nearest_enemy_id = self._objects.get_enemy_ids_sorted_by_distance_to_ball(active_enemy_ids)[2]
         for robot_id in active_robot_ids:
             status = Status()
             robot = self._objects.get_robot_by_id(robot_id)
@@ -54,9 +55,9 @@ class IndirectFreeDefence(StrategyCalcuratorBase):
             elif robot.get_role() == "LFW":
                 #敵kickerとballの延長線上に移動
                 status.status = "move_linear"
-                if nearest_enemy_id != None:
+                if third_nearest_enemy_id != None:
                     # status.pid_goal_pos_x, status.pid_goal_pos_y = functions.calculate_internal_dividing_point(self._enemy[nearest_enemy_id].get_current_position()[0], self._enemy[nearest_enemy_id].get_current_position()[1], self._ball_params.get_current_position()[0], self._ball_params.get_current_position()[1], functions.distance_btw_two_points(self._enemy[nearest_enemy_id].get_current_position(), self._ball_params.get_current_position()) + 0.55, -0.55)
-                    target_pos_xy = functions.calculate_internal_dividing_point_vector_args(self._enemy[second_nearest_enemy_id].get_current_position(), self._ball_params.get_current_position(), 1, 1)
+                    target_pos_xy = functions.calculate_internal_dividing_point_vector_args(self._enemy[third_nearest_enemy_id].get_current_position(), self._ball_params.get_current_position(), 1, 1)
 
                     status.pid_goal_pos_x = target_pos_xy[0]
                     status.pid_goal_pos_y = target_pos_xy[1]
