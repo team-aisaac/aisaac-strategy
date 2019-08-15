@@ -7,3 +7,7 @@ float32 theta
 float32 kick_speed_x
 float32 kick_speed_z
 float32 dribble_power
+bool shutdown_flag
+bool kick_on_flag
+bool chip_on_flag
+int32 kick_power
