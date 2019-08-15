@@ -62,14 +62,14 @@ class IndirectFreeDefence(StrategyCalcuratorBase):
                     status.pid_goal_pos_x = target_pos_xy[0]
                     status.pid_goal_pos_y = target_pos_xy[1]
 
-                    status.pid_goal_theta = math.atan2( (self._ball_params.get_current_position()[1] - self._robot[3].get_current_position()[1]) , (self._ball_params.get_current_position()[0] - self._robot[2].get_current_position()[0]) )
+                    status.pid_goal_theta = math.atan2( (self._ball_params.get_current_position()[1] - robot.get_current_position()[1]) , (self._ball_params.get_current_position()[0] - robot.get_current_position()[0]) )
             elif robot.get_role() == "RFW":
                 #フリーで最もゴールに近い敵idを返す
                 status.status = "move_linear"
                 free_enemy_id = self._get_free_enemy_id(4, nearest_enemy_id)
                 status.pid_goal_pos_x = (self._ball_params.get_current_position()[0] + self._enemy[free_enemy_id].get_current_position()[0]) / 2
                 status.pid_goal_pos_y = (self._ball_params.get_current_position()[1] + self._enemy[free_enemy_id].get_current_position()[1]) / 2
-                status.pid_goal_theta = math.atan2( (self._ball_params.get_current_position()[1] - self._robot[4].get_current_position()[1]) , (self._ball_params.get_current_position()[0] - self._robot[4].get_current_position()[0]) )
+                status.pid_goal_theta = math.atan2( (self._ball_params.get_current_position()[1] - robot.get_current_position()[1]) , (self._ball_params.get_current_position()[0] - robot.get_current_position()[0]) )
             else:
                 status.status = "none"
             self._dynamic_strategy.set_robot_status(robot_id, status)
