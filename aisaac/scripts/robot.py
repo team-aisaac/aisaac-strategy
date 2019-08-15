@@ -94,6 +94,12 @@ class Robot(object):
         self.cmd.dribble_power = default_cmd.dribble_power
 
 
+    def shutdown_cmd(self):
+        self.reset_cmd()
+        self.cmd.shutdown_flag = True
+        self.store_and_publish_commands()
+
+
     def run(self):
         # Loop 処理
         loop_rate = rospy.Rate(ROBOT_LOOP_RATE)
@@ -197,6 +203,9 @@ class Robot(object):
                 self.status.robot_status = "none"
             elif self.status.robot_status == "halt":
                 self.reset_cmd()
+
+            elif self.status.robot_status == "shutdown":
+                self.shutdown_cmd()
 
             self.store_and_publish_commands()
             loop_rate.sleep()
