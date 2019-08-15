@@ -188,9 +188,9 @@ class IndirectFreeAttack(StrategyCalcuratorBase):
                 if self.passed_1_flg:
                     # パス完了した場合
                     if self._objects.robot[robot_id].get_role() == "LDF":
-                        status.status = "defence3"
-                    else:
                         status.status = "defence4"
+                    else:
+                        status.status = "defence3"
                 else:
                     # パス完了する前 パス先をposition1にする、パス完了したら完了flgを立てる
                     status.status = "pass"
@@ -264,9 +264,9 @@ class IndirectFreeAttack(StrategyCalcuratorBase):
                 status.status = "keeper"
 
             elif robot.get_role() == "LDF":
-                status.status = "defence3"
-            elif robot.get_role() == "RDF":
                 status.status = "defence4"
+            elif robot.get_role() == "RDF":
+                status.status = "defence3"
             else:
                 print 'error'
 
@@ -285,9 +285,9 @@ class IndirectFreeAttack(StrategyCalcuratorBase):
             if robot.get_role() == "GK":
                 status.status = "keeper"
             elif robot.get_role() == "LDF":
-                status.status = "defence3"
-            elif robot.get_role() == "RDF":
                 status.status = "defence4"
+            elif robot.get_role() == "RDF":
+                status.status = "defence3"
             elif robot.get_role() == "LFW":
                 #敵kickerとballの延長線上に移動
                 status.status = "move_linear"
