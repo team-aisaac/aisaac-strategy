@@ -31,6 +31,7 @@ class RobotKick(object):
         self.rot_access_threshold = 0.02
         self.pass_stage = 0
         self._kick_start_time = rospy.Time.now()
+        self._dribble_start_pos = self.ball_params.get_current_position()
 
         self.const = 3.0
         # self.const = 4
@@ -58,7 +59,9 @@ class RobotKick(object):
         elapsed_time = rospy.Time.now() - self._kick_start_time
         if functions.distance_btw_two_points(self.ball_params.get_current_position(),
                                              self.ctrld_robot.get_current_position()) \
-                > self.ctrld_robot.size_r + area or elapsed_time.to_sec() > 1.0:
+                > self.ctrld_robot.size_r + area \
+                or elapsed_time.to_sec() > 5.0 \
+                or functions.distance_btw_two_points(self.ball_params.get_current_position(), self._dribble_start_pos) > 0.8:
             self.cmd.vel_surge = 0
             self.cmd.vel_sway = 0
             self.cmd.omega = 0
@@ -145,6 +148,7 @@ class RobotKick(object):
                     # self.status.robot_status = "kick"
                     if not should_wait:
                         self._kick_start_time = rospy.Time.now()
+                        self._dribble_start_pos = self.ball_params.get_current_position()
                         self.pass_stage = 1
 
                 self.pid.pid_linear(pose_x, pose_y, pose_theta, ignore_penalty_area=ignore_penalty_area)
