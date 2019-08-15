@@ -129,7 +129,7 @@ class Robot(object):
                                     self.ctrld_robot.get_pass_target_position()[1])
             elif self.status.robot_status == "pass_chip":
                 self.kick.pass_ball(self.ctrld_robot.get_pass_target_position()[0],
-                                    self.ctrld_robot.get_pass_target_position()[1], 
+                                    self.ctrld_robot.get_pass_target_position()[1],
                                     is_tip_kick=True)
             elif self.status.robot_status == "prepare_pass":
                 self.kick.pass_ball(self.ctrld_robot.get_pass_target_position()[0],
@@ -164,7 +164,12 @@ class Robot(object):
                                                   self.ctrld_robot.get_pass_target_position())
             elif self.status.robot_status == "receive_direct_shoot":
                 self.kick.receive_and_direct_shoot(self.ctrld_robot.get_future_position())
-
+            elif self.status.robot_status == "receive_direct_shoot_left":
+                self.kick.receive_and_direct_shoot(self.ctrld_robot.get_future_position(), target="left")
+            elif self.status.robot_status == "receive_direct_shoot_right":
+                self.kick.receive_and_direct_shoot(self.ctrld_robot.get_future_position(), target="right")
+            elif self.status.robot_status == "receive_direct_shoot_center":
+                self.kick.receive_and_direct_shoot(self.ctrld_robot.get_future_position(), target="center")
             elif self.status.robot_status == "defence1":
                 self.defence.move_defence(
                     self.defence.def1_pos_x, self.defence.def1_pos_y)
@@ -183,7 +188,7 @@ class Robot(object):
 
             elif self.status.robot_status == "keeper_pass_chip":
                 self.kick.pass_ball(self.ctrld_robot.get_pass_target_position()[0],
-                                    self.ctrld_robot.get_pass_target_position()[1], 
+                                    self.ctrld_robot.get_pass_target_position()[1],
                                     is_tip_kick=True,
                                     ignore_penalty_area=True)
 

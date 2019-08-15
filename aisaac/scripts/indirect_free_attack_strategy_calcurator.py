@@ -96,7 +96,7 @@ class IndirectFreeAttack(StrategyCalcuratorBase):
         # position_1はFW_1が行く場所 (ボールが2mラインより左側にいるときに利用する、右側の時は使わない)
         # position2はFW2が行く場所
         # position3はFW1がボールを蹴ったあとに行く場所
-        if self.ball_position_x <= 5.:
+        if self.ball_position_x <= 6.5:
             if self.ball_position_y <= 0.:
                 positions_1 = self._upper_positions_1
                 positions_2 = self._lower_positions_2

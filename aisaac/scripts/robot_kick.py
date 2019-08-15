@@ -186,10 +186,31 @@ class RobotKick(object):
         self._recieve_ball((target_x, target_y),
                            self.ball_params.get_current_position())
 
-    def receive_and_direct_shoot(self, target_xy):
-        self._recieve_ball(target_xy,
-                           config.GOAL_ENEMY_CENTER,
-                           auto_kick=True, is_shoot=True)
+    def receive_and_direct_shoot(self, target_xy, target="random"):
+        _candidates = ["left", "right", "center"]
+
+        if target in _candidates:
+            _target = target
+
+        else:
+            _target = np.random.choice(_candidates)
+
+        post_offset = 0.2
+
+        # 位置調整
+        vec_x = config.GOAL_ENEMY_CENTER[0] - target_xy[0]
+        vec_y = config.GOAL_ENEMY_CENTER[1] - target_xy[1]
+        len = np.sqrt(vec_x ** 2 + vec_y ** 2)
+        target_xy = [target_xy[0] - (vec_x / len) * 0.09, target_xy[1] - (vec_y / len) * 0.09]
+
+        if _target == "center":
+            self._recieve_ball(target_xy, config.GOAL_ENEMY_CENTER, auto_kick=True, is_shoot=True)
+        elif _target == "left":
+            goal_enemy_left = [config.GOAL_ENEMY_LEFT[0], config.GOAL_ENEMY_LEFT[1] - post_offset]
+            self._recieve_ball(target_xy, goal_enemy_left, auto_kick=True, is_shoot=True)
+        elif _target == "right":
+            goal_enemy_right = [config.GOAL_ENEMY_RIGHT[0], config.GOAL_ENEMY_RIGHT[1] + post_offset]
+            self._recieve_ball(target_xy, goal_enemy_right, auto_kick=True, is_shoot=True)
 
     def receive_and_direct_pass(self, target_xy, next_target_xy):
         self._recieve_ball(target_xy,
@@ -275,7 +296,3 @@ class RobotKick(object):
         #     #self.lines3.set_data([self.ball_params.ball_future_x, hx], [self.ball_params.ball_future_y, hy])
         #     #self.lines4.set_data([self.ball_params.ball_future_x, target_x], [self.ball_params.ball_future_y, target_y])
         #     plt.pause(.01)
-
-
-
-
