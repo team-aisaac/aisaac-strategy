@@ -1,15 +1,13 @@
 #!/usr/bin/env  python
 # coding:utf-8
 
-class RobotStatus:
+class RobotStatus(object):
     def __init__(self, pid):
         # type: (robot_pid.RobotPid) -> None
         self.robot_status = "none"
 
         self.pid = pid
         self.ctrld_robot = pid.ctrld_robot
-
-        self.ctrld_robot.set_future_position(0., 0., 0.)
 
     def status_callback(self, msg):
         if msg.status == "move_linear" and (self.ctrld_robot.get_future_position()[0] != msg.pid_goal_pos_x or self.ctrld_robot.get_future_position()[1] != msg.pid_goal_pos_y or self.ctrld_robot.get_future_orientation() != msg.pid_goal_theta):

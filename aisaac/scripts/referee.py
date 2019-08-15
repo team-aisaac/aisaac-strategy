@@ -6,9 +6,9 @@ import rospy
 from consai_msgs.msg import RefereeTeamInfo
 from std_msgs.msg import Int8
 
-class Referee:
-    def __init__(self, objects):
-        self.team_color = objects.team_color
+class Referee(object):
+    def __init__(self, team_color):
+        self.team_color = team_color
         #self.world_state = WorldState(objects)
 
         """refereeから受信する情報"""

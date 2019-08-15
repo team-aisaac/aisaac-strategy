@@ -45,18 +45,7 @@ class Robot(object):
 
         # Composition
         self.objects = Objects(self.robot_color, self.robot_total, self.enemy_total, info="Robot_"+str(self.robot_id))
-        self.ctrld_robot = self.objects.robot[int(self.robot_id)] # type: entity.Robot
-
-        self.robot_friend = self.objects.robot
-        self.robot_enemy = self.objects.enemy
-
-        self.ball_params = self.objects.ball
-
-        self.pid = RobotPid(self.robot_id, self.objects, self.cmd)
-        self.status = RobotStatus(self.pid)
-        self.kick = RobotKick(self.pid, self.cmd, self.status)
-        self.defence = RobotDefence(self.status, self.kick)
-        self.keeper = RobotKeeper(self.kick)
+        self.refresh_instances()
 
         # listner 起動
         # self.odom_listener()
@@ -66,6 +55,20 @@ class Robot(object):
         self.set_pid_server()
         self.def_pos_listener()
         rospy.Timer(rospy.Duration(1.0/30.0), self.pid.replan_timer_callback)
+
+    def refresh_instances(self):
+        self.ctrld_robot = self.objects.get_robot_by_id(self.robot_id) # type: entity.Robot
+
+        self.robot_friend = self.objects.robot
+        self.robot_enemy = self.objects.enemy
+        self.ball_params = self.objects.ball
+
+        self.pid = RobotPid(self.robot_id, self.objects, self.cmd)
+        self.status = RobotStatus(self.pid)
+        self.kick = RobotKick(self.pid, self.cmd, self.status)
+        self.defence = RobotDefence(self.status, self.kick)
+        self.keeper = RobotKeeper(self.kick, self.objects)
+
 
 
     def store_and_publish_commands(self):
@@ -107,6 +110,13 @@ class Robot(object):
 
         while not rospy.is_shutdown():
             # start = time.time()
+            if self.objects.get_if_changed_ids():
+                rospy.loginfo(str("Refreshing Instances: Robot "+str(self.robot_id)))
+                self.refresh_instances()
+
+            if self.ctrld_robot is None:
+                loop_rate.sleep()
+                continue
 
             # カルマンフィルタ,恒等関数フィルタの適用
             # vision_positionからcurrent_positionを決定してつめる
@@ -118,7 +128,6 @@ class Robot(object):
                     identity_filter(robot)
             for enemy in self.robot_enemy.values():
                 identity_filter(enemy)
-
 
             if self.status.robot_status == "move_linear":
                 self.pid.pid_linear(self.ctrld_robot.get_future_position()[0],
@@ -218,13 +227,23 @@ class Robot(object):
 
         """
 
+    def pid_set_pid_callback(self, msg):
+        return self.pid.set_pid_callback(msg)
+
+    def status_status_callback(self, msg):
+        return self.status.status_callback(msg)
+
     def status_listener(self):
         rospy.Subscriber("/" + self.robot_color + "/robot_" +
-                         self.robot_id + "/status", Status, self.status.status_callback)
+                         self.robot_id + "/status", Status, self.status_status_callback)
 
     def set_pid_server(self):
-        rospy.Service("/" + self.robot_color + "/robot_" +
-                      self.robot_id + "/set_pid", pid, self.pid.set_pid_callback)
+        try:
+            rospy.Service("/" + self.robot_color + "/robot_" +
+                          self.robot_id + "/set_pid", pid, self.pid_set_pid_callback)
+        except rospy.ServiceException as e:
+            import traceback
+            traceback.print_exc()
 
     """
     def kick(self, req):

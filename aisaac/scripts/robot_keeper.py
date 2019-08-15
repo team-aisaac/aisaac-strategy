@@ -5,7 +5,7 @@ import rospy
 
 
 class RobotKeeper(object):
-    def __init__(self, kick):
+    def __init__(self, kick, objects):
         # type: (robot_kick.RobotKick) -> None
 
         self.robot_id = kick.pid.robot_id
@@ -17,7 +17,7 @@ class RobotKeeper(object):
         self.team_side = "left" # CONSAIが変換してくれることが発覚したため常にleft
         self.goal_right = [6, -0.620]
         self.goal_left = [6, 0.620]
-        self.r_offset = self.ctrld_robot.size_r
+        self.r_offset = objects.get_a_robot().size_r
 
 
     def calc_keeper_position(self, defense_point_x, defense_point_y):

@@ -26,8 +26,8 @@ class Objects(object):
         self.robot_total = robot_total
         self.enemy_total = enemy_total
 
-        self._changed_friends_id = 0
-        self._changed_enemies_id = 0
+        self._changed_friends_id = False
+        self._changed_enemies_id = False
         self.initialize_robots(range(self.robot_total))
         self.initialize_enemies(range(self.enemy_total))
 
@@ -53,7 +53,7 @@ class Objects(object):
 
         self.robot = {}
         for i in new_ids:
-            self.robot[i] = entity.Robot(id=i)
+            self.robot[int(i)] = entity.Robot(id=i)
 
         roles = ["RFW", "LFW", "RDF", "LDF", "GK"]
         roles = roles[:len(self.robot)]
@@ -66,7 +66,7 @@ class Objects(object):
 
         self.enemy = {}
         for i in new_ids:
-            self.enemy[i] = entity.Robot(id=i)
+            self.enemy[int(i)] = entity.Robot(id=i)
 
     def get_robot_ids_sorted_by_distance_to_ball(self, robot_ids=None):
         # type: (typing.List[int]) -> typing.List[int]
@@ -83,7 +83,7 @@ class Objects(object):
         if robot_ids is None:
             robots = self.robot
         else:
-            robots = [self.robot[i] for i in robot_ids]
+            robots = [self.robot[int(i)] for i in robot_ids]
 
         sorted_robots = sorted(robots,
                                key=lambda robot: functions.distance_btw_two_points(robot.get_current_position(),
@@ -98,7 +98,7 @@ class Objects(object):
         if enemy_ids is None:
             enemys = self.enemy
         else:
-            enemys = [self.enemy[i] for i in enemy_ids]
+            enemys = [self.enemy[int(i)] for i in enemy_ids]
 
         sorted_enemys = sorted(enemys,
                                key=lambda enemy: functions.distance_btw_two_points(enemy.get_current_position(),
@@ -113,19 +113,20 @@ class Objects(object):
         return self._enemy_ids
 
     def get_robot_by_id(self, robot_id):
-        robots = [self.robot[i] for i in self._robot_ids]
-        for i, id in enumerate(self._robot_ids):
-            if id == robot_id:
-                return robots[i]
+        robot_id = int(robot_id)
+        if robot_id in self.robot.keys():
+            return self.robot[int(robot_id)]
+        else:
+            return None
 
     def get_robot_by_role(self, role):
-        robots = [self.robot[i] for i in self._robot_ids]
+        robots = [self.robot[int(i)] for i in self._robot_ids]
         for i, robot in enumerate(robots):
             if robot.get_role() == role:
-                return robots[i]
+                return robots[int(i)]
 
     def get_robot_id_by_role(self, role):
-        robots = [self.robot[i] for i in self._robot_ids]
+        robots = [self.robot[int(i)] for i in self._robot_ids]
         for i, robot in enumerate(robots):
             if robot.get_role() == role:
                 return robot.get_id()
@@ -183,26 +184,33 @@ class Objects(object):
 
         if not self._robot_ids == data:
             self.initialize_robots(data)
-            rospy.loginfo(self._info+"> Changed friend ids: "+str(data))
+            rospy.loginfo(self._info+" > Changed friend ids: "+str(data))
 
             # 変更回数監視
-            self._changed_friends_id = self._changed_friends_id + 1
+            self._changed_friends_id = True
 
     def existing_enemies_id_callback(self, msg):
         data = list(msg.data)
 
         if not self._enemy_ids == data:
             self.initialize_enemies(data)
-            rospy.loginfo(self._info+"> Changed enemy ids: "+str(data))
+            rospy.loginfo(self._info+" > Changed enemy ids: "+str(data))
 
             # 変更回数監視
-            self._changed_enemies_id = self._changed_enemies_id + 1
+            self._changed_enemies_id = True
 
     def get_changed_friends_id(self):
         return self._changed_friends_id
 
     def get_changed_enemies_id(self):
         return self._changed_enemies_id
+
+    def get_if_changed_ids(self):
+        if self.get_changed_enemies_id() or self.get_changed_friends_id():
+            self._changed_enemies_id = False
+            self._changed_friends_id = False
+            return True
+        return False
 
     """---Visionからrobotの現在地をもらう---"""
     def robot_odom_callback(self, msg, id):
@@ -213,11 +221,11 @@ class Objects(object):
         robot_v_y = msg.twist.twist.linear.y
         robot_v_t = msg.twist.twist.linear.z
 
-        if not id in self.robot.keys():
+        if not int(id) in self.robot.keys():
             return
 
-        self.robot[id].set_vision_position(x = robot_x, y = robot_y, theta=robot_t)
-        self.robot[id].set_current_velocity(vx = robot_v_x, vy = robot_v_y, vtheta=robot_v_t)
+        self.robot[int(id)].set_vision_position(x = robot_x, y = robot_y, theta=robot_t)
+        self.robot[int(id)].set_current_velocity(vx = robot_v_x, vy = robot_v_y, vtheta=robot_v_t)
 
     """---Visionからenemyの現在地をもらう---"""
     def enemy_odom_callback(self, msg, id):
@@ -228,11 +236,11 @@ class Objects(object):
         enemy_v_y = msg.twist.twist.linear.y
         enemy_v_t = msg.twist.twist.linear.z
 
-        if not id in self.enemy.keys():
+        if not int(id) in self.enemy.keys():
             return
 
-        self.enemy[id].set_vision_position(x = enemy_x, y = enemy_y, theta=enemy_t)
-        self.enemy[id].set_current_velocity(vx = enemy_v_x, vy = enemy_v_y, vtheta=enemy_v_t)
+        self.enemy[int(id)].set_vision_position(x = enemy_x, y = enemy_y, theta=enemy_t)
+        self.enemy[int(id)].set_current_velocity(vx = enemy_v_x, vy = enemy_v_y, vtheta=enemy_v_t)
 
     """---Visionからballの現在地をもらう---"""
     def ball_odom_callback(self, msg):

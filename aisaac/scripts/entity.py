@@ -24,6 +24,10 @@ class Entity(object):
         self._current_position_y = 0.
         self._current_orientation = 0.
 
+        self._future_position_x = 0.0
+        self._future_position_y = 0.0
+        self._future_orientation = 0.0
+
         self._vision_position_x = 0.
         self._vision_position_y = 0.
         self._vision_orientation = 0.

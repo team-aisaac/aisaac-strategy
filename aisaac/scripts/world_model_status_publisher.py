@@ -31,7 +31,8 @@ class WorldModelStatusPublisher(object):
         all_robot_status = strat.get_all_robot_status()
 
         for robot_id in self._objects.get_robot_ids():
-            if robot_id in all_robot_status:
+            if robot_id in self._status_publishers.keys() \
+                    and robot_id in all_robot_status:
                 self._status_publishers[robot_id].publish(
                     all_robot_status[robot_id])
             #     rospy.loginfo("publishing strategy for: " + str(robot_id))

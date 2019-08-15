@@ -11,7 +11,7 @@ ROBOT_LOOP_RATE = config.ROBOT_LOOP_RATE
 class RobotPid(object):    
     def __init__(self, robot_id, objects, cmd):
         self.robot_id = int(robot_id)
-        self.ctrld_robot = objects.robot[int(robot_id)]
+        self.ctrld_robot = objects.get_robot_by_id(robot_id)
         self.friend = objects.robot
         self.enemy = objects.enemy
         self.ball_params = objects.ball
@@ -68,7 +68,7 @@ class RobotPid(object):
     def collision_detection(self, goal_pos_x, goal_pos_y):
         a, b, c = functions.line_parameters(self.ctrld_robot.get_current_position()[0], self.ctrld_robot.get_current_position()[1], goal_pos_x, goal_pos_y)
         if a != 0 and b != 0:
-            for i in range(len(self.friend)):
+            for i in self.friend.keys():
                 if i != self.robot_id:
                     distance = functions.distance_of_a_point_and_a_straight_line(self.friend[i].get_current_position()[0], self.friend[i].get_current_position()[1], a, b, c)
                     if distance < self.ctrld_robot.size_r * 3:
@@ -81,7 +81,7 @@ class RobotPid(object):
 
                             return True, x, y, self.friend[i].get_current_position()[0] , self.friend[i].get_current_position()[1], distance
 
-            for j in range(len(self.enemy)):
+            for j in self.enemy.keys():
                 distance = functions.distance_of_a_point_and_a_straight_line(self.enemy[j].get_current_position()[0], self.enemy[j].get_current_position()[1], a, b, c)
                 if distance < self.ctrld_robot.size_r * 3:
                         x = (-self.enemy[j].get_current_position()[1] * b + (b**2 / a) * self.enemy[j].get_current_position()[0] - c) / (a + b**2 / a)

@@ -35,7 +35,7 @@ class WorldModel(object):
             self._team_color, config.NUM_FRIEND_ROBOT, config.NUM_ENEMY_ROBOT, info="WorldModel")
 
         """---Referee---"""
-        self._referee = Referee(self._objects)
+        self._referee = Referee(self._objects.team_color)
         self._stcalcurator = {
             'normal_start_normal': NormalStartStrategyCalcurator(self._objects),
             'normal_start_kickoff': NormalStartKickOffStrategyCalcurator(self._objects),
@@ -78,7 +78,8 @@ class WorldModel(object):
 
         self._loop_events = []
 
-
+    def refresh_instances(self):
+        pass
 
     def add_loop_event_listener(self, callback):
         self._loop_events.append(callback)
@@ -137,6 +138,9 @@ def run_world_model():
         last_referee_branch = "NONE"
 
         while not rospy.is_shutdown():
+            if world_model.get_objects().get_if_changed_ids():
+                world_model.refresh_instances()
+
             # 恒等関数フィルタの適用
             # vision_positionからcurrent_positionを決定してつめる
             for robot in world_model.get_objects().robot.values():
@@ -256,6 +260,7 @@ def run_world_model():
 
             # referee_branchが変更されたときに呼び出される
             if tmp_last_referee_branch != referee_branch:
+                rospy.loginfo("RefereeBranch: "+str(referee_branch))
                 rospy.set_param("/robot_max_velocity", config.ROBOT_MAX_VELOCITY)
                 last_referee_branch = tmp_last_referee_branch
                 strat_ctx.update("referee_branch", tmp_last_referee_branch, namespace="world_model")
@@ -278,10 +283,6 @@ def run_world_model():
 
             status_publisher.publish_all(strat)
             world_model.trigger_loop_events()
-
-            if world_model.get_objects().get_changed_friends_id() >= 2 \
-                    or world_model.get_objects().get_changed_enemies_id() >= 2:
-                return
 
             loop_rate.sleep()
     except Exception as e:
