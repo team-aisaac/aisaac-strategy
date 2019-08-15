@@ -94,19 +94,19 @@ class Objects(object):
         return self._enemy_ids
 
     def get_robot_by_id(self, robot_id):
-        robots = [self.robot[i] for i in self._robot_ids]
+        robots = [self.robot[i] for i in self._active_robot_ids]
         for i, id in enumerate(self._robot_ids):
             if id == robot_id:
                 return robots[i]
 
     def get_robot_by_role(self, role):
-        robots = [self.robot[i] for i in self._robot_ids]
+        robots = [self.robot[i] for i in self._active_robot_ids]
         for i, robot in enumerate(robots):
             if robot.get_role() == role:
                 return robots[i]
 
     def get_robot_id_by_role(self, role):
-        robots = [self.robot[i] for i in self._robot_ids]
+        robots = [self.robot[i] for i in self._active_robot_ids]
         for i, robot in enumerate(robots):
             if robot.get_role() == role:
                 return robot.get_id()
