@@ -29,6 +29,7 @@
 #include <nav_msgs/Odometry.h>
 #include <tf/tf.h>
 #include <string>
+#include <aisaac/Shutdown.h>
 
 const uint8_t HEAD_BYTE   = 0x7D;
 const uint8_t ESCAPE_BYTE = 0x7E;
@@ -66,11 +67,15 @@ public:
   vu8 send_buffer;
   int fd;
   int checksum = 0;
+  bool shutdown_flag = false;
   uint8_t u8_checksum = 0;
   uint8_t datatype = 0;
   int16_t x_vector = 0, y_vector = 0, omega = 0;
   uint16_t th_vector = 0, calib_data = 0, command = 0;
   double current_orientation[3] = {0, 0, 0};
+
+  uint16_t kick_flag = 0, kick_chip_flag = 0, kick_power = 0;
+
 
   Sender(){}
 
@@ -150,6 +155,18 @@ public:
       th_vector = uint16_t(theta_deg);
       calib_data = uint16_t(current_orientation_deg);
 
+      kick_flag = msg->kick_on_flag;
+      kick_chip_flag = msg->chip_on_flag;
+      kick_power =msg->kick_power;
+
+      if(shutdown_flag == true){
+          x_vector = 0;
+          y_vector = 0;
+          omega = 0;
+          th_vector = 0;
+      }
+
+
       // make sending byte-data buffer from integer-data
       setSendDataFromROSBus((uint8_t)i, &send_buffer);
 
@@ -192,11 +209,15 @@ public:
     int16_t tmp = x_vector;
     x_vector = y_vector;
     y_vector = -tmp;
-      DBG(" %4d ", x_vector);
-      DBG(" %4d ", y_vector);
-      DBG(" %4d ", th_vector);
-      DBG(" %4d ", calib_data);
-      DBG(" %4d ", omega);
+      DBG("x_vector: %4d ", x_vector);
+      DBG("y_vector: %4d ", y_vector);
+      DBG("th_vector: %4d ", th_vector);
+      DBG("calib_data: %4d ", calib_data);
+      DBG("omega: %4d ", omega);
+      DBG("\n\n");
+      DBG("kick_flag: %4d ", kick_flag);
+      DBG("kick_chip_flag: %4d ", kick_chip_flag);
+      DBG("kick_power: %4d ", kick_power);
       DBG("\n\n\n");
 
 
@@ -205,6 +226,12 @@ public:
   void odom_callback(const nav_msgs::Odometry& msg) {
       tf::Quaternion quat(msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w);
       tf::Matrix3x3(quat).getRPY(current_orientation[0], current_orientation[1], current_orientation[2]);
+  }
+
+  void shutdown_callback(const aisaac::Shutdown& msg) {
+      if(msg.shutdown_flag == true){
+          shutdown_flag = true;
+      }
   }
 
   void setSendDataFromROSBus(uint8_t datatype, vu8 *buf){
@@ -237,7 +264,11 @@ public:
         buf->push_back(tmp);
         break;
       case 2:
-        tmp = ((datatype & 0x7) << 5) | command;
+        tmp = ((datatype & 0x7) << 5) | ((kick_flag & 0x3) << 3) | ((kick_chip_flag & 0x1) << 2) | ((kick_power >> 4));
+        buf->push_back(tmp);
+        tmp = ((kick_power & 0xF)) << 4;
+        buf->push_back(tmp);
+        tmp = 0x0;
         buf->push_back(tmp);
         break;
       default:
@@ -268,14 +299,16 @@ int main(int argc, char** argv)
   ros::init(argc, argv, "command_sender");
   ros::NodeHandle nh;
   ros::Rate r(60);
-  ros::Subscriber command_sub[2], odom_sub[2];
+  ros::Subscriber command_sub[2], odom_sub[2], shutdown_sub[2];
   Sender senders[2];
-  senders[0].open_port("/dev/ttyUSB0");
-  senders[1].open_port("/dev/ttyUSB1");
+  senders[0].open_port("/dev/ttyUSB2");
+  senders[1].open_port("/dev/ttyUSB3");
   command_sub[0] = nh.subscribe("/blue/robot_1/robot_commands", 100, &Sender::command_callback, &senders[0]);
   odom_sub[0] = nh.subscribe("/blue/robot_1/odom", 100, &Sender::odom_callback, &senders[0]);
+  shutdown_sub[0] = nh.subscribe("/blue/shutdown", 100, &Sender::shutdown_callback, &senders[0]);
   command_sub[1] = nh.subscribe("/blue/robot_2/robot_commands", 100, &Sender::command_callback, &senders[1]);
   odom_sub[1] = nh.subscribe("/blue/robot_2/odom", 100, &Sender::odom_callback, &senders[1]);
+  shutdown_sub[1] = nh.subscribe("/blue/shutdown", 100, &Sender::shutdown_callback, &senders[1]);
 
   errorFlag = 0;
 
