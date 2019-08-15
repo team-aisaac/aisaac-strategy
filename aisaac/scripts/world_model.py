@@ -278,6 +278,11 @@ def run_world_model():
 
             status_publisher.publish_all(strat)
             world_model.trigger_loop_events()
+
+            if world_model.get_objects().get_changed_friends_id() >= 2 \
+                    or world_model.get_objects().get_changed_enemies_id() >= 2:
+                return
+
             loop_rate.sleep()
     except Exception as e:
         import traceback

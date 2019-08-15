@@ -26,8 +26,8 @@ class Objects(object):
         self.robot_total = robot_total
         self.enemy_total = enemy_total
 
-        self._changed_friends_id = False
-        self._changed_enemies_id = False
+        self._changed_friends_id = 0
+        self._changed_enemies_id = 0
         self.initialize_robots(range(self.robot_total))
         self.initialize_enemies(range(self.enemy_total))
 
@@ -185,10 +185,8 @@ class Objects(object):
             self.initialize_robots(data)
             rospy.loginfo(self._info+"> Changed friend ids: "+str(data))
 
-            #初回のみID変更OKそうでなかったら例外で無理やり立ち上げ直す
-            if self._changed_enemies_id:
-                raise Exception("Changed IDs")
-            self._changed_friends_id = True
+            # 変更回数監視
+            self._changed_friends_id = self._changed_friends_id + 1
 
     def existing_enemies_id_callback(self, msg):
         data = list(msg.data)
@@ -197,11 +195,14 @@ class Objects(object):
             self.initialize_enemies(data)
             rospy.loginfo(self._info+"> Changed enemy ids: "+str(data))
 
-            #初回のみID変更OKそうでなかったら例外で無理やり立ち上げ直す
-            if self._changed_enemies_id:
-                raise Exception("Changed IDs")
-            self._changed_enemies_id = True
+            # 変更回数監視
+            self._changed_enemies_id = self._changed_enemies_id + 1
 
+    def get_changed_friends_id(self):
+        return self._changed_friends_id
+
+    def get_changed_enemies_id(self):
+        return self._changed_enemies_id
 
     """---Visionからrobotの現在地をもらう---"""
     def robot_odom_callback(self, msg, id):
