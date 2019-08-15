@@ -497,12 +497,13 @@ class RobotPid(object):
             tmp_x = goal_pos_x
             tmp_y = goal_pos_y
 
-            if not ignore_penalty_area:
-                tmp_x, tmp_y = self._clip_penalty_area(tmp_x, tmp_y, offset=self.ctrld_robot.size_r)
 
             tmp_x, tmp_y = self.avoid_penalty_area(tmp_x, tmp_y)
             tmp_x, tmp_y = self.avoid_goal(tmp_x, tmp_y)
             tmp_x, tmp_y = self.path_plan(tmp_x, tmp_y)
+
+            if not ignore_penalty_area:
+                tmp_x, tmp_y = self._clip_penalty_area(tmp_x, tmp_y, offset=self.ctrld_robot.size_r)
 
             self.next_pos_x = tmp_x
             self.next_pos_y = tmp_y

@@ -45,10 +45,10 @@ class DirectFreeAttack(IndirectFreeAttack):
 
         ball_x, ball_y = self._objects.ball.get_current_position()
 
-        if functions.distance_btw_two_points([ball_x, ball_y], [6., 4.5]) < 0.1:
+        if functions.distance_btw_two_points([ball_x, ball_y], [5.8, 4.3]) < 0.1:
             self.ckl_flg =  True
             self.ckr_flg =  False
-        if functions.distance_btw_two_points([ball_x, ball_y], [6., -4.5]) < 0.1:
+        if functions.distance_btw_two_points([ball_x, ball_y], [5.8, -4.3]) < 0.1:
             self.ckl_flg =  False
             self.ckr_flg =  True
 
@@ -72,13 +72,13 @@ class DirectFreeAttack(IndirectFreeAttack):
             status = Status()
             robot = self._objects.get_robot_by_id(robot_id)
             if robot.get_role() == "GK":
-                status.status = "pass_chip"
+                status.status = "keeper_pass_chip"
                 status.pass_target_pos_x = self._objects.get_robot_by_role("LFW").get_current_position()[0]
                 status.pass_target_pos_y = self._objects.get_robot_by_role("LFW").get_current_position()[1]
             elif robot.get_role() == "LDF":
-                status.status = "defence1"
+                status.status = "defence4"
             elif robot.get_role() == "RDF":
-                status.status = "defence2"
+                status.status = "defence3"
             elif robot.get_role() == "LFW":
                 #敵kickerとballの延長線上に移動
                 status.status = "move_linear"
@@ -96,7 +96,6 @@ class DirectFreeAttack(IndirectFreeAttack):
         return result
 
     def calculate_corner_kick_left(self):
-        print ("ckl")
         active_robot_ids = self._get_active_robot_ids()
         for robot_id in active_robot_ids:
             status = Status()
@@ -106,7 +105,7 @@ class DirectFreeAttack(IndirectFreeAttack):
             elif robot.get_role() == "LDF":
                 if self.passed_1_flg:
                     # パス完了した場合
-                    status.status = "defence1"
+                    status.status = "defence4"
                 else:
                     # パス完了する前 パス先をposition1にする、パス完了したら完了flgを立てる
                     status.status = "pass"
@@ -117,7 +116,7 @@ class DirectFreeAttack(IndirectFreeAttack):
                     if self.received_1_flg and self._objects.get_has_a_ball(robot_id) == False:
                         self.passed_1_flg = True
             elif robot.get_role() == "RDF":
-                status.status = "defence2"
+                status.status = "defence3"
             elif robot.get_role() == "LFW":
                 if self.position_2[1] > 0:
                     position = [self.position_2[0] + 1.2, self.position_2[1]]
@@ -129,9 +128,10 @@ class DirectFreeAttack(IndirectFreeAttack):
                     status.pid_goal_pos_x = 2.0
                     status.pid_goal_pos_y = 1.5
                 if self.received_2_flg:
-                    status.status = "pass"
-                    status.pass_target_pos_x = 6.0
-                    status.pass_target_pos_y = 0.50
+                    status.status = "shoot_left"
+                    # status.status = "pass"
+                    # status.pass_target_pos_x = 6.0
+                    # status.pass_target_pos_y = 0.50
                     if self._objects.get_has_a_ball(robot_id) == False:
                         self.passed_2_flg = True
                 else:
@@ -151,9 +151,10 @@ class DirectFreeAttack(IndirectFreeAttack):
                     status.pid_goal_pos_x = 2.0
                     status.pid_goal_pos_y = -1.5
                 if self.received_3_flg:
-                    status.status = "pass"
-                    status.pass_target_pos_x = 6.0
-                    status.pass_target_pos_y = -0.50
+                    status.status = "shoot_right"
+                    # status.status = "pass"
+                    # status.pass_target_pos_x = 6.0
+                    # status.pass_target_pos_y = -0.50
                     if self._objects.get_has_a_ball(robot_id) == False:
                         self.passed_3_flg = True
                 else:
@@ -170,7 +171,6 @@ class DirectFreeAttack(IndirectFreeAttack):
         return result
 
     def calculate_corner_kick_right(self):
-        print ("ckr")
         active_robot_ids = self._get_active_robot_ids()
         for robot_id in active_robot_ids:
             status = Status()
@@ -178,11 +178,11 @@ class DirectFreeAttack(IndirectFreeAttack):
             if robot.get_role() == "GK":
                 status.status = "keeper"
             elif robot.get_role() == "LDF":
-                status.status = "defence1"
+                status.status = "defence4"
             elif robot.get_role() == "RDF":
                 if self.passed_1_flg:
                     # パス完了した場合
-                    status.status = "defence2"
+                    status.status = "defence3"
                 else:
                     # パス完了する前 パス先をposition1にする、パス完了したら完了flgを立てる
                     status.status = "pass"
@@ -203,9 +203,10 @@ class DirectFreeAttack(IndirectFreeAttack):
                     status.pid_goal_pos_x = 2.0
                     status.pid_goal_pos_y = 1.5
                 if self.received_2_flg:
-                    status.status = "pass"
-                    status.pass_target_pos_x = 6.0
-                    status.pass_target_pos_y = 0.50
+                    status.status = "shoot_left"
+                    # status.status = "pass"
+                    # status.pass_target_pos_x = 6.0
+                    # status.pass_target_pos_y = 0.50
                     if self._objects.get_has_a_ball(robot_id) == False:
                         self.passed_2_flg = True
                 else:
@@ -225,9 +226,10 @@ class DirectFreeAttack(IndirectFreeAttack):
                     status.pid_goal_pos_x = 2.0
                     status.pid_goal_pos_y = -1.5
                 if self.received_3_flg:
-                    status.status = "pass"
-                    status.pass_target_pos_x = 6.0
-                    status.pass_target_pos_y = -0.50
+                    status.status = "shoot_right"
+                    # status.status = "pass"
+                    # status.pass_target_pos_x = 6.0
+                    # status.pass_target_pos_y = -0.50
                     if self._objects.get_has_a_ball(robot_id) == False:
                         self.passed_3_flg = True
                 else:
