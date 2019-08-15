@@ -172,6 +172,12 @@ class Robot(object):
             elif self.status.robot_status == "keeper":
                 self.keeper.keeper()
 
+            elif self.status.robot_status == "keeper_pass_chip":
+                self.kick.pass_ball(self.ctrld_robot.get_pass_target_position()[0],
+                                    self.ctrld_robot.get_pass_target_position()[1], 
+                                    is_tip_kick=True,
+                                    ignore_penalty_area=True)
+
             elif self.status.robot_status == "stop":
                 self.reset_cmd()
                 self.status.robot_status = "none"
