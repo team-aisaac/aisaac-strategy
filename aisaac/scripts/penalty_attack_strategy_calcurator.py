@@ -38,6 +38,7 @@ class PenaltyAttack(StrategyCalcuratorBase):
         self.history_who_has_a_ball = ["robots" for i in range(10)]
 
     def calcurate(self, strategy_context=None):
+        #print "penalty"
 
         if self._get_who_has_a_ball() == "free":
             pass
@@ -59,9 +60,9 @@ class PenaltyAttack(StrategyCalcuratorBase):
             if robot.get_role() == "GK":
                 status.status = "keeper"
             elif robot.get_role() == "LDF":
-                status.status = "defence3"
-            elif robot.get_role() == "RDF":
                 status.status = "defence4"
+            elif robot.get_role() == "RDF":
+                status.status = "defence3"
             elif robot.get_role() == "LFW":
                 #敵kickerとballの延長線上に移動
                 status.status = "move_linear"
