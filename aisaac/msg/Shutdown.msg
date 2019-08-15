@@ -1,0 +1,1 @@
+bool shutdown_flag
