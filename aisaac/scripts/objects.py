@@ -115,6 +115,11 @@ class Objects(object):
     def get_active_enemy_ids(self):
         return copy.deepcopy(self._active_enemy_ids)
 
+    def get_enemy_by_id(self, enemy_id):
+        for enemy in self.enemy:
+            if enemy.get_id() == enemy_id:
+                return enemy
+
     def get_ball_in_penalty_area(self):
         return functions.in_penalty_area(self.ball.get_current_position())
 

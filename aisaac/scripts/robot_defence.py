@@ -29,4 +29,4 @@ class RobotDefence:
     def defence2(self):
         pose_theta = math.atan2( (self.ball_params.get_current_position()[1] - self.def2_pos_y) , (self.ball_params.get_current_position()[0] - self.def2_pos_x) )
         self.pid.pid_linear(self.def2_pos_x, self.def2_pos_y, pose_theta)
-        self.kick.receive_and_clear((x, y))
+        self.kick.receive_and_clear((self.def2_pos_x, self.def2_pos_y))
