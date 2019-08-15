@@ -65,7 +65,7 @@ class Robot(object):
         self.status_listener()
         self.set_pid_server()
         self.def_pos_listener()
-        rospy.Timer(rospy.Duration(0.1), self.pid.replan_timer_callback)
+        rospy.Timer(rospy.Duration(1.0/30.0), self.pid.replan_timer_callback)
 
 
     def store_and_publish_commands(self):
