@@ -13,12 +13,11 @@ except:
 
 
 class WorldModelStatusPublisher(object):
-    def __init__(self, team_color, objects, robot_ids=range(config.NUM_FRIEND_ROBOT)):
+    def __init__(self, team_color, robot_ids=range(config.NUM_FRIEND_ROBOT)):
         # type: (str, objects.Objects, List[int]) -> None
         self._team_color = team_color
         self._robot_ids = robot_ids
         self._status_publishers = {}  # type: Dict[int, rospy.Publisher]
-        self._objects = objects
 
         for i in self._robot_ids:
             publisher = rospy.Publisher(
@@ -32,7 +31,5 @@ class WorldModelStatusPublisher(object):
         all_robot_status = strat.get_all_robot_status()
 
         for robot_id in all_robot_status.keys():
-            self._objects.robot[robot_id].set_future_position(all_robot_status[robot_id].pid_goal_pos_x, all_robot_status[robot_id].pid_goal_pos_y)
-
             self._status_publishers[robot_id].publish(
                 all_robot_status[robot_id])
