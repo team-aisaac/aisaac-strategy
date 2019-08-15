@@ -315,7 +315,7 @@ class Calculation():
             self.L_G = 0
 
         # ボールがハーフラインよりも敵陣側（壁が一台）かつ1台で守れる範囲：パターン1
-        if (ball_x > 0) and (((self.line_up_r_y - self.line_down_r_y)**2 + (self.line_up_r_x - self.line_down_r_x)**2) <= 4.0*((self.L_G + self.robot_r)**2)):
+        if (ball_x > 0.5) and (((self.line_up_r_y - self.line_down_r_y)**2 + (self.line_up_r_x - self.line_down_r_x)**2) <= 4.0*((self.L_G + self.robot_r)**2)):
             def1_pos_y = (self.line_up_r_y + self.line_down_r_y)/2.0
             def1_pos_x = (self.line_up_r_x + self.line_down_r_x)/2.0
             def2_pos_y = functions.calculate_internal_dividing_point_vector_args(self.ball_params.get_current_position(), config.GOAL_CENTER, 1, 1)[1]
@@ -345,7 +345,7 @@ class Calculation():
         else:
             t_2 = (self.L_G + self.robot_r)/math.sqrt((self.line_up_r_y - self.line_down_r_y)**2 + (self.line_up_r_x - self.line_down_r_x)**2)
             # 1台の時
-            if ball_x > 0.0:
+            if ball_x > 0.5:
                 # 右サイドにボールがある
                 if ball_y > 0:
                     def1_pos_y = self.line_down_r_y + (self.line_up_r_y - self.line_down_r_y)*t_2
