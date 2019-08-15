@@ -384,7 +384,100 @@ class RobotPid(object):
 
         return 1
 
-    def pid_linear(self, goal_pos_x, goal_pos_y, goal_pos_theta):
+
+    def _clip_penalty_area(self, goal_pos_x, goal_pos_y, offset=0.0):
+        """
+        Parameters
+        ----------
+        goal_pos_x, goal_pos_y 省略
+        offset: float offsetメートル分ペナルティエリアが各辺に対して広いと仮定して計算する
+
+        Return
+        ----------
+        goal_pos_x, goal_pos_y: (float, float) 自分-目的地の直線とペナルティエリアの交点の座標を返す
+        """
+
+        in_penalty_area = functions.in_penalty_area((goal_pos_x, goal_pos_y), offset=offset)
+
+        if not in_penalty_area:
+            return goal_pos_x, goal_pos_y
+
+        penal_area_points = {}
+        penal_area_points['friend'] = {
+            'left_bot': [-6.0 - offset, -1.2 - offset],
+            'right_bot': [-4.8 + offset, -1.2 - offset],
+            'right_top': [-4.8 + offset, 1.2 + offset],
+            'left_top': [-6.0 - offset, 1.2 + offset],
+        }
+        penal_area_points['enemy'] = {
+            'right_top': [6.0 + offset, 1.2 + offset],
+            'left_top': [4.8 - offset, 1.2 + offset],
+            'left_bot': [4.8 + offset, -1.2 - offset],
+            'right_bot': [6.0 + offset, -1.2 - offset],
+        }
+
+        robo_x, robo_y = self.ctrld_robot.get_current_position()
+        line_robot_to_goal = \
+            functions.line_parameters(robo_x, robo_y, goal_pos_x, goal_pos_y)
+
+        line_penal_dict = {}
+
+        line_penal_dict['friend'] = {}
+        line_penal_dict['friend']['front'] = functions.line_parameters_vector_args(
+            penal_area_points['friend']['right_bot'],
+            penal_area_points['friend']['right_top']
+        )
+        line_penal_dict['friend']['top'] = functions.line_parameters_vector_args(
+            penal_area_points['friend']['left_top'],
+            penal_area_points['friend']['right_top'],
+        )
+        line_penal_dict['friend']['bot'] = functions.line_parameters_vector_args(
+            penal_area_points['friend']['left_bot'],
+            penal_area_points['friend']['right_bot'],
+        )
+
+        line_penal_dict['enemy'] = {}
+        line_penal_dict['enemy']['front'] = functions.line_parameters_vector_args(
+            penal_area_points['enemy']['left_bot'],
+            penal_area_points['enemy']['left_top']
+        )
+        line_penal_dict['enemy']['top'] = functions.line_parameters_vector_args(
+            penal_area_points['enemy']['left_top'],
+            penal_area_points['enemy']['right_top']
+        )
+        line_penal_dict['enemy']['bot'] = functions.line_parameters_vector_args(
+            penal_area_points['enemy']['left_bot'],
+            penal_area_points['enemy']['right_bot']
+        )
+
+        if in_penalty_area == "friend":
+            line_penal = line_penal_dict['friend']
+        else:
+            line_penal = line_penal_dict['enemy']
+
+        clip_pos_xys = []
+        for key in line_penal.keys():
+            tmp_cross_point = functions.cross_point(line_penal[key], line_robot_to_goal)
+            if functions.in_penalty_area(tmp_cross_point, offset=offset + 0.1):
+                clip_pos_xys.append(tmp_cross_point)
+
+        sorted_clip_pos_xys = sorted(clip_pos_xys,
+                                     key=lambda clip_pos_xy: functions.distance_btw_two_points(
+                                         clip_pos_xy,
+                                         self.ctrld_robot.get_current_position()))
+
+        return sorted_clip_pos_xys[0]
+
+    def pid_linear(self, goal_pos_x, goal_pos_y, goal_pos_theta, ignore_penalty_area=False):
+        """
+        Parameters
+        ----------
+        goal_pos_x: float 目的地のx座標
+        goal_pos_y: float 目的地のy座標
+        goal_pos_theta: float 目的の角度
+        ignore_penalty_area: boolean Trueならペナルティエリアに進入する、Falseなら進入しない
+        """
+
         """
         self.recursion_count = 0
         next_pos_x, next_pos_y = self.path_plan(goal_pos_x, goal_pos_y)
@@ -400,10 +493,19 @@ class RobotPid(object):
 
         if self.goal_pos_init_flag == True:
             self.recursion_count = 0
-            
-            self.next_pos_x, self.next_pos_y = self.avoid_penalty_area(goal_pos_x, goal_pos_y)
-            self.next_pos_x, self.next_pos_y = self.avoid_goal(self.next_pos_x, self.next_pos_y)
-            self.next_pos_x, self.next_pos_y = self.path_plan(self.next_pos_x, self.next_pos_y)
+
+            tmp_x = goal_pos_x
+            tmp_y = goal_pos_y
+
+            if not ignore_penalty_area:
+                tmp_x, tmp_y = self._clip_penalty_area(tmp_x, tmp_y, offset=self.ctrld_robot.size_r)
+
+            tmp_x, tmp_y = self.avoid_penalty_area(tmp_x, tmp_y)
+            tmp_x, tmp_y = self.avoid_goal(tmp_x, tmp_y)
+            tmp_x, tmp_y = self.path_plan(tmp_x, tmp_y)
+
+            self.next_pos_x = tmp_x
+            self.next_pos_y = tmp_y
             """
             if goal_pos_x != next_pos_x or goal_pos_y != next_pos_y:
                 goal_pos_x = next_pos_x

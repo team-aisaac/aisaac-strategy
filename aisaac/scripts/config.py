@@ -21,8 +21,12 @@ HAS_A_BALL_DISTANCE_THRESHOLD = 0.03
 
 # フィールド
 FIELD_SIZE = [12., 9]
-GOAL_CENTER = [-6., 0]
-GOAL_LEFT = [-6., 0.62]
-GOAL_RIGHT = [-6., -0.62]
+# 守る(味方)側からみてLRしている
+GOAL_CENTER = [-6.0, 0.0]
+GOAL_LEFT = [-6.0, 0.62]
+GOAL_RIGHT = [-6.0, -0.62]
 
-GOAL_ENEMY_CENTER = [6., 0.]
+# 攻める(味方)側からみてLRしている
+GOAL_ENEMY_CENTER = [6.0, 0.0]
+GOAL_ENEMY_LEFT = [6.0, 0.62]
+GOAL_ENEMY_RIGHT = [6.0, -0.62]

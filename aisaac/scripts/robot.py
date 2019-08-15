@@ -123,6 +123,7 @@ class Robot(object):
                                     self.ctrld_robot.get_future_position()[0],
                                     self.ctrld_robot.get_future_position()[1],
                                     self.ctrld_robot.get_future_orientation())
+
             elif self.status.robot_status == "pass":
                 self.kick.pass_ball(self.ctrld_robot.get_pass_target_position()[0],
                                     self.ctrld_robot.get_pass_target_position()[1])
@@ -134,10 +135,18 @@ class Robot(object):
                 self.kick.pass_ball(self.ctrld_robot.get_pass_target_position()[0],
                                     self.ctrld_robot.get_pass_target_position()[1],
                                     should_wait=True)
+
             elif self.status.robot_status == "shoot":
                 self.kick.shoot_ball()
+            elif self.status.robot_status == "shoot_right":
+                self.kick.shoot_ball(target="right")
+            elif self.status.robot_status == "shoot_left":
+                self.kick.shoot_ball(target="left")
+            elif self.status.robot_status == "shoot_center":
+                self.kick.shoot_ball(target="center")
             elif self.status.robot_status == "prepare_shoot":
                 self.kick.shoot_ball(should_wait=True)
+
             elif self.status.robot_status == "receive":
                 self.kick.receive_ball(self.ctrld_robot.get_future_position()[0],
                                        self.ctrld_robot.get_future_position()[1])
@@ -146,6 +155,7 @@ class Robot(object):
                                                   self.ctrld_robot.get_pass_target_position())
             elif self.status.robot_status == "receive_direct_shoot":
                 self.kick.receive_and_direct_shoot(self.ctrld_robot.get_future_position())
+
             elif self.status.robot_status == "defence1":
                 self.defence.move_defence(
                     self.defence.def1_pos_x, self.defence.def1_pos_y)
@@ -158,8 +168,10 @@ class Robot(object):
             elif self.status.robot_status == "defence4":
                 self.kick.receive_ball(
                     self.defence.def2_pos_x, self.defence.def2_pos_y)
+
             elif self.status.robot_status == "keeper":
                 self.keeper.keeper()
+
             elif self.status.robot_status == "stop":
                 self.reset_cmd()
                 self.status.robot_status = "none"
