@@ -79,7 +79,7 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
 
         # 目標位置近くにボールが行ったら次のステートへ
         change_state = False
-        if distance < succeeded_area and len(pass_positions) > cur_state:
+        if distance < succeeded_area:
             cur_state = cur_state + 1
             self._random_fake_position = self._generate_pass_position()
             change_state = True
