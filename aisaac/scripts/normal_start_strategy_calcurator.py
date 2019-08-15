@@ -117,11 +117,11 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
                 self._dynamic_strategy.set_robot_status(robot_id, status)
                 not_assigned_robot_ids.remove(robot_id)
             elif role == 'LDF':
-                status.status = "defence1"
+                status.status = "defence4"
                 self._dynamic_strategy.set_robot_status(robot_id, status)
                 not_assigned_robot_ids.remove(robot_id)
             elif role == 'RDF':
-                status.status = "defence2"
+                status.status = "defence3"
                 self._dynamic_strategy.set_robot_status(robot_id, status)
                 not_assigned_robot_ids.remove(robot_id)
 
@@ -219,9 +219,9 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
             if robot.get_role() == "GK":
                 status.status = "keeper"
             elif robot.get_role() == "LDF":
-                status.status = "defence1"
+                status.status = "defence4"
             elif robot.get_role() == "RDF":
-                status.status = "defence2"
+                status.status = "defence3"
             elif robot.get_role() == "LFW":
                 #ballの位置に移動
                 status.status = "move_linear"
@@ -289,11 +289,11 @@ class NormalStartKickOffStrategyCalcurator(StrategyCalcuratorBase):
                 self._dynamic_strategy.set_robot_status(robot_id, status)
                 not_assigned_robot_ids.remove(robot_id)
             elif role == 'LDF':
-                status.status = "defence1"
+                status.status = "defence4"
                 self._dynamic_strategy.set_robot_status(robot_id, status)
                 not_assigned_robot_ids.remove(robot_id)
             elif role == 'RDF':
-                status.status = "defence2"
+                status.status = "defence3"
                 self._dynamic_strategy.set_robot_status(robot_id, status)
                 not_assigned_robot_ids.remove(robot_id)
 
@@ -362,9 +362,9 @@ class NormalStartKickOffDefenceStrategyCalcurator(StrategyCalcuratorBase):
             if robot.get_role() == "GK":
                 status.status = "keeper"
             elif robot.get_role() == "LDF":
-                status.status = "defence1"
+                status.status = "defence4"
             elif robot.get_role() == "RDF":
-                status.status = "defence2"
+                status.status = "defence3"
             elif robot.get_role() == "LFW":
                 #敵kickerとballの延長線上に移動
                 status.status = "move_linear"

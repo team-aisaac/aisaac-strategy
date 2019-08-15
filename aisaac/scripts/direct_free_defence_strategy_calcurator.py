@@ -49,9 +49,9 @@ class DirectFreeDefence(StrategyCalcuratorBase):
             if robot.get_role() == "GK":
                 status.status = "keeper"
             elif robot.get_role() == "LDF":
-                status.status = "defence1"
+                status.status = "defence4"
             elif robot.get_role() == "RDF":
-                status.status = "defence2"
+                status.status = "defence3"
             elif robot.get_role() == "LFW":
                 #敵kickerとballの延長線上に移動
                 status.status = "move_linear"
