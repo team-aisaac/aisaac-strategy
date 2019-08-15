@@ -55,7 +55,7 @@ class Robot(object):
         self.pid = RobotPid(self.robot_id, self.objects, self.cmd)
         self.status = RobotStatus(self.pid)
         self.kick = RobotKick(self.pid, self.cmd, self.status)
-        self.defence = RobotDefence(self.status)
+        self.defence = RobotDefence(self.status, self.kick)
         self.keeper = RobotKeeper(self.kick)
 
         # listner 起動
@@ -75,6 +75,7 @@ class Robot(object):
         self.ctrld_robot.handle_loop_callback()
 
         self._command_pub.publish(self.cmd)
+        self.reset_cmd()
 
     def reset_cmd(self):
         default_cmd = robot_commands()
