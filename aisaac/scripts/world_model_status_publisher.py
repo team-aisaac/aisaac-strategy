@@ -24,17 +24,15 @@ class WorldModelStatusPublisher(object):
                 "/" + self._team_color + "/robot_"+str(i)+"/status",
                 Status,
                 queue_size=10)
-            self._status_publishers[i] = publisher
+            self._status_publishers[int(i)] = publisher
 
     def publish_all(self, strat):
         # type: (StrategyBase) -> None
         all_robot_status = strat.get_all_robot_status()
 
-        for robot_id in self._objects.get_robot_ids():
-            if robot_id in self._status_publishers.keys() \
-                    and robot_id in all_robot_status:
-                self._status_publishers[robot_id].publish(
-                    all_robot_status[robot_id])
-            #     rospy.loginfo("publishing strategy for: " + str(robot_id))
-            # else:
-            #     rospy.loginfo_throttle(1, str(robot_id) + "is not in strategy")
+        for robot_id in all_robot_status.keys():
+            if robot_id in self._objects.get_robot_ids():
+                self._status_publishers[int(robot_id)].publish(all_robot_status[int(robot_id)])
+
+    def set_objects(self, objects):
+        self._objects = objects

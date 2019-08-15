@@ -115,6 +115,7 @@ class Robot(object):
                 self.refresh_instances()
 
             if self.ctrld_robot is None:
+                rospy.loginfo_throttle(5, "ctrld_robot is None at node: " + str(self.robot_id))
                 loop_rate.sleep()
                 continue
 

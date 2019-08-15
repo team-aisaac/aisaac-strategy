@@ -152,6 +152,9 @@ class StrategyCalcuratorBase(object):
         else:
             return sorted_enemy_ids[1]
 
+    def set_objects(self, objects):
+        self._objects = objects
+
     @abstractmethod
     def calcurate(self, strategy_context=None):
         # 継承先の関数で実装

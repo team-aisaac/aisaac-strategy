@@ -36,6 +36,7 @@ class WorldModel(object):
 
         """---Referee---"""
         self._referee = Referee(self._objects.team_color)
+
         self._stcalcurator = {
             'normal_start_normal': NormalStartStrategyCalcurator(self._objects),
             'normal_start_kickoff': NormalStartKickOffStrategyCalcurator(self._objects),
@@ -50,6 +51,7 @@ class WorldModel(object):
         }
         self._status_publisher = WorldModelStatusPublisher(
             self._team_color, self._objects)
+        self.refresh_instances()
 
         # 積分などに必要な情報を保存するオブジェクト
         self._strategy_context = StrategyContext()
@@ -79,7 +81,9 @@ class WorldModel(object):
         self._loop_events = []
 
     def refresh_instances(self):
-        pass
+        self._status_publisher.set_objects(self._objects)
+        for key in self._stcalcurator.keys():
+            self._stcalcurator[key].set_objects(self._objects)
 
     def add_loop_event_listener(self, callback):
         self._loop_events.append(callback)
