@@ -45,10 +45,10 @@ class DirectFreeAttack(IndirectFreeAttack):
 
         ball_x, ball_y = self._objects.ball.get_current_position()
 
-        if functions.distance_btw_two_points([ball_x, ball_y], [5.8, 4.3]) < 0.1:
+        if functions.distance_btw_two_points([ball_x, ball_y], [5.8, 4.3]) < 0.3:
             self.ckl_flg =  True
             self.ckr_flg =  False
-        if functions.distance_btw_two_points([ball_x, ball_y], [5.8, -4.3]) < 0.1:
+        if functions.distance_btw_two_points([ball_x, ball_y], [5.8, -4.3]) < 0.3:
             self.ckl_flg =  False
             self.ckr_flg =  True
 
@@ -118,10 +118,7 @@ class DirectFreeAttack(IndirectFreeAttack):
             elif robot.get_role() == "RDF":
                 status.status = "defence3"
             elif robot.get_role() == "LFW":
-                if self.position_2[1] > 0:
-                    position = [self.position_2[0] + 1.2, self.position_2[1]]
-                else:
-                    position = self.position_3
+                position = [self.position_2[0] + 0.4, self.position_2[1]]
                 if self.passed_2_flg:
                     status.status = "move_linear"
                     # テキトーに移動
@@ -129,9 +126,6 @@ class DirectFreeAttack(IndirectFreeAttack):
                     status.pid_goal_pos_y = 1.5
                 if self.received_2_flg:
                     status.status = "shoot_left"
-                    # status.status = "pass"
-                    # status.pass_target_pos_x = 6.0
-                    # status.pass_target_pos_y = 0.50
                     if self._objects.get_has_a_ball(robot_id) == False:
                         self.passed_2_flg = True
                 else:
@@ -140,27 +134,37 @@ class DirectFreeAttack(IndirectFreeAttack):
                     status.pid_goal_pos_y = position[1]
                     if self._objects.get_has_a_ball(robot_id):
                         self.received_2_flg = True
+                # else:
+                #     status.status = "receive_direct_shoot_left"
+                #     status.pid_goal_pos_x = position[0]
+                #     status.pid_goal_pos_y = position[1]
+                #     if self._objects.get_has_a_ball(robot_id) == False and self.received_2_flg:
+                #         self.passed_2_flg = True
+                #     if self._objects.get_has_a_ball(robot_id):
+                #         self.received_2_flg = True
             elif robot.get_role() == "RFW":
-                if self.position_2[1] > 0:
-                    position = self.position_3
-                else:
-                    position = [self.position_2[0] + 1.2, self.position_2[1]]
+                position = [self.position_3[0] + 0.2, self.position_3[1]]
                 if self.passed_3_flg:
                     status.status = "move_linear"
                     # テキトーに移動
                     status.pid_goal_pos_x = 2.0
                     status.pid_goal_pos_y = -1.5
-                if self.received_3_flg:
-                    status.status = "shoot_right"
-                    # status.status = "pass"
-                    # status.pass_target_pos_x = 6.0
-                    # status.pass_target_pos_y = -0.50
-                    if self._objects.get_has_a_ball(robot_id) == False:
-                        self.passed_3_flg = True
+                # if self.received_3_flg:
+                #     status.status = "shoot_right"
+                #     if self._objects.get_has_a_ball(robot_id) == False:
+                #         self.passed_3_flg = True
+                # else:
+                #     status.status = "receive"
+                #     status.pid_goal_pos_x = position[0]
+                #     status.pid_goal_pos_y = position[1]
+                #     if self._objects.get_has_a_ball(robot_id):
+                #         self.received_3_flg = True
                 else:
-                    status.status = "receive"
+                    status.status = "receive_direct_shoot_left"
                     status.pid_goal_pos_x = position[0]
                     status.pid_goal_pos_y = position[1]
+                    if self._objects.get_has_a_ball(robot_id) == False and self.received_3_flg:
+                        self.passed_3_flg = True
                     if self._objects.get_has_a_ball(robot_id):
                         self.received_3_flg = True
             else:
@@ -193,10 +197,7 @@ class DirectFreeAttack(IndirectFreeAttack):
                     if self.received_1_flg and self._objects.get_has_a_ball(robot_id) == False:
                         self.passed_1_flg = True
             elif robot.get_role() == "LFW":
-                if self.position_2[1] > 0:
-                    position = [self.position_2[0] + 1.2, self.position_2[1]]
-                else:
-                    position = self.position_3
+                position = [self.position_3[0] + 0.2, self.position_3[1]]
                 if self.passed_2_flg:
                     status.status = "move_linear"
                     # テキトーに移動
@@ -216,10 +217,7 @@ class DirectFreeAttack(IndirectFreeAttack):
                     if self._objects.get_has_a_ball(robot_id):
                         self.received_2_flg = True
             elif robot.get_role() == "RFW":
-                if self.position_2[1] > 0:
-                    position = self.position_3
-                else:
-                    position = [self.position_2[0] + 1.2, self.position_2[1]]
+                position = [self.position_2[0] + 0.4, self.position_2[1]]
                 if self.passed_3_flg:
                     status.status = "move_linear"
                     # テキトーに移動
