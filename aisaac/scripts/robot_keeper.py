@@ -18,6 +18,7 @@ class RobotKeeper(object):
         self.goal_right = [6, -0.620]
         self.goal_left = [6, 0.620]
         self.r_offset = self.ctrld_robot.size_r
+        self.objects = kick.pid.objects
 
 
     def calc_keeper_position(self, defense_point_x, defense_point_y):
@@ -86,42 +87,42 @@ class RobotKeeper(object):
 
         if self.team_side == "right":
             if self.goal_right[1] < self.ball_params.get_current_position()[1] < self.goal_left[1]:
-                for i in range(len(self.friend)):
+                for i in self.objects.get_active_robot_ids():
                     if i != self.robot_id:
                         right_line, left_line = self.calc_line(self.team_side, self.friend[i].get_current_position()[1])
                         if self.friend[i].get_current_position()[0] > right_line \
                             and self.friend[i].get_current_position()[0] > left_line:
                             friend_obstacle.append(i)
 
-                for i in range(len(self.enemy)):
+                for i in self.objects.get_active_enemy_ids():
                     right_line, left_line = self.calc_line(self.team_side, self.enemy[i].get_current_position()[1])
                     if self.enemy[i].get_current_position()[0] > right_line \
                         and self.enemy[i].get_current_position()[0] > left_line:
                         enemy_obstacle.append(i)
 
             if self.ball_params.get_current_position()[1] < self.goal_right[1]:
-                for i in range(len(self.friend)):
+                for i in self.objects.get_active_robot_ids():
                     if i != self.robot_id:
                         right_line, left_line = self.calc_line(self.team_side, self.friend[i].get_current_position()[1])
                         if self.friend[i].get_current_position()[0] < right_line \
                             and self.friend[i].get_current_position()[0] > left_line:
                             friend_obstacle.append(i)
 
-                for i in range(len(self.enemy)):
+                for i in self.objects.get_active_enemy_ids():
                     right_line, left_line = self.calc_line(self.team_side, self.enemy[i].get_current_position()[1])
                     if self.enemy[i].get_current_position()[0] < right_line \
                         and self.enemy[i].get_current_position()[0] > left_line:
                         enemy_obstacle.append(i)
 
             if self.goal_left[1] < self.ball_params.get_current_position()[1]:
-                for i in range(len(self.friend)):
+                for i in self.objects.get_active_robot_ids():
                     if i != self.robot_id:
                         right_line, left_line = self.calc_line(self.team_side, self.friend[i].get_current_position()[1])
                         if self.friend[i].get_current_position()[0] > right_line \
                             and self.friend[i].get_current_position()[0] < left_line:
                             friend_obstacle.append(i)
 
-                for i in range(len(self.enemy)):
+                for i in self.objects.get_active_enemy_ids():
                     right_line, left_line = self.calc_line(self.team_side, self.enemy[i].get_current_position()[1])
                     if self.enemy[i].get_current_position()[0] > right_line \
                         and self.enemy[i].get_current_position()[0] < left_line:
@@ -130,42 +131,42 @@ class RobotKeeper(object):
 
         else:
             if self.goal_right[1] < self.ball_params.get_current_position()[1] < self.goal_left[1]:
-                for i in range(len(self.friend)):
+                for i in self.objects.get_active_robot_ids():
                     if i != self.robot_id:
                         right_line, left_line = self.calc_line(self.team_side, self.friend[i].get_current_position()[1])
                         if self.friend[i].get_current_position()[0] < right_line \
                             and self.friend[i].get_current_position()[0] < left_line:
                             friend_obstacle.append(i)
 
-                for i in range(len(self.enemy)):
+                for i in self.objects.get_active_enemy_ids():
                     right_line, left_line = self.calc_line(self.team_side, self.enemy[i].get_current_position()[1])
                     if self.enemy[i].get_current_position()[0] < right_line \
                         and self.enemy[i].get_current_position()[0] < left_line:
                         enemy_obstacle.append(i)
 
             if self.ball_params.get_current_position()[1] < self.goal_right[1]:
-                for i in range(len(self.friend)):
+                for i in self.objects.get_active_robot_ids():
                     if i != self.robot_id:
                         right_line, left_line = self.calc_line(self.team_side, self.friend[i].get_current_position()[1])
                         if self.friend[i].get_current_position()[0] < right_line \
                             and self.friend[i].get_current_position()[0] > left_line:
                             friend_obstacle.append(i)
 
-                for i in range(len(self.enemy)):
+                for i in self.objects.get_active_enemy_ids():
                     right_line, left_line = self.calc_line(self.team_side, self.enemy[i].get_current_position()[1])
                     if self.enemy[i].get_current_position()[0] < right_line \
                         and self.enemy[i].get_current_position()[0] > left_line:
                         enemy_obstacle.append(i)
 
             if self.goal_left[1] < self.ball_params.get_current_position()[1]:
-                for i in range(len(self.friend)):
+                for i in self.objects.get_active_robot_ids():
                     if i != self.robot_id:
                         right_line, left_line = self.calc_line(self.team_side, self.friend[i].get_current_position()[1])
                         if self.friend[i].get_current_position()[0] > right_line \
                             and self.friend[i].get_current_position()[0] < left_line:
                             friend_obstacle.append(i)
 
-                for i in range(len(self.enemy)):
+                for i in self.objects.get_active_enemy_ids():
                     right_line, left_line = self.calc_line(self.team_side, self.enemy[i].get_current_position()[1])
                     if self.enemy[i].get_current_position()[0] > right_line \
                         and self.enemy[i].get_current_position()[0] < left_line:

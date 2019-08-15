@@ -15,6 +15,7 @@ class RobotPid(object):
         self.friend = objects.robot
         self.enemy = objects.enemy
         self.ball_params = objects.ball
+        self.objects = objects
         self.cmd = cmd
 
         self.goal_pos_init_flag = True
@@ -68,18 +69,18 @@ class RobotPid(object):
     def collision_detection(self, goal_pos_x, goal_pos_y):
         a, b, c = functions.line_parameters(self.ctrld_robot.get_current_position()[0], self.ctrld_robot.get_current_position()[1], goal_pos_x, goal_pos_y)
         if a != 0 and b != 0:
-            for i in range(len(self.friend)):
+            for i in self.objects.get_active_robot_ids():
                 if i != self.robot_id:
-                    distance = functions.distance_of_a_point_and_a_straight_line(self.friend[i].get_current_position()[0], self.friend[i].get_current_position()[1], a, b, c)
+                    distance = functions.distance_of_a_point_and_a_straight_line(self.objects.get_robot_by_id(i).get_current_position()[0], self.objects.get_robot_by_id(i).get_current_position()[1], a, b, c)
                     if distance < self.ctrld_robot.size_r * 3:
-                        x = (-self.friend[i].get_current_position()[1] * b + (b**2 / a) * self.friend[i].get_current_position()[0] - c) / (a + b**2 / a)
+                        x = (-self.objects.get_robot_by_id(i).get_current_position()[1] * b + (b**2 / a) * self.objects.get_robot_by_id(i).get_current_position()[0] - c) / (a + b**2 / a)
                         y = (-a * x -c) / b
                         if (self.ctrld_robot.get_current_position()[0] < x < goal_pos_x \
                             or self.ctrld_robot.get_current_position()[0] > x > goal_pos_x) \
                             and (self.ctrld_robot.get_current_position()[1] < y < goal_pos_y \
                             or self.ctrld_robot.get_current_position()[1] > y > goal_pos_y):
 
-                            return True, x, y, self.friend[i].get_current_position()[0] , self.friend[i].get_current_position()[1], distance
+                            return True, x, y, self.objects.get_robot_by_id(i).get_current_position()[0] , self.objects.get_robot_by_id(i).get_current_position()[1], distance
 
             for j in range(len(self.enemy)):
                 distance = functions.distance_of_a_point_and_a_straight_line(self.enemy[j].get_current_position()[0], self.enemy[j].get_current_position()[1], a, b, c)

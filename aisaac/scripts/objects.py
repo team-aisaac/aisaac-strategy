@@ -112,8 +112,8 @@ class Objects(object):
                 return robot.get_id()
 
     def get_active_robot_ids(self):
-        #return copy.deepcopy(self.active_robot_ids)
-        return copy.deepcopy(self._robot_ids)
+        return copy.deepcopy(self._active_robot_ids)
+        # return copy.deepcopy(self._robot_ids)
 
     def get_active_enemy_ids(self):
         return copy.deepcopy(self._active_enemy_ids)
