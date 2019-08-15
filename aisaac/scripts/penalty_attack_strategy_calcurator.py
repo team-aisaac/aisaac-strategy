@@ -59,9 +59,9 @@ class PenaltyAttack(StrategyCalcuratorBase):
             if robot.get_role() == "GK":
                 status.status = "keeper"
             elif robot.get_role() == "LDF":
-                status.status = "defence1"
+                status.status = "defence3"
             elif robot.get_role() == "RDF":
-                status.status = "defence2"
+                status.status = "defence4"
             elif robot.get_role() == "LFW":
                 #敵kickerとballの延長線上に移動
                 status.status = "move_linear"
@@ -75,7 +75,7 @@ class PenaltyAttack(StrategyCalcuratorBase):
                 status.status = "none"
 
             if  robot_id == active_robot_ids[0]:
-                status.status = "shoot"
+                status.status = "penalty_shoot"
 
             self._dynamic_strategy.set_robot_status(robot_id, status)
 
