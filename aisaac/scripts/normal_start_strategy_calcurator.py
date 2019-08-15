@@ -110,6 +110,9 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
 
         # Defence系をアサイン
         for robot_id in tmp_not_assigned_robot_ids:
+            if len(not_assigned_robot_ids) <= 1:
+                break
+
             status = Status()
             role = self._objects.get_robot_by_id(robot_id).get_role()
             if role == 'GK':
@@ -282,6 +285,10 @@ class NormalStartKickOffStrategyCalcurator(StrategyCalcuratorBase):
         tmp_not_assigned_robot_ids = copy.deepcopy(not_assigned_robot_ids)
 
         for robot_id in tmp_not_assigned_robot_ids:
+
+            if len(not_assigned_robot_ids) <= 2:
+                break
+
             status = Status()
             role = self._objects.get_robot_by_id(robot_id).get_role()
             if role == 'GK':
@@ -302,7 +309,11 @@ class NormalStartKickOffStrategyCalcurator(StrategyCalcuratorBase):
         for idx, robot_id in enumerate(robots_near_to_ball):
             status = Status()
             if idx == 0:
-                status.status = "pass"
+                if len(robots_near_to_ball) == 1:
+                    status.status = "shoot"
+                else:
+                    status.status = "pass"
+
                 if self._receiver_id is not None:
                     receiver_pos = self._objects.robot[self._receiver_id].get_current_position()
                     receiver_area = 1.0
@@ -310,7 +321,7 @@ class NormalStartKickOffStrategyCalcurator(StrategyCalcuratorBase):
                         if not self._prepare_pass:
                             self._prepare_pass_start_time = rospy.Time.now()
                             self._prepare_pass = True
-                        if (rospy.Time.now() - self._prepare_pass_start_time).to_sec() > 1.0:
+                        if (rospy.Time.now() - self._prepare_pass_start_time).to_sec() > 3.0:
                             status.status = "pass"
                         else:
                             status.status = "prepare_pass"
