@@ -170,12 +170,12 @@ class IndirectFreeAttack(StrategyCalcuratorBase):
 
 
     def calculate_1(self, strategy_context=None):
-        print 'passed_1_flg:', self.passed_1_flg
-        print 'received_1_flg:', self.received_1_flg
-        print 'passed_2_flg:',self.passed_2_flg
-        print 'received_2_flg:', self.received_2_flg
-        print 'passed_3_flg:', self.passed_3_flg
-        print 'received_3_flg:', self.received_3_flg
+        # print 'passed_1_flg:', self.passed_1_flg
+        # print 'received_1_flg:', self.received_1_flg
+        # print 'passed_2_flg:',self.passed_2_flg
+        # print 'received_2_flg:', self.received_2_flg
+        # print 'passed_3_flg:', self.passed_3_flg
+        # print 'received_3_flg:', self.received_3_flg
         """ハーフラインより左側の戦略（の予定）"""
         ball_x, ball_y = self._objects.ball.get_current_position()
         active_enemy_ids = self._get_active_enemy_ids()
@@ -204,13 +204,15 @@ class IndirectFreeAttack(StrategyCalcuratorBase):
             elif robot_id == self.position_1_nearest_id:
                 if self.received_3_flg:
                     #シュートを打つ子がボールを受け取ったあとはこの機体もシュート体制に入る(おこぼれを狙うイメージ)
-                    status.status = "pass"
+                    #status.status = "pass"
                     if self.position_2[1] > 0.:
-                        status.pass_target_pos_x = 6.0
-                        status.pass_target_pos_y = 0.55
+                        status.status = "shoot_left"
+                        # status.pass_target_pos_x = 6.0
+                        # status.pass_target_pos_y = 0.55
                     else:
-                        status.pass_target_pos_x = 6.0
-                        status.pass_target_pos_y = -0.55
+                        status.status = "shoot_right"
+                        # status.pass_target_pos_x = 6.0
+                        # status.pass_target_pos_y = -0.55
 
                 elif self.passed_2_flg:
                     #　自分がパスしたあとはゴール前のposition_3に移動
@@ -240,13 +242,15 @@ class IndirectFreeAttack(StrategyCalcuratorBase):
                         status.pid_goal_pos_x, status.pid_goal_pos_y = functions.calculate_internal_dividing_point(self._enemy[nearest_enemy_id].get_current_position()[0], self._enemy[nearest_enemy_id].get_current_position()[1], self._ball_params.get_current_position()[0], self._ball_params.get_current_position()[1], functions.distance_btw_two_points(self._enemy[nearest_enemy_id].get_current_position(), self._ball_params.get_current_position()) + 0.55, -0.55)
                         status.pid_goal_theta = math.atan2( (self._ball_params.get_current_position()[1] - self._robot[3].get_current_position()[1]) , (self._ball_params.get_current_position()[0] - self._robot[2].get_current_position()[0]) )
                 elif self.received_3_flg:
-                    status.status = "pass"
+                    # status.status = "pass"
                     if self.position_3[1] > 0.:
-                        status.pass_target_pos_x = 6.0
-                        status.pass_target_pos_y = 0.55
+                        status.status = "shoot_left"
+                        # status.pass_target_pos_x = 6.0
+                        # status.pass_target_pos_y = 0.55
                     else:
-                        status.pass_target_pos_x = 6.0
-                        status.pass_target_pos_y = -0.55
+                        status.status = "shoot_right"
+                        # status.pass_target_pos_x = 6.0
+                        # status.pass_target_pos_y = -0.55
                     if self._objects.get_has_a_ball(robot_id) == False:
                         self.passed_3_flg = True
                 else:
