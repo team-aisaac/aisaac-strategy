@@ -76,9 +76,9 @@ class DirectFreeAttack(IndirectFreeAttack):
                 status.pass_target_pos_x = self._objects.get_robot_by_role("LFW").get_current_position()[0]
                 status.pass_target_pos_y = self._objects.get_robot_by_role("LFW").get_current_position()[1]
             elif robot.get_role() == "LDF":
-                status.status = "defence1"
+                status.status = "defence3"
             elif robot.get_role() == "RDF":
-                status.status = "defence2"
+                status.status = "defence4"
             elif robot.get_role() == "LFW":
                 #敵kickerとballの延長線上に移動
                 status.status = "move_linear"
@@ -105,7 +105,7 @@ class DirectFreeAttack(IndirectFreeAttack):
             elif robot.get_role() == "LDF":
                 if self.passed_1_flg:
                     # パス完了した場合
-                    status.status = "defence1"
+                    status.status = "defence3"
                 else:
                     # パス完了する前 パス先をposition1にする、パス完了したら完了flgを立てる
                     status.status = "pass"
@@ -116,7 +116,7 @@ class DirectFreeAttack(IndirectFreeAttack):
                     if self.received_1_flg and self._objects.get_has_a_ball(robot_id) == False:
                         self.passed_1_flg = True
             elif robot.get_role() == "RDF":
-                status.status = "defence2"
+                status.status = "defence4"
             elif robot.get_role() == "LFW":
                 if self.position_2[1] > 0:
                     position = [self.position_2[0] + 1.2, self.position_2[1]]
@@ -178,11 +178,11 @@ class DirectFreeAttack(IndirectFreeAttack):
             if robot.get_role() == "GK":
                 status.status = "keeper"
             elif robot.get_role() == "LDF":
-                status.status = "defence1"
+                status.status = "defence3"
             elif robot.get_role() == "RDF":
                 if self.passed_1_flg:
                     # パス完了した場合
-                    status.status = "defence2"
+                    status.status = "defence4"
                 else:
                     # パス完了する前 パス先をposition1にする、パス完了したら完了flgを立てる
                     status.status = "pass"
