@@ -72,7 +72,7 @@ class DirectFreeAttack(IndirectFreeAttack):
             status = Status()
             robot = self._objects.get_robot_by_id(robot_id)
             if robot.get_role() == "GK":
-                status.status = "pass_chip"
+                status.status = "keeper_pass_chip"
                 status.pass_target_pos_x = self._objects.get_robot_by_role("LFW").get_current_position()[0]
                 status.pass_target_pos_y = self._objects.get_robot_by_role("LFW").get_current_position()[1]
             elif robot.get_role() == "LDF":

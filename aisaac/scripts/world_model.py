@@ -194,7 +194,7 @@ def run_world_model():
                 strat_calcrator = world_model.get_strategy_calcurator(
                     'normal_start_kickoff_defence')
                 strat = strat_calcrator.calcurate(strat_ctx, referee_branch)
-                
+
             elif referee_branch == "PENALTY_ATTACK":
                 if not strat_ctx.get_last("penalty_finish", namespace="world_model"):
                     strat_calcrator = world_model.get_strategy_calcurator(

@@ -17,6 +17,7 @@ class StopStrategyCalculator(StrategyCalcuratorBase):
     def calcurate(self, strategy_context=None):
         # (context.StrategyContext) -> strategy.StrategyBase
         strategy_context.update("placed_ball_position", self._ball_params.get_current_position(), namespace="world_model")
+        strategy_context.update("enemy_kick", False, namespace="world_model")
         self._dynamic_strategy.clone_from(self._static_strategies['initial'])
 
         rospy.set_param("/robot_max_velocity", 1.5)
@@ -31,7 +32,7 @@ class StopStrategyCalculator(StrategyCalcuratorBase):
 
             # 閾値を超える/超えないで振動を防ぐためのoffset
             offset = 0.0
-            if distance <= (target_distance + offset): 
+            if distance <= (target_distance + offset):
                 status = Status()
                 status.status = "move_linear"
                 vector = np.array(config.GOAL_CENTER) - np.array(ball.get_current_position())
