@@ -72,7 +72,7 @@ class RobotKick(object):
         self.pid.pid_linear(self.ball_params.get_current_position()[0], self.ball_params.get_current_position()[1], self.pose_theta, ignore_penalty_area=ignore_penalty_area)
         #self.cmd.vel_surge = 3
 
-    def shoot_ball(self, should_wait=False, target="random"):
+    def shoot_ball(self, should_wait=False, target="random", ignore_penalty_area=False):
         """
         Parameters
         ----------
@@ -89,11 +89,11 @@ class RobotKick(object):
         post_offset = 0.2
 
         if _target == "center":
-            self.pass_ball(config.GOAL_ENEMY_CENTER[0], config.GOAL_ENEMY_CENTER[1], should_wait=should_wait, is_shoot=True)
+            self.pass_ball(config.GOAL_ENEMY_CENTER[0], config.GOAL_ENEMY_CENTER[1], should_wait=should_wait, is_shoot=True, ignore_penalty_area=ignore_penalty_area)
         elif _target == "left":
-            self.pass_ball(config.GOAL_ENEMY_LEFT[0], config.GOAL_ENEMY_LEFT[1] - post_offset, should_wait=should_wait, is_shoot=True)
+            self.pass_ball(config.GOAL_ENEMY_LEFT[0], config.GOAL_ENEMY_LEFT[1] - post_offset, should_wait=should_wait, is_shoot=True, ignore_penalty_area=ignore_penalty_area)
         elif _target == "right":
-            self.pass_ball(config.GOAL_ENEMY_RIGHT[0], config.GOAL_ENEMY_RIGHT[1] + post_offset, should_wait=should_wait, is_shoot=True)
+            self.pass_ball(config.GOAL_ENEMY_RIGHT[0], config.GOAL_ENEMY_RIGHT[1] + post_offset, should_wait=should_wait, is_shoot=True, ignore_penalty_area=ignore_penalty_area)
 
 
     def pass_ball(self, target_x, target_y, should_wait=False, is_shoot=False, is_tip_kick=False, ignore_penalty_area=False):

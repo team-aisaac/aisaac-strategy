@@ -65,7 +65,7 @@ class Robot(object):
         self.status_listener()
         self.set_pid_server()
         self.def_pos_listener()
-        rospy.Timer(rospy.Duration(0.1), self.pid.replan_timer_callback)
+        rospy.Timer(rospy.Duration(1.0/30.0), self.pid.replan_timer_callback)
 
 
     def store_and_publish_commands(self):
@@ -146,6 +146,15 @@ class Robot(object):
                 self.kick.shoot_ball(target="center")
             elif self.status.robot_status == "prepare_shoot":
                 self.kick.shoot_ball(should_wait=True)
+
+            elif self.status.robot_status == "penalty_shoot":
+                self.kick.shoot_ball(ignore_penalty_area=True)
+            elif self.status.robot_status == "penalty_shoot_right":
+                self.kick.shoot_ball(target="right", ignore_penalty_area=True)
+            elif self.status.robot_status == "penalty_shoot_left":
+                self.kick.shoot_ball(target="left", ignore_penalty_area=True)
+            elif self.status.robot_status == "penalty_shoot_center":
+                self.kick.shoot_ball(target="center", ignore_penalty_area=True)
 
             elif self.status.robot_status == "receive":
                 self.kick.receive_ball(self.ctrld_robot.get_future_position()[0],

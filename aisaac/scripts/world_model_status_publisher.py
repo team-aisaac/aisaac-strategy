@@ -14,7 +14,7 @@ except:
 
 class WorldModelStatusPublisher(object):
     def __init__(self, team_color, robot_ids=range(config.NUM_FRIEND_ROBOT)):
-        # type: (str, List[int]) -> None
+        # type: (str, objects.Objects, List[int]) -> None
         self._team_color = team_color
         self._robot_ids = robot_ids
         self._status_publishers = {}  # type: Dict[int, rospy.Publisher]
