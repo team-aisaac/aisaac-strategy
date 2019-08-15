@@ -24,6 +24,7 @@ add_message_files(
   Status.msg
   Ball_sub_params.msg
   Def_pos.msg
+  Shutdown.msg
 )
 
 include_directories(
