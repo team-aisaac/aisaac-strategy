@@ -39,7 +39,7 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
         ----------
         offset: float このxより前側にパスコースを作る
         """
-        tmp_x = offset + (4.8 - offset) * (-0.5 + np.random.rand())
+        tmp_x = offset + (4.8 - offset) * np.random.rand()
         tmp_y = 8.0 * (-0.5 + np.random.rand())
         return tmp_x, tmp_y
 
@@ -51,6 +51,8 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
             tmp_pass_pos = self._generate_pass_position(tmp_pass_pos[0])
             pass_positions.append(tmp_pass_pos)
         pass_positions.append([6.0, 0.0])
+
+        rospy.loginfo("パス経路："+str(pass_positions))
 
         return pass_positions
 
