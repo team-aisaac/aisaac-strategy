@@ -30,15 +30,20 @@ class StopStrategyCalculator(StrategyCalcuratorBase):
             if robot is None:
                 continue
 
+            status = self._dynamic_strategy.get_robot_status(robot_id)
+            target_pos_xy = (status.pid_goal_pos_x, status.pid_goal_pos_y)
+
             target_distance = 0.5 + self._objects.robot[0].size_r
-            distance = functions.distance_btw_two_points(robot.get_current_position(), ball.get_current_position())
+            distance_ball_robot = functions.distance_btw_two_points(robot.get_current_position(), ball.get_current_position())
+            distance_ball_target_pos = functions.distance_btw_two_points(target_pos_xy, ball.get_current_position())
 
             # 閾値を超える/超えないで振動を防ぐためのoffset
             offset = 0.0
-            if distance <= (target_distance + offset):
+            if distance_ball_robot < (target_distance + offset) \
+                    and distance_ball_target_pos < (target_distance + offset):
                 status = Status()
                 status.status = "move_linear"
-                vector = np.array(config.GOAL_CENTER) - np.array(ball.get_current_position())
+                vector = np.array(target_pos_xy) - np.array(ball.get_current_position())
                 vector = (target_distance / np.linalg.norm(vector)) * vector
                 vector = np.array(ball.get_current_position()) + vector
                 status.pid_goal_pos_x = vector[0]

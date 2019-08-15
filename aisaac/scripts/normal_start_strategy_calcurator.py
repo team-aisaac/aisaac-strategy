@@ -33,18 +33,23 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
         self._pass_positions = None
         self._random_fake_position = self._generate_pass_position()
 
-    def _generate_pass_position(self):
-        tmp_x = 2.6 + 4.0 * (-0.5 + np.random.rand())
-        tmp_y = 0.0 + 3.0 * (-0.5 + np.random.rand())
+    def _generate_pass_position(self, offset=0.0):
+        """
+        Parameters
+        ----------
+        offset: float このxより前側にパスコースを作る
+        """
+        tmp_x = offset + (4.8 - offset) * (-0.5 + np.random.rand())
+        tmp_y = 8.0 * (-0.5 + np.random.rand())
         return tmp_x, tmp_y
 
     def _generate_pass_positions(self):
         length_pass_stage = np.random.choice([0,1,2])
         pass_positions = []
+        tmp_pass_pos = (0.0, 0.0)
         for i in range(length_pass_stage):
-            tmp_x = 2.6 + 4.0 * (-0.5 + np.random.rand())
-            tmp_y = 0.0 + 3.0 * (-0.5 + np.random.rand())
-            pass_positions.append(self._generate_pass_position())
+            tmp_pass_pos = self._generate_pass_position(tmp_pass_pos[0])
+            pass_positions.append(tmp_pass_pos)
         pass_positions.append([6.0, 0.0])
 
         return pass_positions
@@ -110,10 +115,16 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
 
         # Defence系をアサイン
         for robot_id in tmp_not_assigned_robot_ids:
-            if len(not_assigned_robot_ids) <= 1:
-                break
 
             status = Status()
+
+            # 2台以下ならとりあえずGKをアサイン
+            if len(not_assigned_robot_ids) <= 2:
+                status.status = "keeper"
+                self._dynamic_strategy.set_robot_status(robot_id, status)
+                not_assigned_robot_ids.remove(robot_id)
+                break
+
             role = self._objects.get_robot_by_id(robot_id).get_role()
             if role == 'GK':
                 status.status = "keeper"
