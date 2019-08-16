@@ -32,13 +32,19 @@ include_directories(
   include/${PROJECT_NAME}
 )
 
-add_executable(command_senders
-    src/command_senders.cpp
+add_executable(command_senders_blue
+    src/command_senders_blue.cpp
+)
+add_executable(command_senders_yellow
+    src/command_senders_yellow.cpp
 )
 add_executable(command_sender
     src/command_sender.cpp
 )
-target_link_libraries(command_senders
+target_link_libraries(command_senders_blue
+    ${catkin_LIBRARIES}
+)
+target_link_libraries(command_senders_yellow
     ${catkin_LIBRARIES}
 )
 target_link_libraries(command_sender
