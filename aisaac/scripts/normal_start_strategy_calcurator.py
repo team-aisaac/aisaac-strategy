@@ -33,19 +33,26 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
         self._pass_positions = None
         self._random_fake_position = self._generate_pass_position()
 
-    def _generate_pass_position(self):
-        tmp_x = 2.6 + 4.0 * (-0.5 + np.random.rand())
-        tmp_y = 0.0 + 3.0 * (-0.5 + np.random.rand())
+    def _generate_pass_position(self, offset=0.0):
+        """
+        Parameters
+        ----------
+        offset: float このxより前側にパスコースを作る
+        """
+        tmp_x = offset + (4.8 - offset) * np.random.rand()
+        tmp_y = 8.0 * (-0.5 + np.random.rand())
         return tmp_x, tmp_y
 
     def _generate_pass_positions(self):
         length_pass_stage = np.random.choice([0,1,2])
         pass_positions = []
+        tmp_pass_pos = (0.0, 0.0)
         for i in range(length_pass_stage):
-            tmp_x = 2.6 + 4.0 * (-0.5 + np.random.rand())
-            tmp_y = 0.0 + 3.0 * (-0.5 + np.random.rand())
-            pass_positions.append(self._generate_pass_position())
+            tmp_pass_pos = self._generate_pass_position(tmp_pass_pos[0])
+            pass_positions.append(tmp_pass_pos)
         pass_positions.append([6.0, 0.0])
+
+        rospy.loginfo("パス経路："+str(pass_positions))
 
         return pass_positions
 
@@ -70,7 +77,7 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
             target_pos = pass_positions[last_state]
         else:
             # パスの目標ではなく、受け取る側のロボットが実際にリーチした場所を目標とする
-            target_pos = self._objects.robot[self._receiver_id].get_current_position()
+            target_pos = self._objects.get_robot_by_id(self._receiver_id).get_current_position()
 
         distance = functions.distance_btw_two_points(ball_pos, target_pos)
         # print("Receiver: "+ str(self._receiver_id) +" Distance:"+str(distance))
@@ -79,7 +86,7 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
 
         # 目標位置近くにボールが行ったら次のステートへ
         change_state = False
-        if distance < succeeded_area and len(pass_positions) > cur_state:
+        if distance < succeeded_area:
             cur_state = cur_state + 1
             self._random_fake_position = self._generate_pass_position()
             change_state = True
@@ -110,7 +117,16 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
 
         # Defence系をアサイン
         for robot_id in tmp_not_assigned_robot_ids:
+
             status = Status()
+
+            # 2台以下ならとりあえずGKをアサイン
+            if len(not_assigned_robot_ids) <= 2:
+                status.status = "keeper"
+                self._dynamic_strategy.set_robot_status(robot_id, status)
+                not_assigned_robot_ids.remove(robot_id)
+                break
+
             role = self._objects.get_robot_by_id(robot_id).get_role()
             if role == 'GK':
                 status.status = "keeper"
@@ -141,7 +157,7 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
                     else:
                         status.status = "pass"
                     if self._receiver_id is not None:
-                        receiver_pos = self._objects.robot[self._receiver_id].get_current_position()
+                        receiver_pos = self._objects.get_robot_by_id(self._receiver_id).get_current_position()
                         receiver_area = 1.0
                         if functions.distance_btw_two_points(pass_positions[cur_state], receiver_pos) > receiver_area:
                             if not self._prepare_pass:
@@ -227,14 +243,14 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
                 status.status = "move_linear"
                 status.pid_goal_pos_x = self._ball_params.get_current_position()[0]
                 status.pid_goal_pos_y = self._ball_params.get_current_position()[1]
-                status.pid_goal_theta = math.atan2( (self._ball_params.get_current_position()[1] - self._robot[3].get_current_position()[1]) , (self._ball_params.get_current_position()[0] - self._robot[3].get_current_position()[0]) )
+                status.pid_goal_theta = math.atan2( (self._ball_params.get_current_position()[1] - robot.get_current_position()[1]) , (self._ball_params.get_current_position()[0] - robot.get_current_position()[0]) )
             elif robot.get_role() == "RFW":
                 #フリーで最もゴールに近い敵idを返す
                 status.status = "move_linear"
                 free_enemy_id = self._get_free_enemy_id(4, nearest_enemy_id)
                 status.pid_goal_pos_x = (self._ball_params.get_current_position()[0] + self._enemy[free_enemy_id].get_current_position()[0]) / 2
                 status.pid_goal_pos_y = (self._ball_params.get_current_position()[1] + self._enemy[free_enemy_id].get_current_position()[1]) / 2
-                status.pid_goal_theta = math.atan2( (self._ball_params.get_current_position()[1] - self._robot[4].get_current_position()[1]) , (self._ball_params.get_current_position()[0] - self._robot[4].get_current_position()[0]) )
+                status.pid_goal_theta = math.atan2( (self._ball_params.get_current_position()[1] - robot.get_current_position()[1]) , (self._ball_params.get_current_position()[0] - robot.get_current_position()[0]) )
             else:
                 status.status = "none"
             self._dynamic_strategy.set_robot_status(robot_id, status)
@@ -282,6 +298,10 @@ class NormalStartKickOffStrategyCalcurator(StrategyCalcuratorBase):
         tmp_not_assigned_robot_ids = copy.deepcopy(not_assigned_robot_ids)
 
         for robot_id in tmp_not_assigned_robot_ids:
+
+            if len(not_assigned_robot_ids) <= 2:
+                break
+
             status = Status()
             role = self._objects.get_robot_by_id(robot_id).get_role()
             if role == 'GK':
@@ -302,15 +322,19 @@ class NormalStartKickOffStrategyCalcurator(StrategyCalcuratorBase):
         for idx, robot_id in enumerate(robots_near_to_ball):
             status = Status()
             if idx == 0:
-                status.status = "pass"
+                if len(robots_near_to_ball) == 1:
+                    status.status = "shoot"
+                else:
+                    status.status = "pass"
+
                 if self._receiver_id is not None:
-                    receiver_pos = self._objects.robot[self._receiver_id].get_current_position()
+                    receiver_pos = self._objects.get_robot_by_id(self._receiver_id).get_current_position()
                     receiver_area = 1.0
                     if functions.distance_btw_two_points(pass_pos, receiver_pos) > receiver_area:
                         if not self._prepare_pass:
                             self._prepare_pass_start_time = rospy.Time.now()
                             self._prepare_pass = True
-                        if (rospy.Time.now() - self._prepare_pass_start_time).to_sec() > 1.0:
+                        if (rospy.Time.now() - self._prepare_pass_start_time).to_sec() > 3.0:
                             status.status = "pass"
                         else:
                             status.status = "prepare_pass"

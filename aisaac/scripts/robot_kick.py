@@ -61,7 +61,7 @@ class RobotKick(object):
                                              self.ctrld_robot.get_current_position()) \
                 > self.ctrld_robot.size_r + area \
                 or elapsed_time.to_sec() > 5.0 \
-                or functions.distance_btw_two_points(self.ball_params.get_current_position(), self._dribble_start_pos) > 0.8:
+                or functions.distance_btw_two_points(self.ball_params.get_current_position(), self._dribble_start_pos) > 0.3:
             self.cmd.vel_surge = 0
             self.cmd.vel_sway = 0
             self.cmd.omega = 0
@@ -98,6 +98,7 @@ class RobotKick(object):
         elif _target == "right":
             self.pass_ball(config.GOAL_ENEMY_RIGHT[0], config.GOAL_ENEMY_RIGHT[1] + post_offset, should_wait=should_wait, is_shoot=True, ignore_penalty_area=ignore_penalty_area)
 
+    
 
     def pass_ball(self, target_x, target_y, should_wait=False, is_shoot=False, is_tip_kick=False, ignore_penalty_area=False):
         """

@@ -2,6 +2,7 @@
 # coding:utf-8
 import numpy as np
 import rospy
+import functions
 
 
 class RobotKeeper(object):
@@ -19,6 +20,7 @@ class RobotKeeper(object):
         self.goal_left = [6, 0.620]
         self.r_offset = self.ctrld_robot.size_r
         self.objects = kick.pid.objects
+        self._ball_in_friend_penalty_start_time = rospy.Time.now()
 
 
     def calc_keeper_position(self, defense_point_x, defense_point_y):
@@ -336,6 +338,16 @@ class RobotKeeper(object):
 
 
     def keeper(self):
+        if functions.in_penalty_area(self.ball_params.get_current_position()) == "friend":
+            if (rospy.Time.now() - self._ball_in_friend_penalty_start_time).to_sec() > 3.0:
+                self.kick.pass_ball(self.ctrld_robot.get_pass_target_position()[0],
+                                    self.ctrld_robot.get_pass_target_position()[1],
+                                    is_tip_kick=True,
+                                    ignore_penalty_area=True)
+                return
+        else:
+            self._ball_in_friend_penalty_start_time = rospy.Time.now()
+
         shel_r = []
         shel_l = []
         if self.team_side == "right":

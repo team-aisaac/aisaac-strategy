@@ -33,6 +33,7 @@
   <run_depend>std_msgs</run_depend>
   <run_depend>nav_msgs</run_depend>
   <run_depend>tf</run_depend>
+  <run_depend>message_generation</run_depend>
 
 </package>
 
