@@ -57,10 +57,10 @@ class DirectFreeAttack(IndirectFreeAttack):
             result = self.calculate_goal_kick()
         elif self.ckl_flg:
             # ボールがCK左の位置にあるとき
-            result = self.calculate_corner_kick_left()
+            result = self.calculate_corner_kick_left_2()
         elif self.ckr_flg:
             #　ボールがCK右の位置にあるとき
-            result = self.calculate_corner_kick_right()
+            result = self.calculate_corner_kick_right_2()
         else:
             result = self.calculate_1()
 
@@ -236,6 +236,133 @@ class DirectFreeAttack(IndirectFreeAttack):
                     status.pid_goal_pos_y = position[1]
                     if self._objects.get_has_a_ball(robot_id):
                         self.received_3_flg = True
+            else:
+                status.status = "none"
+            self._dynamic_strategy.set_robot_status(robot_id, status)
+
+        result = self._dynamic_strategy
+        return result
+
+
+
+    def calculate_corner_kick_right_2(self):
+        active_robot_ids = self._get_active_robot_ids()
+        for robot_id in active_robot_ids:
+            status = Status()
+            robot = self._objects.get_robot_by_id(robot_id)
+
+            if self.ball_position_nearest_id == robot_id:
+                if self.passed_1_flg:
+                    # パス完了した場合
+                    if self._objects.robot[robot_id].get_role() == "LDF":
+                        status.status = "defence4"
+                    else:
+                        status.status = "defence3"
+                else:
+                    # パス完了する前 パス先をposition1にする、パス完了したら完了flgを立てる
+                    status.status = "pass"
+                    status.pass_target_pos_x = self._objects.get_robot_by_role(self.lfw_or_rfw).get_current_position()[0]
+                    status.pass_target_pos_y = self._objects.get_robot_by_role(self.lfw_or_rfw).get_current_position()[1]
+                    if self._objects.get_has_a_ball(robot_id):
+                        self.received_1_flg = True
+                    if self.received_1_flg and self._objects.get_has_a_ball(robot_id) == False:
+                        self.passed_1_flg = True
+
+            elif robot_id == self.position_1_nearest_id:
+                position = [self.position_3[0] + 0.2, self.position_3[1]]
+                if self.received_2_flg:
+                    status.status = "shoot_left"
+                    if self._objects.get_has_a_ball(robot_id) == False:
+                        self.passed_2_flg = True
+                else:
+                    status.status = "receive"
+                    status.pid_goal_pos_x = position[0]
+                    status.pid_goal_pos_y = position[1]
+                    if self._objects.get_has_a_ball(robot_id):
+                        self.received_2_flg = True
+
+            elif robot_id == self.position_2_nearest_id:
+                position = [self.position_2[0] + 0.4, self.position_2[1]]
+                if self.received_3_flg:
+                    status.status = "shoot_right"
+                    if self._objects.get_has_a_ball(robot_id) == False:
+                        self.passed_3_flg = True
+                else:
+                    status.status = "receive"
+                    status.pid_goal_pos_x = position[0]
+                    status.pid_goal_pos_y = position[1]
+                    if self._objects.get_has_a_ball(robot_id):
+                        self.received_3_flg = True
+
+            elif robot.get_role() == "GK":
+                status.status = "keeper"
+            elif robot.get_role() == "LDF":
+                status.status = "defence4"
+            elif robot.get_role() == "RDF":
+                status.status = "defence3"
+            else:
+                status.status = "none"
+            self._dynamic_strategy.set_robot_status(robot_id, status)
+
+        result = self._dynamic_strategy
+        return result
+
+    def calculate_corner_kick_left_2(self):
+        active_robot_ids = self._get_active_robot_ids()
+        for robot_id in active_robot_ids:
+            status = Status()
+            robot = self._objects.get_robot_by_id(robot_id)
+
+            if self.ball_position_nearest_id == robot_id:
+                if self.passed_1_flg:
+                    # パス完了した場合
+                    if self._objects.robot[robot_id].get_role() == "LDF":
+                        status.status = "defence4"
+                    else:
+                        status.status = "defence3"
+                else:
+                    # パス完了する前 パス先をposition1にする、パス完了したら完了flgを立てる
+                    status.status = "pass"
+                    status.pass_target_pos_x = self._objects.get_robot_by_role(self.lfw_or_rfw).get_current_position()[0]
+                    status.pass_target_pos_y = self._objects.get_robot_by_role(self.lfw_or_rfw).get_current_position()[1]
+                    if self._objects.get_has_a_ball(robot_id):
+                        self.received_1_flg = True
+                    if self.received_1_flg and self._objects.get_has_a_ball(robot_id) == False:
+                        self.passed_1_flg = True
+
+            elif robot_id == self.position_1_nearest_id:
+                position = [self.position_3[0] + 0.2, self.position_3[1]]
+                if self.received_2_flg:
+                    status.status = "shoot_right"
+                    if self._objects.get_has_a_ball(robot_id) == False:
+                        self.passed_2_flg = True
+                else:
+                    status.status = "receive"
+                    status.pid_goal_pos_x = position[0]
+                    status.pid_goal_pos_y = position[1]
+                    if self._objects.get_has_a_ball(robot_id):
+                        self.received_2_flg = True
+
+            elif robot_id == self.position_2_nearest_id:
+                position = [self.position_2[0] + 0.4, self.position_2[1]]
+                if self.received_3_flg:
+                    status.status = "shoot_left"
+
+                    if self._objects.get_has_a_ball(robot_id) == False:
+                        self.passed_3_flg = True
+                else:
+                    status.status = "receive"
+                    status.pid_goal_pos_x = position[0]
+                    status.pid_goal_pos_y = position[1]
+                    if self._objects.get_has_a_ball(robot_id):
+                        self.received_3_flg = True
+
+            elif robot.get_role() == "GK":
+                status.status = "keeper"
+            elif robot.get_role() == "LDF":
+                status.status = "defence4"
+            elif robot.get_role() == "RDF":
+                status.status = "defence3"
             else:
                 status.status = "none"
             self._dynamic_strategy.set_robot_status(robot_id, status)

@@ -52,7 +52,7 @@ class Objects(object):
             for robot, role in zip(self.robot, roles):
                 robot.set_role(role)
         elif len(self.robot) == 2:
-            roles = ["RFW", "LDF"]
+            roles = ["RFW", "GK"]
             for robot, role in zip(self.robot, roles):
                 robot.set_role(role)
         elif len(self.robot) == 1:
