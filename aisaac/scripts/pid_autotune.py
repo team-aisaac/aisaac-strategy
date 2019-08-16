@@ -213,15 +213,15 @@ if __name__ == '__main__':
 
     main = Main()
 
-    if mode == "rotation":
-        pbounds = {
-                   'Kpr': (1, 10),
-                   'Kdr': (1, 10),
-                   }
-    elif mode == "position":
+    if mode == "position":
         pbounds = {
                    'Kpv': (1, 10),
                    'Kdv': (1, 10),
+                   }
+    else:
+        pbounds = {
+                   'Kpr': (1, 10),
+                   'Kdr': (1, 10),
                    }
     optimizer = BayesianOptimization(
             f=main.main,
