@@ -19,7 +19,6 @@ global mode
 
 class Main(object):
     def main(self, Kpv=None, Kpr=None, Kdv=None, Kdr=None):
-        rospy.init_node("autotuner")
 
         robot_id = str(0)
         robot_color = 'blue'
@@ -71,7 +70,7 @@ class Main(object):
                                2.0)
         self.publish(status)
 
-        rospy.sleep(4.0)
+        rospy.sleep(3.0)
 
         self.pid_service_proxy(next_param['Kpv'],
                                next_param['Kpr'],
@@ -88,9 +87,9 @@ class Main(object):
         if mode == "position":
             positions = [
                 [0.0, 0.0, 0.3 * np.pi],
-                [0.0, 2.0, 0.9 * np.pi],
-                [0.0, -2.0, 1.8 * np.pi],
-                [0.0, 4.0, 0.6 * np.pi],
+                [0.0, 1.0, 0.9 * np.pi],
+                [0.0, -1.0, 1.8 * np.pi],
+                [0.0, 2.0, 0.6 * np.pi],
             ]
         else:
             positions = [
@@ -119,7 +118,7 @@ class Main(object):
             start_time = rospy.Time.now()
             # Start measuring
 
-            time_limit = 5.0
+            time_limit = 4.0
             additional_cost = 0.0
 
             self.publish(status)
@@ -205,26 +204,33 @@ class Main(object):
 
 if __name__ == '__main__':
     mode = "position"
-    mode = "rotation"
+    # mode = "rotation"
+
+    rospy.init_node("autotuner")
+    program_start_time = rospy.Time.now()
+
+    print("AutotuneMode: " + mode)
 
     main = Main()
 
-    if mode == "rotation":
-        pbounds = {
-                   'Kpr': (1, 10),
-                   'Kdr': (1, 10),
-                   }
-    elif mode == "position":
+    if mode == "position":
         pbounds = {
                    'Kpv': (1, 10),
                    'Kdv': (1, 10),
+                   }
+    else:
+        pbounds = {
+                   'Kpr': (1, 10),
+                   'Kdr': (1, 10),
                    }
     optimizer = BayesianOptimization(
             f=main.main,
             pbounds=pbounds,
             random_state=1
     )
-    optimizer.maximize(init_points=4, n_iter=30)
+    optimizer.maximize(init_points=4, n_iter=20)
     print("max"+str(optimizer.max))
     print("res"+str(optimizer.res))
-    ipdb.set_trace()
+
+    program_end_time = rospy.Time.now()
+    print("Elapsed time: " + str((program_end_time - program_end_time).to_sec()) + " sec.")
