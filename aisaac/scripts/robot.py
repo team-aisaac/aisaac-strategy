@@ -19,6 +19,8 @@ from robot_command_publisher_wrapper import RobotCommandPublisherWrapper
 from filter import kalman_filter, identity_filter
 
 import config
+import numpy as np
+import functions
 
 ROBOT_LOOP_RATE = config.ROBOT_LOOP_RATE
 
@@ -36,7 +38,7 @@ class Robot(object):
         self.robot_total = config.NUM_FRIEND_ROBOT
         self.enemy_total = config.NUM_ENEMY_ROBOT
 
-        self.cmd = robot_commands()
+        self.cmd = robot_commands() # type: robot_commands
         self.cmd.kick_speed_x = 0
         self.cmd.kick_speed_z = 0
         self.cmd.dribble_power = 0
@@ -67,11 +69,15 @@ class Robot(object):
         self.def_pos_listener()
         rospy.Timer(rospy.Duration(1.0/30.0), self.pid.replan_timer_callback)
 
-
     def store_and_publish_commands(self):
+
         self.ctrld_robot.update_expected_velocity_context(self.cmd.vel_x,
                                                           self.cmd.vel_y,
                                                           self.cmd.omega)
+
+        self.cmd.vel_surge, self.cmd.vel_sway \
+            = functions.clip_vector2((self.cmd.vel_surge, self.cmd.vel_sway), 0.075)
+
         self.ctrld_robot.handle_loop_callback()
 
         self._command_pub.publish(self.cmd)

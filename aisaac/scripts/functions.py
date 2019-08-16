@@ -120,3 +120,9 @@ def cross_point(line_1, line_2):
     y = (l2a * l1c - l1a * l2c) / (l1a * l2b - l2a * l1b)
 
     return x, y
+
+
+def clip_vector2(vec, length):
+    vec = np.array([vec[0], vec[1]])
+    vec = length * np.linalg.norm(vec)
+    return vec[0], vec[1]
