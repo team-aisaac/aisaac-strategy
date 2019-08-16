@@ -20,15 +20,15 @@ class RobotKick(object):
         self.pid = pid
         self.status = status
         self.cmd = cmd
-        self.dispersion1 = [10] * 5
-        self.dispersion2 = [10] * 5
-        self.rot_dispersion = [10] * 5
+        self.dispersion1 = [10] * 1
+        self.dispersion2 = [10] * 1
+        self.rot_dispersion = [10] * 1
 
-        self.access_threshold1 = 0.05
-        self.access_threshold2 = 0.05
+        self.access_threshold1 = 0.1
+        self.access_threshold2 = 0.1
         self.feint_threshold1 = 0.2
         self.feint_threshold2 = 0.2
-        self.rot_access_threshold = 0.02
+        self.rot_access_threshold = 0.1
         self.pass_stage = 0
         self._kick_start_time = rospy.Time.now()
         self._dribble_start_pos = self.ball_params.get_current_position()
@@ -61,7 +61,7 @@ class RobotKick(object):
                                              self.ctrld_robot.get_current_position()) \
                 > self.ctrld_robot.size_r + area \
                 or elapsed_time.to_sec() > 5.0 \
-                or functions.distance_btw_two_points(self.ball_params.get_current_position(), self._dribble_start_pos) > 0.3:
+                or functions.distance_btw_two_points(self.ball_params.get_current_position(), self._dribble_start_pos) > 0.8:
             self.cmd.vel_surge = 0
             self.cmd.vel_sway = 0
             self.cmd.omega = 0

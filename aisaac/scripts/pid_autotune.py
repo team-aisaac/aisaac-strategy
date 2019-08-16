@@ -87,9 +87,9 @@ class Main(object):
         if mode == "position":
             positions = [
                 [0.0, 0.0, 0.3 * np.pi],
-                [0.0, 1.0, 0.9 * np.pi],
-                [0.0, -1.0, 1.8 * np.pi],
-                [0.0, 2.0, 0.6 * np.pi],
+                [0.0, 2.0, 0.9 * np.pi],
+                # [0.0, -1.0, 1.8 * np.pi],
+                # [0.0, 2.0, 0.6 * np.pi],
             ]
         else:
             positions = [
@@ -215,20 +215,20 @@ if __name__ == '__main__':
 
     if mode == "position":
         pbounds = {
-                   'Kpv': (1, 10),
-                   'Kdv': (1, 10),
+                   'Kpv': (1, 5),
+                   'Kdv': (1, 5),
                    }
     else:
         pbounds = {
-                   'Kpr': (1, 10),
-                   'Kdr': (1, 10),
+                   'Kpr': (1, 5),
+                   'Kdr': (1, 5),
                    }
     optimizer = BayesianOptimization(
             f=main.main,
             pbounds=pbounds,
             random_state=1
     )
-    optimizer.maximize(init_points=4, n_iter=20)
+    optimizer.maximize(init_points=4, n_iter=16)
     print("max"+str(optimizer.max))
     print("res"+str(optimizer.res))
 

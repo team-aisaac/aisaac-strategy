@@ -75,7 +75,7 @@ class Robot(object):
         self.ctrld_robot.handle_loop_callback()
 
         self._command_pub.publish(self.cmd)
-        self.reset_cmd()
+        # self.reset_cmd()
 
     def reset_cmd(self):
         default_cmd = robot_commands()

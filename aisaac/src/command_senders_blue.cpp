@@ -37,7 +37,7 @@ const uint8_t ESCAPE_MASK = 0x20;
 #define SERIAL_PORT "/dev/ttyUSB0" // SDevice file corrensponding to serial interface
 #define MAX_DATA_TYPE 3
 
-#define VEL_MAX 1500
+#define VEL_MAX 2500
 
 #define ENABLE_DBG             // Toggle when using printf() function
 #ifndef ENABLE_DBG

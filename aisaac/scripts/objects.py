@@ -66,6 +66,7 @@ class Objects(object):
         elif len(self._active_robot_ids) == 1:
             roles = ["RFW"]
         else:
+            roles = ["RFW"]
             print ("error")
 
         for robot_id, role in zip(self._active_robot_ids, roles):
