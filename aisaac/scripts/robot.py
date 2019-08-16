@@ -71,23 +71,30 @@ class Robot(object):
 
         self._last_pub_time = rospy.Time.now()
         self._last_accel_vec = [0.0, 0.0]
-        self._last_vel_vec = [0.0, 0.0]
+        self._last_vel_surge_sway_vec = [0.0, 0.0]
 
     def store_and_publish_commands(self):
         current_pub_time = rospy.Time.now()
+        dt = current_pub_time - self._last_pub_time
 
         self.ctrld_robot.update_expected_velocity_context(self.cmd.vel_x,
                                                           self.cmd.vel_y,
                                                           self.cmd.omega)
 
-        self.cmd.vel_surge, self.cmd.vel_sway \
-            = functions.clip_vector2((self.cmd.vel_surge, self.cmd.vel_sway), 0.075)
+        current_acc = np.array([self.cmd.vel_surge - self._last_vel_surge_sway_vec[0], self.cmd.vel_sway - self._last_vel_surge_sway_vec[1]]) / dt
 
+        clipped_acc \
+            = functions.clip_vector2(current_acc, 0.075)
+
+        self.cmd.vel_surge = self._last_vel_surge_sway_vec[0] + clipped_acc[0]
+        self.cmd.vel_sway = self._last_vel_surge_sway_vec[1] + clipped_acc[1]
 
         self.ctrld_robot.handle_loop_callback()
 
         self._command_pub.publish(self.cmd)
+
         self._last_pub_time = rospy.Time.now()
+        self._last_vel_surge_sway_vec = (self.cmd.vel_surge, self.cmd.vel_sway)
         # self.reset_cmd()
 
     def reset_cmd(self):
