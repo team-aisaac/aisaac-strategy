@@ -37,7 +37,7 @@ class PenaltyAttack(StrategyCalcuratorBase):
     def reset(self):
         self.history_who_has_a_ball = ["robots" for i in range(10)]
 
-    def calcurate(self, strategy_context=None):
+    def calcurate(self, strategy_context=None, should_wait=True):
         #print "penalty"
 
         if self._get_who_has_a_ball() == "free":
@@ -49,9 +49,9 @@ class PenaltyAttack(StrategyCalcuratorBase):
             self.history_who_has_a_ball.pop(0)
             self.history_who_has_a_ball.append("enemy")
 
-        if self.history_who_has_a_ball.count("enemy") > 5:
-            strategy_context.update("penalty_finish", True, namespace="world_model")
-            strategy_context.update("defence_or_attack", False, namespace="world_model")
+        # if self.history_who_has_a_ball.count("enemy") > 5:
+        #     strategy_context.update("penalty_finish", True, namespace="world_model")
+        #     strategy_context.update("defence_or_attack", False, namespace="world_model")
 
         active_robot_ids = self._get_active_robot_ids()
         for robot_id in active_robot_ids:
@@ -76,7 +76,18 @@ class PenaltyAttack(StrategyCalcuratorBase):
                 status.status = "none"
 
             if  robot_id == active_robot_ids[0]:
-                status.status = "penalty_shoot"
+                if should_wait:
+                    status.status = "move_linear"
+                    status.pid_goal_pos_x = 4.5
+                    status.pid_goal_pos_y = 0.0
+                else:
+                    status.status = "penalty_shoot"
+
+                    if functions.distance_btw_two_points(self._objects.ball.get_current_position(),
+                            self._objects.get_robot_by_id(robot_id).get_current_position()) > 1.0:
+                        strategy_context.update("penalty_finish", True, namespace="world_model")
+                        strategy_context.update("defence_or_attack", False, namespace="world_model")
+
 
             self._dynamic_strategy.set_robot_status(robot_id, status)
 

@@ -39,30 +39,11 @@ class Objects(object):
         # for robot, role in zip(self.robot, roles):
         #     robot.set_role(role)
 
-        if len(self.robot) == 5:
-            roles = ["RFW", "LFW", "RDF", "LDF", "GK"]
-            for robot, role in zip(self.robot, roles):
-                robot.set_role(role)
-        elif len(self.robot) == 4:
-            roles = ["RFW", "LFW", "LDF", "GK"]
-            for robot, role in zip(self.robot, roles):
-                robot.set_role(role)
-        elif len(self.robot) == 3:
-            roles = ["RFW", "LDF", "GK"]
-            for robot, role in zip(self.robot, roles):
-                robot.set_role(role)
-        elif len(self.robot) == 2:
-            roles = ["RFW", "GK"]
-            for robot, role in zip(self.robot, roles):
-                robot.set_role(role)
-        elif len(self.robot) == 1:
-            roles = ["RFW"]
-            for robot, role in zip(self.robot, roles):
-                robot.set_role(role)
-        else:
-            print ("error")
+        roles = ["RFW", "LFW", "RDF", "LDF", "GK"]
+        for robot_id, role in zip(self._robot_ids, roles):
+            self.get_robot_by_id(robot_id).set_role(role)
 
-
+        rospy.Timer(rospy.Duration(5.0), self.redefine_roles)
 
         self.ball = entity.Ball()
 
@@ -72,6 +53,24 @@ class Objects(object):
 
         self.odom_listener()
         self.existing_listener()
+
+    def redefine_roles(self, event):
+        if len(self._active_robot_ids) == 5:
+            roles = ["RFW", "LFW", "RDF", "LDF", "GK"]
+        elif len(self._active_robot_ids) == 4:
+            roles = ["RFW", "LFW", "LDF", "GK"]
+        elif len(self._active_robot_ids) == 3:
+            roles = ["RFW", "LDF", "GK"]
+        elif len(self._active_robot_ids) == 2:
+            roles = ["RFW", "GK"]
+        elif len(self._active_robot_ids) == 1:
+            roles = ["RFW"]
+        else:
+            roles = ["RFW"]
+            print ("error")
+
+        for robot_id, role in zip(self._active_robot_ids, roles):
+            self.get_robot_by_id(robot_id).set_role(role)
 
 
     def get_robot_ids_sorted_by_distance_to_ball(self, robot_ids=None):

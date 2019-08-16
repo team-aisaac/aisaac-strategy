@@ -165,6 +165,12 @@ def run_world_model():
                         'normal_start_kickoff')
                     strat = strat_calcrator.calcurate(strat_ctx)
                     # 前のreferee_branchがKICKOFF_DEFENCEかつenemy_kick終了してない場合
+                elif not strat_ctx.get_last("penalty_finish", namespace="world_model") \
+                        and last_referee_branch == "PENALTY_ATTACK":
+                    strat_calcrator = world_model.get_strategy_calcurator(
+                        'penalty_attack')
+                    strat = strat_calcrator.calcurate(strat_ctx, should_wait=False)
+
                 elif not strat_ctx.get_last("enemy_kick", namespace="world_model") \
                         and last_referee_branch == "KICKOFF_DEFENCE":
                     strat_calcrator = world_model.get_strategy_calcurator(
@@ -196,12 +202,14 @@ def run_world_model():
                 strat = strat_calcrator.calcurate(strat_ctx, referee_branch)
 
             elif referee_branch == "PENALTY_ATTACK":
-                if not strat_ctx.get_last("penalty_finish", namespace="world_model"):
-                    strat_calcrator = world_model.get_strategy_calcurator(
-                        'penalty_attack')
-                else:
-                    strat_calcrator = world_model.get_strategy_calcurator(
-                        'normal_start_normal')
+                # if not strat_ctx.get_last("penalty_finish", namespace="world_model"):
+                strat_ctx.update("penalty_finish", False, namespace="world_model")
+                strat_calcrator = world_model.get_strategy_calcurator(
+                    'penalty_attack')
+                strat = strat_calcrator.calcurate(strat_ctx, should_wait=True)
+                # else:
+                #     strat_calcrator = world_model.get_strategy_calcurator(
+                #         'normal_start_normal')
                 strat = strat_calcrator.calcurate(strat_ctx)
             elif referee_branch == "PENALTY_DEFENCE":
                 strat_calcrator = world_model.get_strategy_calcurator(
@@ -270,7 +278,7 @@ def run_world_model():
                 if referee_branch == "PENALTY_ATTACK":
                     strat_calcrator = world_model.get_strategy_calcurator(
                         'penalty_attack').reset()
-                    strat_ctx.update("direct_finish", False, namespace="world_model")
+                    strat_ctx.update("penalty_finish", False, namespace="world_model")
 
 
 

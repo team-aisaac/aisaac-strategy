@@ -33,11 +33,11 @@ class RobotPid(object):
         # self.Kpr = 3.0
         # self.Kdv = 1.9759837181620452
         # self.Kdr = 3.0
-        self.Kpv = 3.112
-        self.Kpr = 3.0
-        self.Kdv = 5.437
-        self.Kdr = 2.0
-        # param_dict = {'Kdv': 4.210412653218034, 'Kpv': 3.9577989929770307, 'Kpr': 7.492985949699556, 'Kdr': 5.743020391472334}
+        # self.Kpv = 6.112
+        # self.Kpr = 3.0
+        # self.Kdv = 5.437
+        # self.Kdr = 2.0
+        # # param_dict = {'Kdv': 4.210412653218034, 'Kpv': 3.9577989929770307, 'Kpr': 7.492985949699556, 'Kdr': 5.743020391472334}
         # self.Kpr = param_dict['Kpr']
         # self.Kpv = param_dict['Kpv']
         # self.Kdv = param_dict['Kdv']
@@ -50,10 +50,10 @@ class RobotPid(object):
         # self.Kdr = 5.0
 
         # 実機
-        # self.Kpv = 4.5
-        # self.Kpr = 2.0
-        # self.Kdv = 1.5
-        # self.Kdr = 1.0
+        self.Kpv = 4.5
+        self.Kpr = 2.0
+        self.Kdv = 1.5
+        self.Kdr = 1.0
         
         # 壁用
         # self.Kpv = 3.0
@@ -75,7 +75,7 @@ class RobotPid(object):
                     if robot is None:
                         continue
                     distance = functions.distance_of_a_point_and_a_straight_line(robot.get_current_position()[0], robot.get_current_position()[1], a, b, c)
-                    if distance < self.ctrld_robot.size_r * 3:
+                    if distance < self.ctrld_robot.size_r * 2:
                         x = (-robot.get_current_position()[1] * b + (b**2 / a) * robot.get_current_position()[0] - c) / (a + b**2 / a)
                         y = (-a * x -c) / b
                         if (self.ctrld_robot.get_current_position()[0] < x < goal_pos_x \
@@ -90,7 +90,7 @@ class RobotPid(object):
                 if enemy is None:
                     continue
                 distance = functions.distance_of_a_point_and_a_straight_line(enemy.get_current_position()[0], enemy.get_current_position()[1], a, b, c)
-                if distance < self.ctrld_robot.size_r * 3:
+                if distance < self.ctrld_robot.size_r * 2:
                         x = (-enemy.get_current_position()[1] * b + (b**2 / a) * enemy.get_current_position()[0] - c) / (a + b**2 / a)
                         y = (-a * x -c) / b
                         if (self.ctrld_robot.get_current_position()[0] < x < goal_pos_x \
@@ -102,7 +102,7 @@ class RobotPid(object):
 
             distance = functions.distance_of_a_point_and_a_straight_line(self.ball_params.get_current_position()[0], self.ball_params.get_current_position()[1], a, b, c)
 
-            if distance < self.ctrld_robot.size_r * 2:
+            if distance < self.ctrld_robot.size_r * 1:
                         x = (-self.ball_params.get_current_position()[1] * b + (b**2 / a) * self.ball_params.get_current_position()[0] - c) / (a + b**2 / a)
                         y = (-a * x -c) / b
                         if (self.ctrld_robot.get_current_position()[0] < x < goal_pos_x \
