@@ -219,7 +219,7 @@ class Objects(object):
         rospy.Subscriber("/" + self.team_color + "/existing_enemies_id", UInt16MultiArray, self.existing_enemies_callback)
 
     def existing_friends_callback(self, msg):
-        self._active_robot_ids = [id for id in msg.data]
+        self._active_robot_ids = [int(id) for id in msg.data]
 
     def existing_enemies_callback(self, msg):
-        self._active_enemy_ids = [id for id in msg.data]
+        self._active_enemy_ids = [int(id) for id in msg.data]

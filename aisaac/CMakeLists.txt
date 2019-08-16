@@ -10,7 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   consai_msgs
   std_msgs
-  message_generation 
+  message_generation
 )
 
 add_service_files(
