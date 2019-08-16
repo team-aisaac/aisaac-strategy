@@ -71,28 +71,34 @@ class RobotPid(object):
         if a != 0 and b != 0:
             for i in self.objects.get_active_robot_ids():
                 if i != self.robot_id:
-                    distance = functions.distance_of_a_point_and_a_straight_line(self.objects.get_robot_by_id(i).get_current_position()[0], self.objects.get_robot_by_id(i).get_current_position()[1], a, b, c)
+                    robot = self.objects.get_robot_by_id(i)
+                    if robot is None:
+                        continue
+                    distance = functions.distance_of_a_point_and_a_straight_line(robot.get_current_position()[0], robot.get_current_position()[1], a, b, c)
                     if distance < self.ctrld_robot.size_r * 3:
-                        x = (-self.objects.get_robot_by_id(i).get_current_position()[1] * b + (b**2 / a) * self.objects.get_robot_by_id(i).get_current_position()[0] - c) / (a + b**2 / a)
+                        x = (-robot.get_current_position()[1] * b + (b**2 / a) * robot.get_current_position()[0] - c) / (a + b**2 / a)
                         y = (-a * x -c) / b
                         if (self.ctrld_robot.get_current_position()[0] < x < goal_pos_x \
                             or self.ctrld_robot.get_current_position()[0] > x > goal_pos_x) \
                             and (self.ctrld_robot.get_current_position()[1] < y < goal_pos_y \
                             or self.ctrld_robot.get_current_position()[1] > y > goal_pos_y):
 
-                            return True, x, y, self.objects.get_robot_by_id(i).get_current_position()[0] , self.objects.get_robot_by_id(i).get_current_position()[1], distance
+                            return True, x, y, robot.get_current_position()[0] , robot.get_current_position()[1], distance
 
             for j in self.objects.get_active_enemy_ids():
-                distance = functions.distance_of_a_point_and_a_straight_line(self.objects.get_enemy_by_id(j).get_current_position()[0], self.objects.get_enemy_by_id(j).get_current_position()[1], a, b, c)
+                enemy = self.objects.get_enemy_by_id(j)
+                if enemy is None:
+                    continue
+                distance = functions.distance_of_a_point_and_a_straight_line(enemy.get_current_position()[0], enemy.get_current_position()[1], a, b, c)
                 if distance < self.ctrld_robot.size_r * 3:
-                        x = (-self.objects.get_enemy_by_id(j).get_current_position()[1] * b + (b**2 / a) * self.objects.get_enemy_by_id(j).get_current_position()[0] - c) / (a + b**2 / a)
+                        x = (-enemy.get_current_position()[1] * b + (b**2 / a) * enemy.get_current_position()[0] - c) / (a + b**2 / a)
                         y = (-a * x -c) / b
                         if (self.ctrld_robot.get_current_position()[0] < x < goal_pos_x \
                             or self.ctrld_robot.get_current_position()[0] > x > goal_pos_x) \
                             and (self.ctrld_robot.get_current_position()[1] < y < goal_pos_y \
                             or self.ctrld_robot.get_current_position()[1] > y > goal_pos_y):
 
-                            return True, x, y, self.objects.get_enemy_by_id(j).get_current_position()[0] , self.objects.get_enemy_by_id(j).get_current_position()[1], distance
+                            return True, x, y, enemy.get_current_position()[0] , enemy.get_current_position()[1], distance
 
             distance = functions.distance_of_a_point_and_a_straight_line(self.ball_params.get_current_position()[0], self.ball_params.get_current_position()[1], a, b, c)
 
