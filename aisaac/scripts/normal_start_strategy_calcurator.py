@@ -317,12 +317,10 @@ class NormalStartKickOffStrategyCalcurator(StrategyCalcuratorBase):
                 self._dynamic_strategy.set_robot_status(robot_id, status)
                 not_assigned_robot_ids.remove(robot_id)
 
-        robots_near_to_ball = self._objects.get_robot_ids_sorted_by_distance_to_ball(not_assigned_robot_ids)
-
-        for idx, robot_id in enumerate(robots_near_to_ball):
+        for idx, robot_id in enumerate(not_assigned_robot_ids):
             status = Status()
             if idx == 0:
-                if len(robots_near_to_ball) == 1:
+                if len(not_assigned_robot_ids) == 1:
                     status.status = "shoot"
                 else:
                     status.status = "pass"
