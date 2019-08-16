@@ -142,7 +142,14 @@ class IndirectFreeAttack(StrategyCalcuratorBase):
         else:
             self.position_1_nearest_id = self._objects.get_robot_id_by_role("RFW")
             self.position_2_nearest_id = self._objects.get_robot_id_by_role("LFW")
-            self.ball_position_nearest_id = self._objects.get_robot_id_by_role("RDF")
+            if "RDF" in roles:
+                self.ball_position_nearest_id = self._objects.get_robot_id_by_role("RDF")
+            elif "LDF" in roles:
+                self.ball_position_nearest_id = self._objects.get_robot_id_by_role("LDF")
+            elif "GK" in roles:
+                self.ball_position_nearest_id = self._objects.get_robot_id_by_role("GK")
+            else:
+                self.ball_position_nearest_id = self._objects.get_robot_id_by_role("RFW")
 
         #self.position_2_nearest_id = self._objects.get_robot_ids_sorted_by_distance(self.position_2)[0]
         #self.ball_position_nearest_id = self._objects.get_robot_ids_sorted_by_distance([self.ball_position_x, self.ball_position_y])[0]
@@ -150,6 +157,8 @@ class IndirectFreeAttack(StrategyCalcuratorBase):
         self.LDF_id = self._objects.get_robot_id_by_role("LDF")
         self.RDF_id = self._objects.get_robot_id_by_role("RDF")
         self.last_calcurate = "calcurate_1"
+
+        # indirect時、パスを回すか、shootをうつか 
 
         # ここから下はdirect用
         self.ckl_flg = False
@@ -163,6 +172,7 @@ class IndirectFreeAttack(StrategyCalcuratorBase):
         elif "RFW" in roles:
             lr  = ["RFW"]
         self.lfw_or_rfw = np.random.choice(lr)
+
 
 
     def calcurate(self, strategy_context=None):
