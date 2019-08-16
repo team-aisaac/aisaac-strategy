@@ -123,10 +123,15 @@ def cross_point(line_1, line_2):
 
 
 def clip_vector2(vec, clip_length):
+
     vec = np.array([vec[0], vec[1]])
     vec_length = np.linalg.norm(vec)
 
+    if vec_length <= 0.001:
+        return vec[0], vec[1]
+
     return_length = np.min([clip_length, vec_length])
 
-    vec = (return_length / vec_length) * vec
+    vec[0] = (return_length / vec_length) * vec[0]
+    vec[1] = (return_length / vec_length) * vec[1]
     return vec[0], vec[1]

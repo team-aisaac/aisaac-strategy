@@ -75,7 +75,7 @@ class Robot(object):
 
     def store_and_publish_commands(self):
         current_pub_time = rospy.Time.now()
-        dt = current_pub_time - self._last_pub_time
+        dt = (current_pub_time - self._last_pub_time).to_sec()
 
         self.ctrld_robot.update_expected_velocity_context(self.cmd.vel_x,
                                                           self.cmd.vel_y,
