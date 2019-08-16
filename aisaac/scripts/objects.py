@@ -35,9 +35,34 @@ class Objects(object):
         self.robot = [entity.Robot(id=i) for i in self._robot_ids]  # type: typing.List[entity.Robot]
         self.enemy = [entity.Robot(id=i) for i in self._enemy_ids]  # type: typing.List[entity.Robot]
 
-        roles = ["RFW", "LFW", "RDF", "LDF", "GK"]
-        for robot, role in zip(self.robot, roles):
-            robot.set_role(role)
+        # roles = ["RFW", "LFW", "RDF", "LDF", "GK"]
+        # for robot, role in zip(self.robot, roles):
+        #     robot.set_role(role)
+
+        if len(self.robot) == 5:
+            roles = ["RFW", "LFW", "RDF", "LDF", "GK"]
+            for robot, role in zip(self.robot, roles):
+                robot.set_role(role)
+        elif len(self.robot) == 4:
+            roles = ["RFW", "LFW", "LDF", "GK"]
+            for robot, role in zip(self.robot, roles):
+                robot.set_role(role)
+        elif len(self.robot) == 3:
+            roles = ["RFW", "LDF", "GK"]
+            for robot, role in zip(self.robot, roles):
+                robot.set_role(role)
+        elif len(self.robot) == 2:
+            roles = ["RFW", "LDF"]
+            for robot, role in zip(self.robot, roles):
+                robot.set_role(role)
+        elif len(self.robot) == 1:
+            roles = ["RFW"]
+            for robot, role in zip(self.robot, roles):
+                robot.set_role(role)
+        else:
+            print ("error")
+
+
 
         self.ball = entity.Ball()
 
@@ -98,6 +123,11 @@ class Objects(object):
             if robot.get_id() == robot_id:
                 return robot
 
+    def get_enemy_by_id(self, enemy_id):
+        for enemy in self.enemy:
+            if enemy.get_id() == enemy_id:
+                return enemy
+
     def get_robot_by_role(self, role):
         for robot in self.robot:
             if robot.get_role() == role:
@@ -114,11 +144,6 @@ class Objects(object):
 
     def get_active_enemy_ids(self):
         return copy.deepcopy(self._active_enemy_ids)
-
-    def get_enemy_by_id(self, enemy_id):
-        for enemy in self.enemy:
-            if enemy.get_id() == enemy_id:
-                return enemy
 
     def get_ball_in_penalty_area(self):
         return functions.in_penalty_area(self.ball.get_current_position())

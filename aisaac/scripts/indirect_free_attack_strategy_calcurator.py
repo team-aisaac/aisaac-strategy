@@ -125,11 +125,20 @@ class IndirectFreeAttack(StrategyCalcuratorBase):
         choice_index = np.random.choice(len(positions_3))
         self.position_3 = positions_3[choice_index]
 
+        roles = set([self._robot[robot_id].get_role() for robot_id in self._objects.get_active_robot_ids()])
+
         # position1 ~ position3の位置を決定
-        if self.position_1 and self.position_1[0] >= 0.:
+        if self.position_1 and self.position_1[1] >= 0.:
             self.position_1_nearest_id = self._objects.get_robot_id_by_role("LFW")
             self.position_2_nearest_id = self._objects.get_robot_id_by_role("RFW")
-            self.ball_position_nearest_id = self._objects.get_robot_id_by_role("LDF")
+            if "LDF" in roles:
+                self.ball_position_nearest_id = self._objects.get_robot_id_by_role("LDF")
+            elif "RDF" in roles:
+                self.ball_position_nearest_id = self._objects.get_robot_id_by_role("RDF")
+            elif "GK" in roles:
+                self.ball_position_nearest_id = self._objects.get_robot_id_by_role("GK")
+            else:
+                self.ball_position_nearest_id = self._objects.get_robot_id_by_role("RFW")
         else:
             self.position_1_nearest_id = self._objects.get_robot_id_by_role("RFW")
             self.position_2_nearest_id = self._objects.get_robot_id_by_role("LFW")
@@ -145,7 +154,14 @@ class IndirectFreeAttack(StrategyCalcuratorBase):
         # ここから下はdirect用
         self.ckl_flg = False
         self.ckr_flg = False
-        lr  = ["LFW", "RFW"]
+
+        # 蹴るターゲット
+        if "LFW" in roles and "RFW" in roles:
+            lr  = ["LFW", "RFW"]
+        elif "LFW" in roles:
+            lr  = ["LFW"]
+        elif "RFW" in roles:
+            lr  = ["RFW"]
         self.lfw_or_rfw = np.random.choice(lr)
 
 
