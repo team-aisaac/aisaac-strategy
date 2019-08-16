@@ -12,6 +12,7 @@ from direct_free_attack_strategy_calcurator import DirectFreeAttack
 from direct_free_defence_strategy_calcurator import DirectFreeDefence
 from indirect_free_attack_strategy_calcurator import IndirectFreeAttack
 from indirect_free_defence_strategy_calcurator import IndirectFreeDefence
+from penalty_attack_strategy_calcurator import PenaltyAttack
 from context import StrategyContext
 from world_model_status_publisher import WorldModelStatusPublisher
 
@@ -40,6 +41,7 @@ class WorldModel(object):
             'normal_start_kickoff': NormalStartKickOffStrategyCalcurator(self._objects),
             'normal_start_kickoff_defence': NormalStartKickOffDefenceStrategyCalcurator(self._objects),
             'stop': StopStrategyCalculator(self._objects),
+            'penalty_attack': PenaltyAttack(self._objects),
             'penalty_defence': NormalStartPenaltyDefenceStrategyCalcurator(self._objects),
             'direct_free_attack': DirectFreeAttack(self._objects),
             'direct_free_defence': DirectFreeDefence(self._objects),
@@ -71,6 +73,8 @@ class WorldModel(object):
             "indirect_finish", 1, False, namespace="world_model")
         self._strategy_context.register_new_context(
             "direct_finish", 1, False, namespace="world_model")
+        self._strategy_context.register_new_context(
+            "penalty_finish", 1, False, namespace="world_model")
 
         self._loop_events = []
 
@@ -192,8 +196,12 @@ def run_world_model():
                 strat = strat_calcrator.calcurate(strat_ctx, referee_branch)
 
             elif referee_branch == "PENALTY_ATTACK":
-                strat_calcrator = world_model.get_strategy_calcurator(
-                    'direct_free_attack')
+                if not strat_ctx.get_last("penalty_finish", namespace="world_model"):
+                    strat_calcrator = world_model.get_strategy_calcurator(
+                        'penalty_attack')
+                else:
+                    strat_calcrator = world_model.get_strategy_calcurator(
+                        'normal_start_normal')
                 strat = strat_calcrator.calcurate(strat_ctx)
             elif referee_branch == "PENALTY_DEFENCE":
                 strat_calcrator = world_model.get_strategy_calcurator(
@@ -258,6 +266,10 @@ def run_world_model():
                 if referee_branch == "DIRECT_FREE_ATTACK":
                     strat_calcrator = world_model.get_strategy_calcurator(
                         'direct_free_attack').reset()
+                    strat_ctx.update("direct_finish", False, namespace="world_model")
+                if referee_branch == "PENALTY_ATTACK":
+                    strat_calcrator = world_model.get_strategy_calcurator(
+                        'penalty_attack').reset()
                     strat_ctx.update("direct_finish", False, namespace="world_model")
 
 
