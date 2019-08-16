@@ -37,7 +37,7 @@ class PenaltyAttack(StrategyCalcuratorBase):
     def reset(self):
         self.history_who_has_a_ball = ["robots" for i in range(10)]
 
-    def calcurate(self, strategy_context=None):
+    def calcurate(self, strategy_context=None, should_wait=True):
         #print "penalty"
 
         if self._get_who_has_a_ball() == "free":
@@ -76,7 +76,13 @@ class PenaltyAttack(StrategyCalcuratorBase):
                 status.status = "none"
 
             if  robot_id == active_robot_ids[0]:
-                status.status = "penalty_shoot"
+                if should_wait:
+                    status.status = "move_linear"
+                    status.pid_goal_pos_x = 4.5
+                    status.pid_goal_pos_y = 0.0
+                else:
+                    status.status = "penalty_shoot"
+
 
             self._dynamic_strategy.set_robot_status(robot_id, status)
 
