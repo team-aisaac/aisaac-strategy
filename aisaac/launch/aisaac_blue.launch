@@ -41,7 +41,7 @@
     <node name="launch_manager" pkg="launch_manager" type="launch_manager.py" required="true"/>
 
     <!-- Visualizer -->
-    <!--<node name="sai_visualizer" pkg="sai_visualizer" type="sai_visualizer" /> -->
+    <node name="sai_visualizer" pkg="sai_visualizer" type="sai_visualizer" />
     <!-- <node name="rviz" pkg="rviz" type="rviz" /> -->
     <!-- <node name="rqt_console" pkg="rqt_console" type="rqt_console" /> -->
     <!-- <node name="plot" pkg="rqt_plot" type="rqt_plot" /> -->
