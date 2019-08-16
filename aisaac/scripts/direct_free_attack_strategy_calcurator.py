@@ -61,9 +61,11 @@ class DirectFreeAttack(IndirectFreeAttack):
         elif self.ckr_flg:
             #　ボールがCK右の位置にあるとき
             result = self.calculate_corner_kick_right_2()
+        elif self._objects.ball.get_current_position()[1] > 0.:
+            result = self.calculate_indirect_left()
         else:
-            result = self.calculate_1()
-
+            result = self.calculate_indirect_right()
+            
         return result
 
     def calculate_goal_kick(self):
