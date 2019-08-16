@@ -264,6 +264,7 @@ def run_world_model():
 
             tmp_last_referee_branch = referee_branch
 
+            
             status_publisher.publish_all(strat)
             world_model.trigger_loop_events()
             loop_rate.sleep()
