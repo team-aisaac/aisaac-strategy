@@ -13,7 +13,7 @@ cd ~/catkin_ws/src
 ln -s /aisaac-strategy
 
 cd ~/catkin_ws
-catkin_make -j4 || catkin_make -j4 || catkin_make -j4
+catkin_make -j8 || catkin_make -j8 || catkin_make -j8
 source devel/setup.bash
 
 mkdir -p ~/.config/matplotlib/
