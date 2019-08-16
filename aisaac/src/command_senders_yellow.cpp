@@ -155,9 +155,19 @@ public:
       th_vector = uint16_t(theta_deg);
       calib_data = uint16_t(current_orientation_deg);
 
-      kick_flag = msg->kick_on_flag;
-      kick_chip_flag = msg->chip_on_flag;
-      kick_power =msg->kick_power;
+      if(msg->kick_power > 0){
+        kick_flag = 1;
+        kick_chip_flag = 0;
+        kick_power = 0;
+      }else{
+        kick_flag = 0;
+        kick_chip_flag = 0;
+        kick_power = 0;
+      }
+
+      // kick_flag = msg->kick_on_flag;
+      // kick_chip_flag = msg->chip_on_flag;
+      // kick_power =msg->kick_power;
 
       if(shutdown_flag == true){
           x_vector = 0;
