@@ -1,6 +1,7 @@
 #!/usr/bin/env  python
 # coding:utf-8
 import rospy
+import rosservice
 
 from consai_msgs.msg import robot_commands
 from aisaac.msg import Status, Ball_sub_params, Def_pos
@@ -47,7 +48,7 @@ class Robot(object):
         self._command_pub = RobotCommandPublisherWrapper(self.robot_color, self.robot_id)
 
         # Composition
-        self.objects = Objects(self.robot_color, self.robot_total, self.enemy_total)
+        self.objects = Objects(self.robot_color, self.robot_total, self.enemy_total, node="robot"+str(self.robot_id))
         self.ctrld_robot = self.objects.robot[int(self.robot_id)] # type: entity.Robot
 
         self.robot_friend = self.objects.robot
@@ -89,7 +90,7 @@ class Robot(object):
         clipped_acc \
             = functions.clip_vector2(current_acc, 0.075)
         clipped_omega_acc, _ \
-            = functions.clip_vector2((current_omega_acc, 0.0), 0.075 * self.objects.robot[0].size_r)
+            = functions.clip_vector2((current_omega_acc, 0.0), 0.075 / self.objects.robot[0].size_r)
 
         self.cmd.vel_surge = self._last_vel_surge_sway_vec[0] + clipped_acc[0]
         self.cmd.vel_sway = self._last_vel_surge_sway_vec[1] + clipped_acc[1]
@@ -255,8 +256,9 @@ class Robot(object):
                          self.robot_id + "/status", Status, self.status.status_callback)
 
     def set_pid_server(self):
-        rospy.Service("/" + self.robot_color + "/robot_" +
-                      self.robot_id + "/set_pid", pid, self.pid.set_pid_callback)
+        service_name = "/" + self.robot_color + "/robot_" + self.robot_id + "/set_pid"
+        if service_name not in rosservice.get_service_list():
+            rospy.Service(service_name, pid, self.pid.set_pid_callback)
 
     """
     def kick(self, req):
