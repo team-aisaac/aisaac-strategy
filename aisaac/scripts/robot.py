@@ -21,6 +21,7 @@ from filter import kalman_filter, identity_filter
 import config
 import numpy as np
 import functions
+import copy
 
 ROBOT_LOOP_RATE = config.ROBOT_LOOP_RATE
 
@@ -70,24 +71,29 @@ class Robot(object):
         rospy.Timer(rospy.Duration(1.0/30.0), self.pid.replan_timer_callback)
 
         self._last_pub_time = rospy.Time.now()
-        self._last_accel_vec = [0.0, 0.0]
         self._last_vel_surge_sway_vec = [0.0, 0.0]
+        self._last_omega = 0.0
 
     def store_and_publish_commands(self):
         current_pub_time = rospy.Time.now()
         dt = (current_pub_time - self._last_pub_time).to_sec()
+
 
         self.ctrld_robot.update_expected_velocity_context(self.cmd.vel_x,
                                                           self.cmd.vel_y,
                                                           self.cmd.omega)
 
         current_acc = np.array([self.cmd.vel_surge - self._last_vel_surge_sway_vec[0], self.cmd.vel_sway - self._last_vel_surge_sway_vec[1]]) / dt
+        current_omega_acc = (self.cmd.omega - self._last_omega) / dt
 
         clipped_acc \
             = functions.clip_vector2(current_acc, 0.075)
+        clipped_omega_acc, _ \
+            = functions.clip_vector2((current_omega_acc, 0.0), 0.075 * self.objects.robot[0].size_r)
 
         self.cmd.vel_surge = self._last_vel_surge_sway_vec[0] + clipped_acc[0]
         self.cmd.vel_sway = self._last_vel_surge_sway_vec[1] + clipped_acc[1]
+        self.cmd.omega = self._last_omega + clipped_omega_acc
 
         self.ctrld_robot.handle_loop_callback()
 
@@ -95,6 +101,7 @@ class Robot(object):
 
         self._last_pub_time = rospy.Time.now()
         self._last_vel_surge_sway_vec = (self.cmd.vel_surge, self.cmd.vel_sway)
+        self._last_omega = self.cmd.omega
         # self.reset_cmd()
 
     def reset_cmd(self):
