@@ -103,7 +103,8 @@ class Robot(object):
         if -vel_acc_clip_threshold_min < clipped_acc[1] < vel_acc_clip_threshold_min:
             self.cmd.vel_sway = self._last_vel_surge_sway_vec[1] + clipped_acc[1]
 
-        if -omega_acc_clip_threshold_min < clipped_omega_acc < omega_acc_clip_threshold_min:
+        if False:
+        # if -omega_acc_clip_threshold_min < clipped_omega_acc < omega_acc_clip_threshold_min:
             self.cmd.omega = self._last_omega + clipped_omega_acc
 
         self.ctrld_robot.handle_loop_callback()

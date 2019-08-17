@@ -54,11 +54,12 @@ class RobotPid(object):
         # self.Kpr = 2.0
         # self.Kdv = 1.5
         # self.Kdr = 1.0
+
         self.Kpv = 2.2
-        self.Kpr = 2.2
+        self.Kpr = 1.7
         self.Kdv = 1.0
-        self.Kdr = 1.0
-        
+        self.Kdr = 0.8
+
         # 壁用
         # self.Kpv = 3.0
         # self.Kpr = 6.0
