@@ -16,6 +16,8 @@ from penalty_attack_strategy_calcurator import PenaltyAttack
 from context import StrategyContext
 from world_model_status_publisher import WorldModelStatusPublisher
 
+from std_msgs.msg import String
+
 from filter import identity_filter
 
 import config
@@ -78,7 +80,11 @@ class WorldModel(object):
 
         self._loop_events = []
 
+        custom_referee_branch_subs = rospy.Subscriber("/force_referee_branch", String, self.force_referee_branch)
+        self.custom_referee_branch = ""
 
+    def force_referee_branch(self, msg):
+        self.custom_referee_branch = msg.data
 
     def add_loop_event_listener(self, callback):
         self._loop_events.append(callback)
@@ -145,6 +151,10 @@ def run_world_model():
                 identity_filter(enemy)
 
             referee_branch = referee.get_referee_branch()
+
+            if world_model.custom_referee_branch != "":
+                referee_branch = world_model.custom_referee_branch
+
             # referee_branch = "STOP"
             #referee_branch = "INDIRECT_FREE_ATTACK"
 
