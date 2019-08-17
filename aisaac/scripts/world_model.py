@@ -32,7 +32,7 @@ class WorldModel(object):
 
         """----上の5つの変数、インスタンスをまとめたもの、callbackをもつ---"""
         self._objects = Objects(
-            self._team_color, config.NUM_FRIEND_ROBOT, config.NUM_ENEMY_ROBOT)
+            self._team_color, config.NUM_FRIEND_ROBOT, config.NUM_ENEMY_ROBOT, node="world_model")
 
         """---Referee---"""
         self._referee = Referee(self._objects)
@@ -264,6 +264,7 @@ def run_world_model():
 
             # referee_branchが変更されたときに呼び出される
             if tmp_last_referee_branch != referee_branch:
+                rospy.loginfo("Referee branch changed: "+str(referee_branch))
                 rospy.set_param("/robot_max_velocity", config.ROBOT_MAX_VELOCITY)
                 last_referee_branch = tmp_last_referee_branch
                 strat_ctx.update("referee_branch", tmp_last_referee_branch, namespace="world_model")

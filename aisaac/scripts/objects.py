@@ -20,7 +20,7 @@ class Objects(object):
             cls.__instance = object.__new__(cls)
         return cls.__instance
 
-    def __init__(self, team_color, robot_total, enemy_total):
+    def __init__(self, team_color, robot_total, enemy_total, node=""):
         # type: (str, int, int) -> None
         self.team_color = team_color
         self.robot_total = robot_total
@@ -42,6 +42,7 @@ class Objects(object):
         roles = ["RFW", "LFW", "RDF", "LDF", "GK"]
         for robot_id, role in zip(self._robot_ids, roles):
             self.get_robot_by_id(robot_id).set_role(role)
+        self.roles = roles # 保存
 
         rospy.Timer(rospy.Duration(5.0), self.redefine_roles)
 
@@ -53,6 +54,8 @@ class Objects(object):
 
         self.odom_listener()
         self.existing_listener()
+
+        self.node = node
 
     def redefine_roles(self, event):
         if len(self._active_robot_ids) == 5:
@@ -67,11 +70,16 @@ class Objects(object):
             roles = ["RFW"]
         else:
             roles = ["RFW"]
-            print ("error")
+            print(str(self.node)+": Error! Current active robot ids: " +
+                  str(self._active_robot_ids))
+
+        if self.roles != roles:
+            print(str(self.node)+": Changed roles: "+str(roles))
 
         for robot_id, role in zip(self._active_robot_ids, roles):
             self.get_robot_by_id(robot_id).set_role(role)
 
+        self.roles = roles
 
     def get_robot_ids_sorted_by_distance_to_ball(self, robot_ids=None):
         # type: (typing.List[int]) -> typing.List[int]

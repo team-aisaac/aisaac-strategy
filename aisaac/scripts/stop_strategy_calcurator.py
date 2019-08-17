@@ -38,7 +38,7 @@ class StopStrategyCalculator(StrategyCalcuratorBase):
             distance_ball_target_pos = functions.distance_btw_two_points(target_pos_xy, ball.get_current_position())
 
             # 閾値を超える/超えないで振動を防ぐためのoffset
-            offset = 0.0
+            offset = 0.05
             if distance_ball_robot < (target_distance + offset) \
                     and distance_ball_target_pos < (target_distance + offset):
                 status = Status()

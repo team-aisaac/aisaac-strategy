@@ -1,6 +1,7 @@
 #!/usr/bin/env  python
 # coding:utf-8
 import rospy
+import rosservice
 
 from consai_msgs.msg import robot_commands
 from aisaac.msg import Status, Ball_sub_params, Def_pos
@@ -19,6 +20,9 @@ from robot_command_publisher_wrapper import RobotCommandPublisherWrapper
 from filter import kalman_filter, identity_filter
 
 import config
+import numpy as np
+import functions
+import copy
 
 ROBOT_LOOP_RATE = config.ROBOT_LOOP_RATE
 
@@ -36,7 +40,7 @@ class Robot(object):
         self.robot_total = config.NUM_FRIEND_ROBOT
         self.enemy_total = config.NUM_ENEMY_ROBOT
 
-        self.cmd = robot_commands()
+        self.cmd = robot_commands() # type: robot_commands
         self.cmd.kick_speed_x = 0
         self.cmd.kick_speed_z = 0
         self.cmd.dribble_power = 0
@@ -44,7 +48,7 @@ class Robot(object):
         self._command_pub = RobotCommandPublisherWrapper(self.robot_color, self.robot_id)
 
         # Composition
-        self.objects = Objects(self.robot_color, self.robot_total, self.enemy_total)
+        self.objects = Objects(self.robot_color, self.robot_total, self.enemy_total, node="robot"+str(self.robot_id))
         self.ctrld_robot = self.objects.robot[int(self.robot_id)] # type: entity.Robot
 
         self.robot_friend = self.objects.robot
@@ -67,14 +71,49 @@ class Robot(object):
         self.def_pos_listener()
         rospy.Timer(rospy.Duration(1.0/30.0), self.pid.replan_timer_callback)
 
+        self._last_pub_time = rospy.Time.now()
+        self._last_vel_surge_sway_vec = [0.0, 0.0]
+        self._last_omega = 0.0
 
     def store_and_publish_commands(self):
+        acc_clip_threshold_max = 0.075
+        acc_clip_threshold_min = 0.01
+
+        current_pub_time = rospy.Time.now()
+        dt = (current_pub_time - self._last_pub_time).to_sec()
+
         self.ctrld_robot.update_expected_velocity_context(self.cmd.vel_x,
                                                           self.cmd.vel_y,
                                                           self.cmd.omega)
+
+        current_acc = np.array([self.cmd.vel_surge - self._last_vel_surge_sway_vec[0], self.cmd.vel_sway - self._last_vel_surge_sway_vec[1]]) / dt
+        current_omega_acc = (self.cmd.omega - self._last_omega) / dt
+
+        clipped_acc \
+            = functions.clip_vector2(current_acc, acc_clip_threshold_max)
+        clipped_omega_acc, _ \
+            = functions.clip_vector2((current_omega_acc, 0.0), acc_clip_threshold_max / self.objects.robot[0].size_r)
+
+        vel_acc_clip_threshold_min = acc_clip_threshold_min
+        omega_acc_clip_threshold_min = acc_clip_threshold_min / self.objects.robot[0].size_r
+
+        if -vel_acc_clip_threshold_min < clipped_acc[0] < vel_acc_clip_threshold_min:
+            self.cmd.vel_surge = self._last_vel_surge_sway_vec[0] + clipped_acc[0]
+
+        if -vel_acc_clip_threshold_min < clipped_acc[1] < vel_acc_clip_threshold_min:
+            self.cmd.vel_sway = self._last_vel_surge_sway_vec[1] + clipped_acc[1]
+
+        if False:
+        # if -omega_acc_clip_threshold_min < clipped_omega_acc < omega_acc_clip_threshold_min:
+            self.cmd.omega = self._last_omega + clipped_omega_acc
+
         self.ctrld_robot.handle_loop_callback()
 
         self._command_pub.publish(self.cmd)
+
+        self._last_pub_time = rospy.Time.now()
+        self._last_vel_surge_sway_vec = (self.cmd.vel_surge, self.cmd.vel_sway)
+        self._last_omega = self.cmd.omega
         # self.reset_cmd()
 
     def reset_cmd(self):
@@ -228,8 +267,9 @@ class Robot(object):
                          self.robot_id + "/status", Status, self.status.status_callback)
 
     def set_pid_server(self):
-        rospy.Service("/" + self.robot_color + "/robot_" +
-                      self.robot_id + "/set_pid", pid, self.pid.set_pid_callback)
+        service_name = "/" + self.robot_color + "/robot_" + self.robot_id + "/set_pid"
+        if service_name not in rosservice.get_service_list():
+            rospy.Service(service_name, pid, self.pid.set_pid_callback)
 
     """
     def kick(self, req):

@@ -42,7 +42,7 @@ class Calculation():
 
         # Composition
         self.objects = Objects(
-            self.robot_color, config.NUM_FRIEND_ROBOT, config.NUM_ENEMY_ROBOT)
+            self.robot_color, config.NUM_FRIEND_ROBOT, config.NUM_ENEMY_ROBOT, node="calculation")
 
         # self.ctrld_robot = self.objects.robot[int(self.robot_id)]
 
