@@ -32,7 +32,7 @@ class WorldModel(object):
 
         """----上の5つの変数、インスタンスをまとめたもの、callbackをもつ---"""
         self._objects = Objects(
-            self._team_color, config.NUM_FRIEND_ROBOT, config.NUM_ENEMY_ROBOT)
+            self._team_color, config.NUM_FRIEND_ROBOT, config.NUM_ENEMY_ROBOT, node="world_model")
 
         """---Referee---"""
         self._referee = Referee(self._objects)
