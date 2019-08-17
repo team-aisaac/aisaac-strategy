@@ -20,7 +20,7 @@ global mode
 class Main(object):
     def main(self, Kpv=None, Kpr=None, Kdv=None, Kdr=None):
 
-        robot_id = str(0)
+        robot_id = str(4)
         robot_color = 'blue'
 
         status_topic_name = '/'+robot_color+'/robot_'+robot_id+'/status'
@@ -44,11 +44,11 @@ class Main(object):
         if Kpv is None:
             Kpv = 3.111774552866889
         if Kpr is None:
-            Kpr = 2.0
+            Kpr = 2.2
         if Kdv is None:
             Kdv = 5.436618301696918
         if Kdr is None:
-            Kdr = 2.0
+            Kdr = 1.0
         # kdr 4.78     |  5.037    
 
         next_param = {
@@ -60,7 +60,7 @@ class Main(object):
 
         status = Status()
         status.status = "move_linear"
-        status.pid_goal_pos_x = 0.0
+        status.pid_goal_pos_x = 4.5
         status.pid_goal_pos_y = 1.0
         status.pid_goal_theta = 0.0
 
@@ -86,17 +86,17 @@ class Main(object):
         global mode
         if mode == "position":
             positions = [
-                [0.0, 0.0, 0.3 * np.pi],
-                [0.0, 2.0, 0.9 * np.pi],
+                [4.5, 0.0, 0.3 * np.pi],
+                [4.5, 2.0, 0.9 * np.pi],
                 # [0.0, -1.0, 1.8 * np.pi],
                 # [0.0, 2.0, 0.6 * np.pi],
             ]
         else:
             positions = [
-                [0.0, 1.0, 0.3 * np.pi],
-                [0.0, 1.0, 0.9 * np.pi],
-                [0.0, 1.0, 1.8 * np.pi],
-                [0.0, 1.0, 0.6 * np.pi],
+                [4.5, 1.0, 0.3 * np.pi],
+                [4.5, 1.0, 0.9 * np.pi],
+                [4.5, 1.0, 1.8 * np.pi],
+                [4.5, 1.0, 0.6 * np.pi],
             ]
 
         total_average_pos = 0.0
@@ -204,7 +204,7 @@ class Main(object):
 
 if __name__ == '__main__':
     mode = "position"
-    # mode = "rotation"
+    #mode = "rotation"
 
     rospy.init_node("autotuner")
     program_start_time = rospy.Time.now()

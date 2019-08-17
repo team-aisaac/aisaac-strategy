@@ -1,0 +1,42 @@
+# PS4 Controller
+#
+#          Button / Axes
+# share     : 8  /
+# option    : 9  /
+# key_up    :    / 7
+# key_right :    / 6
+# key_down  :    / 7
+# key_left  :    / 6
+# Lstick_h  :    / 0
+# Lstick_v  :    / 1
+# Rstick_h  :    / 3
+# Rstick_v  :    / 4
+# L2        : 6  / 2
+# R2        : 7  / 5
+# L1        : 4  / 
+# R1        : 5  / 
+# sankaku   : 2  / 
+# maru      : 1  / 
+# batsu     : 0  / 
+# shikaku   : 3  / 
+# PS/touch  : 10 /
+# L3        : 11 /
+# R3        : 12 /
+
+surge_axis   : 1
+sway_axis    : 0
+
+turbo_button : 5
+turn_l_axis : 2
+turn_r_axis : 5
+
+kick_x_button   : 0
+kick_z_button   : 1
+dribble_button  : 4
+
+select_button : 8
+start_button  : 9
+
+halt_button  : 7
+stopgame_button : 6
+force_start_button : 7
