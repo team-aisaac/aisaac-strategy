@@ -76,9 +76,11 @@ class Robot(object):
         self._last_omega = 0.0
 
     def store_and_publish_commands(self):
+        acc_clip_threshold_max = 0.075
+        acc_clip_threshold_min = 0.01
+
         current_pub_time = rospy.Time.now()
         dt = (current_pub_time - self._last_pub_time).to_sec()
-
 
         self.ctrld_robot.update_expected_velocity_context(self.cmd.vel_x,
                                                           self.cmd.vel_y,
@@ -88,13 +90,21 @@ class Robot(object):
         current_omega_acc = (self.cmd.omega - self._last_omega) / dt
 
         clipped_acc \
-            = functions.clip_vector2(current_acc, 0.075)
+            = functions.clip_vector2(current_acc, acc_clip_threshold_max)
         clipped_omega_acc, _ \
-            = functions.clip_vector2((current_omega_acc, 0.0), 0.075 / self.objects.robot[0].size_r)
+            = functions.clip_vector2((current_omega_acc, 0.0), acc_clip_threshold_max / self.objects.robot[0].size_r)
 
-        self.cmd.vel_surge = self._last_vel_surge_sway_vec[0] + clipped_acc[0]
-        self.cmd.vel_sway = self._last_vel_surge_sway_vec[1] + clipped_acc[1]
-        self.cmd.omega = self._last_omega + clipped_omega_acc
+        vel_acc_clip_threshold_min = acc_clip_threshold_min
+        omega_acc_clip_threshold_min = acc_clip_threshold_min / self.objects.robot[0].size_r
+
+        if -vel_acc_clip_threshold_min < clipped_acc[0] < vel_acc_clip_threshold_min:
+            self.cmd.vel_surge = self._last_vel_surge_sway_vec[0] + clipped_acc[0]
+
+        if -vel_acc_clip_threshold_min < clipped_acc[1] < vel_acc_clip_threshold_min:
+            self.cmd.vel_sway = self._last_vel_surge_sway_vec[1] + clipped_acc[1]
+
+        if -omega_acc_clip_threshold_min < clipped_omega_acc < omega_acc_clip_threshold_min:
+            self.cmd.omega = self._last_omega + clipped_omega_acc
 
         self.ctrld_robot.handle_loop_callback()
 
