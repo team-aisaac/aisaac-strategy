@@ -21,7 +21,7 @@
           </div>
         </div>
       </article>
-      <article v-for="(message, index) in reverseMessages" :key="index" class="media">
+      <article v-for="(msg, index) in reverseMessages" :key="index" class="media">
         <figure class="media-left">
           <p class="image is-64x64">
             <img src="https://bulma.io/images/placeholders/128x128.png">
@@ -30,14 +30,14 @@
         <div class="media-content">
           <div class="content">
             <p>
-              <strong>id: {{ message.user }}</strong>
+              <strong>id: {{ msg.user }}</strong>
               <br>
-              {{ message.text }}
+              {{ msg.text }}
               <br>
               <small>
                 <a>Like</a> ·
                 <a>Reply</a>
-                · {{ message.date }}
+                · {{ msg.date }}
               </small>
             </p>
           </div>
