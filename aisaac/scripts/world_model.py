@@ -268,7 +268,8 @@ def run_world_model():
             elif referee_branch == "BALL_PLACEMENT_FRIEND":
                 strat_ctx.update("enemy_kick", False, namespace="world_model")
                 strat_calcrator = world_model.get_strategy_calcurator("friend_ball_placement")
-                strat = strat_calcrator.calcurate(strat_ctx)
+                place_ball_position = referee.get_place_ball_position()
+                strat = strat_calcrator.calcurate(strat_ctx, place_ball_position)
             elif referee_branch == "BALL_PLACEMENT_ENEMY":
                 strat_ctx.update("enemy_kick", False, namespace="world_model")
                 strat_calcrator = world_model.get_strategy_calcurator("stop")

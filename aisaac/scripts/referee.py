@@ -3,7 +3,7 @@
 
 #from world_state import WorldState
 import rospy
-from consai_msgs.msg import RefereeTeamInfo
+from consai_msgs.msg import RefereeTeamInfo, PlaceBall
 from std_msgs.msg import Int8
 
 class Referee:
@@ -15,13 +15,15 @@ class Referee:
         self._command = None
         self._stage = None
         self._teaminfo = None
+        self._place_ball_position = None
 
         """---Refereeから司令をもらうsubscriberの起動--"""
         rospy.Subscriber("/" + self.team_color + "/refbox/command", Int8, self._command_callback)
         rospy.Subscriber("/" + self.team_color + "/refbox/stage", Int8, self._stage_callback)
         rospy.Subscriber("/" + self.team_color + "/refbox/blue_info", RefereeTeamInfo, self._teaminfo_callback)
+        rospy.Subscriber("/" + self.team_color + "/refbox/place_ball_position", PlaceBall, self._place_ball_position_callback)
 
-    """---Refereeからommandをもらう---"""
+    """---Refereeからcommandをもらう---"""
     def _command_callback(self, msg):
         self._command = str(msg)
 
@@ -33,6 +35,10 @@ class Referee:
     def _teaminfo_callback(self, msg):
         self._teaminfo = str(msg)
 
+    """---Refereeから現在のball place positionをもらう---"""
+    def _place_ball_position_callback(self, msg):
+        self._place_ball_position = msg
+
     def get_referee_msg(self):
         referee_msg = {
             'command': self._command,
@@ -41,6 +47,8 @@ class Referee:
         }
         return referee_msg
 
+    def get_place_ball_position(self):
+        return [self._place_ball_position.x, self._place_ball_position.y]
 
     """---Refereeからの指示にしたがって行動指針を決定する---"""
     def get_referee_branch(self):
