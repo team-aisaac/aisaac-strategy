@@ -28,11 +28,11 @@ class FriendBallPlacement(StrategyCalcuratorBase):
         super(FriendBallPlacement, self).__init__(objects)
         self.kick_margin = 1.
         self.dribble_range = 1.5
-        self.place_point = [0, 0]
         self.ball_dispersion = [10.] * 30
 
-    def calcurate(self, strategy_context=None):
-        # type: (StrategyContext) -> StrategyBasei
+    def calcurate(self, strategy_context=None, place_ball_position=[0,0]):
+        # type: (StrategyContext) -> StrategyBase
+        self.place_point = place_ball_position
         self.ball_dispersion.append(
             functions.distance_btw_two_points(self.place_point, self._ball_params.get_current_position()))
         del self.ball_dispersion[0]
