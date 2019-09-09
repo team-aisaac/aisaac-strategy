@@ -480,7 +480,7 @@ class RobotPid(object):
 
         return sorted_clip_pos_xys[0]
 
-    def pid_linear(self, goal_pos_x, goal_pos_y, goal_pos_theta, ignore_penalty_area=False):
+    def pid_linear(self, goal_pos_x, goal_pos_y, goal_pos_theta, ignore_penalty_area=False, avoid=True):
         """
         Parameters
         ----------
@@ -488,6 +488,7 @@ class RobotPid(object):
         goal_pos_y: float 目的地のy座標
         goal_pos_theta: float 目的の角度
         ignore_penalty_area: boolean Trueならペナルティエリアに進入する、Falseなら進入しない
+        avoid: boolean Trueなら障害物回避を行う
         """
 
         """
@@ -512,7 +513,9 @@ class RobotPid(object):
 
             tmp_x, tmp_y = self.avoid_penalty_area(tmp_x, tmp_y)
             tmp_x, tmp_y = self.avoid_goal(tmp_x, tmp_y)
-            tmp_x, tmp_y = self.path_plan(tmp_x, tmp_y)
+
+            if avoid:
+                tmp_x, tmp_y = self.path_plan(tmp_x, tmp_y)
 
             if not ignore_penalty_area:
                 tmp_x, tmp_y = self._clip_penalty_area(tmp_x, tmp_y, offset=self.ctrld_robot.size_r)
