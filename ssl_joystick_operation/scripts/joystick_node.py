@@ -71,8 +71,8 @@ class RobotCommand():
     """docstring for RobotCommand"""
 
     def __init__(self):
-        self.pub = rospy.Publisher(
-            '~robot_commands', robot_commands, queue_size=10)
+        # self.pub = rospy.Publisher('~robot_commands', robot_commands, queue_size=10)
+        self.pub = rospy.Publisher('/blue/robot_0/robot_commands', robot_commands, queue_size=10)
 
         self.surge_axis = rospy.get_param('~surge_axis')
         self.sway_axis = rospy.get_param('~sway_axis')

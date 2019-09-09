@@ -34,10 +34,10 @@
 const uint8_t HEAD_BYTE   = 0x7D;
 const uint8_t ESCAPE_BYTE = 0x7E;
 const uint8_t ESCAPE_MASK = 0x20;
-#define SERIAL_PORT "/dev/ttyUSB0" // SDevice file corrensponding to serial interface
+//#define SERIAL_PORT "/dev/ttyUSB0" // SDevice file corrensponding to serial interface
 #define MAX_DATA_TYPE 3
 
-#define VEL_MAX 2500
+#define VEL_MAX 3000
 
 #define ENABLE_DBG             // Toggle when using printf() function
 #ifndef ENABLE_DBG
@@ -91,6 +91,7 @@ public:
     ioctl(fd, TCGETS, &oldtio);             // Evacuate current serial port settings
     newtio = oldtio;                        // Copy current serial port settings
     newtio.c_cflag = B57600|CREAD|CS8;         // Configure port settings. See man page termios(3)
+    // newtio.c_cflag = B115200|CREAD|CS8;         // Configure port settings. See man page termios(3)
     ioctl(fd, TCSETS, &newtio);             // Enable port settings
 
     struct timeval tv_start, tv_end; // for realtime sequence

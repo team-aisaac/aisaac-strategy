@@ -32,6 +32,7 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
 
         self._pass_positions = None
         self._random_fake_position = self._generate_pass_position()
+        self._last_pass_start_time = rospy.Time.now()
 
     def _generate_pass_position(self, offset=0.0):
         """
@@ -51,6 +52,7 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
             tmp_pass_pos = self._generate_pass_position(tmp_pass_pos[0])
             pass_positions.append(tmp_pass_pos)
         pass_positions.append([6.0, 0.0])
+        self._last_pass_start_time = rospy.Time.now()
 
         rospy.loginfo("パス経路："+str(pass_positions))
 
@@ -86,10 +88,11 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
 
         # 目標位置近くにボールが行ったら次のステートへ
         change_state = False
-        if distance < succeeded_area:
+        if distance < succeeded_area or (rospy.Time.now() - self._last_pass_start_time).to_sec() > 10.0:
             cur_state = cur_state + 1
             self._random_fake_position = self._generate_pass_position()
             change_state = True
+            self._last_pass_start_time = rospy.Time.now()
 
         # 最後のpass_positionsだったらシュート
         is_shoot = False
@@ -287,8 +290,9 @@ class NormalStartKickOffStrategyCalcurator(StrategyCalcuratorBase):
         ball_pos = self._objects.ball.get_current_position()
         target_pos = pass_pos
         distance = functions.distance_btw_two_points(ball_pos, target_pos)
+        distance_from_center = functions.distance_btw_two_points(ball_pos, [0.0, 0.0])
 
-        if distance < succeeded_area:
+        if distance < succeeded_area or distance_from_center > 1.0:
             strategy_context.update("kickoff_complete", True, namespace="world_model")
             strategy_context.update("defence_or_attack", True, namespace="world_model")
 
