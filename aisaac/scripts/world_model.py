@@ -13,6 +13,7 @@ from direct_free_defence_strategy_calcurator import DirectFreeDefence
 from indirect_free_attack_strategy_calcurator import IndirectFreeAttack
 from indirect_free_defence_strategy_calcurator import IndirectFreeDefence
 from penalty_attack_strategy_calcurator import PenaltyAttack
+from friend_ball_placement_strategy_calcurator import FriendBallPlacement
 from context import StrategyContext
 from world_model_status_publisher import WorldModelStatusPublisher
 
@@ -48,7 +49,8 @@ class WorldModel(object):
             'direct_free_attack': DirectFreeAttack(self._objects),
             'direct_free_defence': DirectFreeDefence(self._objects),
             'indirect_free_attack': IndirectFreeAttack(self._objects),
-            'indirect_free_defence': IndirectFreeDefence(self._objects)
+            'indirect_free_defence': IndirectFreeDefence(self._objects),
+            'friend_ball_placement': FriendBallPlacement(self._objects)
         }
         self._status_publisher = WorldModelStatusPublisher(
             self._team_color, robot_ids=self._objects.get_robot_ids())
@@ -263,9 +265,9 @@ def run_world_model():
                         'normal_start_normal')
                 strat = strat_calcrator.calcurate(strat_ctx)
 
-            elif referee_branch == "BALL_PLACEMENT_ROBOT":
+            elif referee_branch == "BALL_PLACEMENT_FRIEND":
                 strat_ctx.update("enemy_kick", False, namespace="world_model")
-                strat_calcrator = world_model.get_strategy_calcurator("stop")
+                strat_calcrator = world_model.get_strategy_calcurator("friend_ball_placement")
                 strat = strat_calcrator.calcurate(strat_ctx)
             elif referee_branch == "BALL_PLACEMENT_ENEMY":
                 strat_ctx.update("enemy_kick", False, namespace="world_model")
