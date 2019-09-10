@@ -19,8 +19,9 @@ ACTION_ORIENTATION_SIGMA = 0.1 ** 2
 
 HAS_A_BALL_DISTANCE_THRESHOLD = 0.03
 
-# フィールド
+# フィールドサイズ
 FIELD_SIZE = [13.4, 10.4]
+# コートサイズ
 COURT_SIZE = [12., 9]
 # 守る(味方)側からみてLRしている
 GOAL_CENTER = [-6.0, 0.0]

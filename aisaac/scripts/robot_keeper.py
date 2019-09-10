@@ -355,7 +355,11 @@ class RobotKeeper(object):
         else:
             defense_point_x = -self.goal_left[0]
         defense_point_y = 0
+
+        #壁検知
         friend_obstacle, enemy_obstacle = self.detect_obstacle()
+
+        #壁による守備不要域取得
         if friend_obstacle != [] or enemy_obstacle != []:
             for i in friend_obstacle:
                 shel_r.append(self.culc_sheltered_area(self.objects.get_robot_by_id(i).get_current_position())[0])
@@ -366,6 +370,8 @@ class RobotKeeper(object):
                 shel_l.append(self.culc_sheltered_area(self.enemy[i].get_current_position())[1])
             """
             shel = self.sort_sheltered_area(shel_r, shel_l)
+
+            #キーパー守備位置
             defense_point_x, defense_point_y = self.culc_defense_point(shel)
         x, y, theta = self.calc_keeper_position(defense_point_x, defense_point_y)
         self.kick.receive_ball_keeper((x, y))

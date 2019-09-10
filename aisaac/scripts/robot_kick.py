@@ -310,6 +310,7 @@ class RobotKick(object):
     def dribble_ball(self, target_x, target_y, ignore_penalty_area=False):
         distance = math.sqrt((target_x - self.ball_params.get_current_position()[0])**2 + (target_y - self.ball_params.get_current_position()[1])**2)
         if distance != 0:
+            #ボール後方へ移動
             if self.dribble_stage == 0:
                 prepare_offset = 0.4
                 pose_x = (- prepare_offset * target_x + (prepare_offset + distance) * self.ball_params.get_current_position()[0]) / distance
@@ -343,6 +344,7 @@ class RobotKick(object):
 
                 self.pid.pid_linear(pose_x, pose_y, pose_theta, ignore_penalty_area=ignore_penalty_area)
 
+            #目標地付近までドリブル
             elif self.dribble_stage == 1:
                 rospy.set_param("/robot_max_velocity", 0.5)
                 pose_theta = math.atan2( (target_y - self.ctrld_robot.get_current_position()[1]) , (target_x - self.ctrld_robot.get_current_position()[0]) )
@@ -365,6 +367,7 @@ class RobotKick(object):
                 self.cmd.dribble_power = self.dribble_power
                 self.pid.pid_linear(target_x, target_y, pose_theta, ignore_penalty_area=ignore_penalty_area, avoid=False)
 
+            #目標地付近になったらドリブラーを止めて引きずる(バックスピン防止)
             elif self.dribble_stage == 2:
                 pose_theta = math.atan2( (target_y - self.ctrld_robot.get_current_position()[1]) , (target_x - self.ctrld_robot.get_current_position()[0]) )
                 area = 0.5
