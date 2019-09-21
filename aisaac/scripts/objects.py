@@ -20,9 +20,10 @@ class Objects(object):
             cls.__instance = object.__new__(cls)
         return cls.__instance
 
-    def __init__(self, team_color, robot_total, enemy_total, node=""):
+    def __init__(self, team_color, team_side, robot_total, enemy_total, node=""):
         # type: (str, int, int) -> None
         self.team_color = team_color
+        self.team_side = team_side
         self.robot_total = robot_total
         self.enemy_total = enemy_total
 

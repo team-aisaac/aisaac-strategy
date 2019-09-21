@@ -36,6 +36,7 @@
 
     <node name="world_model" pkg="aisaac" type="world_model.py" output="screen" >
       <param name="team_color" type="string" value="$(arg color)" />
+      <param name="team_side" type="string" value="$(arg side)" />
     </node>
 
     <node name="launch_manager" pkg="launch_manager" type="launch_manager.py" required="true"/>

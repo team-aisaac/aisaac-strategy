@@ -38,11 +38,12 @@ class Calculation():
         rospy.init_node("Calculation_node")
         
         self.robot_color = str(rospy.get_param("~robot_color"))
+        self.robot_side = str(rospy.get_param("~robot_side"))
         # self.robot_id = str(rospy.get_param("~robot_num"))
 
         # Composition
         self.objects = Objects(
-            self.robot_color, config.NUM_FRIEND_ROBOT, config.NUM_ENEMY_ROBOT, node="calculation")
+            self.robot_color, self.robot_side, config.NUM_FRIEND_ROBOT, config.NUM_ENEMY_ROBOT, node="calculation")
 
         # self.ctrld_robot = self.objects.robot[int(self.robot_id)]
 
