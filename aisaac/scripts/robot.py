@@ -31,6 +31,7 @@ class Robot(object):
     def __init__(self, robot_id=None):
         rospy.init_node("robot")
         self.robot_color = str(rospy.get_param("~robot_color"))
+        self.robot_side = str(rospy.get_param("~robot_side"))
 
         if not robot_id:
             self.robot_id = str(rospy.get_param("~robot_num"))
@@ -48,7 +49,7 @@ class Robot(object):
         self._command_pub = RobotCommandPublisherWrapper(self.robot_color, self.robot_id)
 
         # Composition
-        self.objects = Objects(self.robot_color, self.robot_total, self.enemy_total, node="robot"+str(self.robot_id))
+        self.objects = Objects(self.robot_color, self.robot_side, self.robot_total, self.enemy_total, node="robot"+str(self.robot_id))
         self.ctrld_robot = self.objects.robot[int(self.robot_id)] # type: entity.Robot
 
         self.robot_friend = self.objects.robot
