@@ -222,7 +222,7 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
         result = self._dynamic_strategy
         return result
 
-
+    #通常時defence戦略
     def _defence_strategy(self, strategy_context=None):
 
         #ball取得時、攻撃へ移行
@@ -247,6 +247,7 @@ class NormalStartStrategyCalcurator(StrategyCalcuratorBase):
                 status.pid_goal_pos_x = self._ball_params.get_current_position()[0]
                 status.pid_goal_pos_y = self._ball_params.get_current_position()[1]
                 status.pid_goal_theta = math.atan2( (self._ball_params.get_current_position()[1] - robot.get_current_position()[1]) , (self._ball_params.get_current_position()[0] - robot.get_current_position()[0]) )
+            #ボールとフリーの機体の中点へ移動
             elif robot.get_role() == "RFW":
                 #フリーで最もゴールに近い敵idを返す
                 status.status = "move_linear"

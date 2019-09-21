@@ -72,8 +72,18 @@ class RobotPid(object):
         # self.Kdr = 3
 
     def collision_detection(self, goal_pos_x, goal_pos_y):
+        #返り値
+        #   衝突するか(bool)
+        #   障害物位置から機体位置と目標地の直線に下ろした垂線の交点x(float)
+        #   障害物位置から機体位置と目標地の直線に下ろした垂線の交点y(float)
+        #   障害物位置x(float)
+        #   障害物位置y(float)
+        #   機体位置と目標地の直線と障害物の距離(float)
+
         a, b, c = functions.line_parameters(self.ctrld_robot.get_current_position()[0], self.ctrld_robot.get_current_position()[1], goal_pos_x, goal_pos_y)
         if a != 0 and b != 0:
+
+            #自分以外の全robotに対して衝突判定
             for i in self.objects.get_active_robot_ids():
                 if i != self.robot_id:
                     robot = self.objects.get_robot_by_id(i)
@@ -90,6 +100,7 @@ class RobotPid(object):
 
                             return True, x, y, robot.get_current_position()[0] , robot.get_current_position()[1], distance
 
+            #全enemyに対して衝突判定
             for j in self.objects.get_active_enemy_ids():
                 enemy = self.objects.get_enemy_by_id(j)
                 if enemy is None:
@@ -107,6 +118,7 @@ class RobotPid(object):
 
             distance = functions.distance_of_a_point_and_a_straight_line(self.ball_params.get_current_position()[0], self.ball_params.get_current_position()[1], a, b, c)
 
+            #ballに対して衝突判定
             if distance < self.ctrld_robot.size_r * 1:
                         x = (-self.ball_params.get_current_position()[1] * b + (b**2 / a) * self.ball_params.get_current_position()[0] - c) / (a + b**2 / a)
                         y = (-a * x -c) / b
@@ -380,7 +392,9 @@ class RobotPid(object):
 
     def path_plan(self, goal_pos_x, goal_pos_y):
         self.recursion_count += 1
+        #障害物検知
         collision = self.collision_detection(goal_pos_x, goal_pos_y)
+        #障害物が存在するときサブゴールを設定し,再計算
         if collision[0] and self.recursion_count < self.recursion_max:
             goal_pos_x, goal_pos_y = self.get_sub_goal(collision[1], collision[2], collision[3], collision[4], collision[5])
             self.path_plan(goal_pos_x, goal_pos_y)
@@ -480,7 +494,7 @@ class RobotPid(object):
 
         return sorted_clip_pos_xys[0]
 
-    def pid_linear(self, goal_pos_x, goal_pos_y, goal_pos_theta, ignore_penalty_area=False):
+    def pid_linear(self, goal_pos_x, goal_pos_y, goal_pos_theta, ignore_penalty_area=False, avoid=True):
         """
         Parameters
         ----------
@@ -488,6 +502,7 @@ class RobotPid(object):
         goal_pos_y: float 目的地のy座標
         goal_pos_theta: float 目的の角度
         ignore_penalty_area: boolean Trueならペナルティエリアに進入する、Falseなら進入しない
+        avoid: boolean Trueなら障害物回避を行う
         """
 
         """
@@ -512,7 +527,9 @@ class RobotPid(object):
 
             tmp_x, tmp_y = self.avoid_penalty_area(tmp_x, tmp_y)
             tmp_x, tmp_y = self.avoid_goal(tmp_x, tmp_y)
-            tmp_x, tmp_y = self.path_plan(tmp_x, tmp_y)
+
+            if avoid:
+                tmp_x, tmp_y = self.path_plan(tmp_x, tmp_y)
 
             if not ignore_penalty_area:
                 tmp_x, tmp_y = self._clip_penalty_area(tmp_x, tmp_y, offset=self.ctrld_robot.size_r)

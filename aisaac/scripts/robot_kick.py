@@ -14,6 +14,7 @@ class RobotKick(object):
         # type: (robot_pid.RobotPid, aisaac.msg.Status, robot_status.RobotStatus) -> None
         self.kick_power_x = 10
         self.kick_power_z = 0
+        self.dribble_power = 10
 
         self.ball_params = pid.ball_params
         self.ctrld_robot = pid.ctrld_robot
@@ -24,16 +25,21 @@ class RobotKick(object):
         self.dispersion2 = [10] * 1
         self.rot_dispersion = [10] * 1
 
-        self.access_threshold1 = 0.1
-        self.access_threshold2 = 0.1
-        self.feint_threshold1 = 0.2
-        self.feint_threshold2 = 0.2
-        self.rot_access_threshold = 0.1
+        self.kick_access_threshold1 = 0.1
+        self.kick_access_threshold2 = 0.1
+        self.kick_feint_threshold1 = 0.2
+        self.kick_feint_threshold2 = 0.2
+        self.kick_rot_access_threshold = 0.1
+        self.dribble_access_threshold1 = 0.03
+        self.dribble_access_threshold2 = 0.05
+        self.dribble_rot_access_threshold = 0.1
         self.pass_stage = 0
+        self.dribble_stage = 0
         self._kick_start_time = rospy.Time.now()
         self._dribble_start_pos = self.ball_params.get_current_position()
 
         self.const = 3.0
+        self.const_place = 2.0
         # self.const = 4
 
         self.ball_frame = 60 #ボールの軌道の直線フィッティングと速度の計算フレーム数、使ってない
@@ -100,13 +106,14 @@ class RobotKick(object):
 
     
 
-    def pass_ball(self, target_x, target_y, should_wait=False, is_shoot=False, is_tip_kick=False, ignore_penalty_area=False):
+    def pass_ball(self, target_x, target_y, should_wait=False, is_shoot=False, is_tip_kick=False, ignore_penalty_area=False, place=False):
         """
         Parameters
         ----------
         should_wait: boolean TrueならKick準備完了後、Kick直前でKickせず待機
         is_shoot:    boolean Trueならshootの威力でKick、Falseならpassの威力でKick
         is_tip_kick  boolean Trueならtip kick
+        place        boolean Trueなら目標位置でballが静止するようにKick
         """
         distance = math.sqrt((target_x - self.ball_params.get_current_position()[0])**2 + (target_y - self.ball_params.get_current_position()[1])**2)
         if distance != 0:
@@ -133,8 +140,8 @@ class RobotKick(object):
                 dispersion_average1 = sum(self.dispersion1)/len(self.dispersion1)
                 dispersion_average2 = sum(self.dispersion2)/len(self.dispersion2)
 
-                if dispersion_average1 > self.feint_threshold1 \
-                        or dispersion_average2 > self.feint_threshold2 \
+                if dispersion_average1 > self.kick_feint_threshold1 \
+                        or dispersion_average2 > self.kick_feint_threshold2 \
                         or should_wait:
                     pose_theta += np.pi/3.
 
@@ -144,7 +151,7 @@ class RobotKick(object):
 
                 # print("{} {}".format(dispersion_average, rot_dispersion_average))
 
-                if dispersion_average1 < self.access_threshold1 and dispersion_average2 < self.access_threshold2 and rot_dispersion_average < self.rot_access_threshold:
+                if dispersion_average1 < self.kick_access_threshold1 and dispersion_average2 < self.kick_access_threshold2 and rot_dispersion_average < self.kick_rot_access_threshold:
                     self.pose_theta = pose_theta
                     # self.status.robot_status = "kick"
                     if not should_wait:
@@ -164,6 +171,8 @@ class RobotKick(object):
                     kick_power_z = math.sqrt(distance) * self.const
                     self.kick_xz(power_x=kick_power_x, power_z=kick_power_z, ignore_penalty_area=ignore_penalty_area)
                 else:
+                    if place:
+                        kick_power_x = math.sqrt(distance) * self.const_place
                     self.kick_xz(power_x=kick_power_x, ignore_penalty_area=ignore_penalty_area)
 
             """
@@ -297,3 +306,83 @@ class RobotKick(object):
         #     #self.lines3.set_data([self.ball_params.ball_future_x, hx], [self.ball_params.ball_future_y, hy])
         #     #self.lines4.set_data([self.ball_params.ball_future_x, target_x], [self.ball_params.ball_future_y, target_y])
         #     plt.pause(.01)
+
+    def dribble_ball(self, target_x, target_y, ignore_penalty_area=False):
+        distance = math.sqrt((target_x - self.ball_params.get_current_position()[0])**2 + (target_y - self.ball_params.get_current_position()[1])**2)
+        if distance != 0:
+            #ボール後方へ移動
+            if self.dribble_stage == 0:
+                prepare_offset = 0.4
+                pose_x = (- prepare_offset * target_x + (prepare_offset + distance) * self.ball_params.get_current_position()[0]) / distance
+                pose_y = (- prepare_offset * target_y + (prepare_offset + distance) * self.ball_params.get_current_position()[1]) / distance
+                pose_theta = math.atan2( (target_y - self.ctrld_robot.get_current_position()[1]) , (target_x - self.ctrld_robot.get_current_position()[0]) )
+
+                a, b, c = functions.line_parameters(self.ball_params.get_current_position()[0], self.ball_params.get_current_position()[1], target_x, target_y)
+
+                self.dispersion1.append(
+                        functions.distance_of_a_point_and_a_straight_line(self.ctrld_robot.get_current_position()[0], self.ctrld_robot.get_current_position()[1], a, b, c))
+                        #(pose_x - self.ctrld_robot.get_current_position()[0])**2 \
+                        #+ (pose_y - self.ctrld_robot.get_current_position()[1])**2)
+                del self.dispersion1[0]
+
+                self.dispersion2.append(
+                        (pose_x - self.ctrld_robot.get_current_position()[0])**2 \
+                        + (pose_y - self.ctrld_robot.get_current_position()[1])**2)
+                del self.dispersion2[0]
+
+                dispersion_average1 = sum(self.dispersion1)/len(self.dispersion1)
+                dispersion_average2 = sum(self.dispersion2)/len(self.dispersion2)
+
+                self.rot_dispersion.append((pose_theta - self.ctrld_robot.get_current_orientation())**2)
+                del self.rot_dispersion[0]
+                rot_dispersion_average = sum(self.rot_dispersion)/len(self.rot_dispersion)
+
+                # print("{} {}".format(dispersion_average, rot_dispersion_average))
+
+                if dispersion_average1 < self.dribble_access_threshold1 and dispersion_average2 < self.dribble_access_threshold2 and rot_dispersion_average < self.dribble_rot_access_threshold:
+                    self.dribble_stage = 1
+
+                self.pid.pid_linear(pose_x, pose_y, pose_theta, ignore_penalty_area=ignore_penalty_area)
+
+            #目標地付近までドリブル
+            elif self.dribble_stage == 1:
+                rospy.set_param("/robot_max_velocity", 0.5)
+                pose_theta = math.atan2( (target_y - self.ctrld_robot.get_current_position()[1]) , (target_x - self.ctrld_robot.get_current_position()[0]) )
+                area = 0.5
+                if functions.distance_btw_two_points(self.ball_params.get_current_position(),
+                                                     self.ctrld_robot.get_current_position()) \
+                                                             > self.ctrld_robot.size_r + area: 
+
+                    self.cmd.vel_surge = 0
+                    self.cmd.vel_sway = 0
+                    self.cmd.omega = 0
+                    self.cmd.dribble_power = 0
+                    self.status.robot_status = "None"
+                    self.dribble_stage = 0
+                    return
+
+                if functions.distance_btw_two_points(self.ball_params.get_current_position(), [target_x, target_y]) < 0.3:
+                    self.dribble_stage = 2
+
+                self.cmd.dribble_power = self.dribble_power
+                self.pid.pid_linear(target_x, target_y, pose_theta, ignore_penalty_area=ignore_penalty_area, avoid=False)
+
+            #目標地付近になったらドリブラーを止めて引きずる(バックスピン防止)
+            elif self.dribble_stage == 2:
+                pose_theta = math.atan2( (target_y - self.ctrld_robot.get_current_position()[1]) , (target_x - self.ctrld_robot.get_current_position()[0]) )
+                area = 0.5
+                if functions.distance_btw_two_points(self.ball_params.get_current_position(),
+                                                     self.ctrld_robot.get_current_position()) \
+                        > self.ctrld_robot.size_r + area \
+                        or functions.distance_btw_two_points(self.ball_params.get_current_position(), [target_x, target_y]) < 0.1:
+
+                    self.cmd.vel_surge = 0
+                    self.cmd.vel_sway = 0
+                    self.cmd.omega = 0
+                    self.cmd.dribble_power = 0
+                    self.status.robot_status = "None"
+                    self.dribble_stage = 0
+                    return
+
+                self.cmd.dribble_power = 0
+                self.pid.pid_linear(target_x, target_y, pose_theta, ignore_penalty_area=ignore_penalty_area, avoid=False)
