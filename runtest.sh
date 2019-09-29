@@ -13,7 +13,7 @@ cd ~/catkin_ws/src
 ln -s /aisaac-strategy
 
 cd ~/catkin_ws
-catkin_make -j8 || catkin_make -j8 || catkin_make -j8
+catkin_make -j8 || catkin_make -j8 || catkin_make -j8 || catkin_make -j8 || catkin_make -j8
 source devel/setup.bash
 
 mkdir -p ~/.config/matplotlib/
@@ -23,9 +23,9 @@ roscore &
 
 sleep 3
 
-rosrun aisaac test1.py
-rosrun aisaac test2.py
-rosrun aisaac test3.py
+rosrun aisaac test_robot.py
+rosrun aisaac test_world_model.py
+rosrun aisaac test_calculation.py
 
 killall -9 roscore
 killall -9 rosmaster

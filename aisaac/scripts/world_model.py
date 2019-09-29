@@ -31,8 +31,8 @@ import config
 class WorldModel(object):
     def __init__(self):
         rospy.init_node("world_model")
-        self._team_color = str(rospy.get_param('~team_color'))
-        self._team_side = str(rospy.get_param('~team_side'))
+        self._team_color = str(rospy.get_param('friend_color'))
+        self._team_side = str(rospy.get_param('team_side'))
 
         """----上の5つの変数、インスタンスをまとめたもの、callbackをもつ---"""
         self._objects = Objects(
@@ -317,3 +317,5 @@ if __name__ == "__main__":
         except:
             import traceback
             traceback.print_exc()
+            if rospy.get_param("is_test", False):
+                break
