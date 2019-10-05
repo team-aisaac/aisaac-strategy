@@ -29,8 +29,8 @@ ROBOT_LOOP_RATE = config.ROBOT_LOOP_RATE
 
 class Robot(object):
     def __init__(self, robot_id=None):
-        rospy.init_node("robot")
-        self.robot_color = str(rospy.get_param("~robot_color"))
+        self.robot_color = str(rospy.get_param("friend_color"))
+        self.robot_side = str(rospy.get_param("team_side"))
 
         if not robot_id:
             self.robot_id = str(rospy.get_param("~robot_num"))
@@ -48,7 +48,7 @@ class Robot(object):
         self._command_pub = RobotCommandPublisherWrapper(self.robot_color, self.robot_id)
 
         # Composition
-        self.objects = Objects(self.robot_color, self.robot_total, self.enemy_total, node="robot"+str(self.robot_id))
+        self.objects = Objects(self.robot_color, self.robot_side, self.robot_total, self.enemy_total, node="robot"+str(self.robot_id))
         self.ctrld_robot = self.objects.robot[int(self.robot_id)] # type: entity.Robot
 
         self.robot_friend = self.objects.robot
@@ -308,12 +308,18 @@ def run_robot():
 
 
 if __name__ == "__main__":
+    rospy.init_node("robot")
+
     while True and not rospy.is_shutdown():
         try:
+            # import cProfile
+            # cProfile.run('run_robot()','profile_robot_'+str(rospy.get_param("~robot_num"))+'.txt')
             run_robot()
         except:
             import traceback
             traceback.print_exc()
+            if rospy.get_param("is_test", False):
+                break
 
 
 """

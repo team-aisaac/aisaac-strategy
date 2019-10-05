@@ -9,8 +9,10 @@ import sys
 
 package = 'aisaac'
 executable = 'calculation.py'
-rospy.set_param('team_side', 'blue')
-node = roslaunch.core.Node(package, executable, args='_robot_color:=blue _robot_num:=0')
+rospy.set_param('is_test', True)
+rospy.set_param('team_side', 'left')
+rospy.set_param('friend_color', 'blue')
+node = roslaunch.core.Node(package, executable, args='')
 
 
 
