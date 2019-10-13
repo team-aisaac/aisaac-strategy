@@ -167,6 +167,10 @@ class Robot(object):
                                     self.ctrld_robot.get_future_position()[0],
                                     self.ctrld_robot.get_future_position()[1],
                                     self.ctrld_robot.get_future_orientation())
+            if self.status.robot_status == "move_linear_straight":
+                self.pid.pid_straight(self.ctrld_robot.get_future_position()[0],
+                                    self.ctrld_robot.get_future_position()[1],
+                                    self.ctrld_robot.get_future_orientation())
 
             elif self.status.robot_status == "pass":
                 self.kick.pass_ball(self.ctrld_robot.get_pass_target_position()[0],

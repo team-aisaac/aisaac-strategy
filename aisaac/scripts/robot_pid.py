@@ -18,7 +18,8 @@ class RobotPid(object):
         self.objects = objects
         self.cmd = cmd
 
-        self.goal_pos_init_flag = True
+        self.path_replan_flag = True
+        self.goal_change_flag = False
 
         self.pid_circle_center_x = 0
         self.pid_circle_center_y = 0
@@ -28,6 +29,20 @@ class RobotPid(object):
 
         self.last_loop_time = rospy.Time.now()
         self.dt = 0
+
+        self.next_goal_pos_x = 0
+        self.next_goal_pos_y = 0
+        self.prev_goal_pos_x = 0
+        self.prev_goal_pos_y = 0
+        self.pid_line_param = [0, 0, 0]
+        self.pid_p_prev_normal = np.array([0, 0])
+        self.pid_p_prev_projection = np.array([0, 0]) 
+        self.pid_p_prev_theta = 0
+
+        self.Kpv_normal = 2.2
+        self.Kdv_normal = 1.0
+        self.Kpv_projection = 2.2
+        self.Kdv_projection = 1.0
 
         # self.Kpv = 3.615645812128088
         # self.Kpr = 3.0
@@ -505,20 +520,13 @@ class RobotPid(object):
         avoid: boolean Trueなら障害物回避を行う
         """
 
-        """
-        self.recursion_count = 0
-        next_pos_x, next_pos_y = self.path_plan(goal_pos_x, goal_pos_y)
-        if goal_pos_x != next_pos_x or goal_pos_y != next_pos_y:
-            self.goal_pos_init_flag = True
-            goal_pos_x = next_pos_x
-            goal_pos_y = next_pos_y
-        """
-
+        #dt計算
         self.dt = rospy.Time.now() - self.last_loop_time
         self.last_loop_time = rospy.Time.now()
-        #print self.dt.to_sec()
 
-        if self.goal_pos_init_flag == True:
+        #経路再計算
+        if self.path_replan_flag == True:
+            self.path_replan_flag = False
             self.recursion_count = 0
 
             tmp_x = goal_pos_x
@@ -534,17 +542,15 @@ class RobotPid(object):
             if not ignore_penalty_area:
                 tmp_x, tmp_y = self._clip_penalty_area(tmp_x, tmp_y, offset=self.ctrld_robot.size_r)
 
-            self.next_pos_x = tmp_x
-            self.next_pos_y = tmp_y
-            """
-            if goal_pos_x != next_pos_x or goal_pos_y != next_pos_y:
-                goal_pos_x = next_pos_x
-                goal_pos_y = next_pos_y
-            """
+            self.next_goal_pos_x = tmp_x
+            self.next_goal_pos_y = tmp_y
+
+            if self.next_goal_pos_x != self.prev_goal_pos_x or self.next_goal_pos_y != self.prev_goal_pos_y:
+                self.goal_change_flag = True
 
 
-        d_x = self.next_pos_x - self.ctrld_robot.get_current_position()[0]
-        d_y = self.next_pos_y - self.ctrld_robot.get_current_position()[1]
+        d_x = self.next_goal_pos_x - self.ctrld_robot.get_current_position()[0]
+        d_y = self.next_goal_pos_y - self.ctrld_robot.get_current_position()[1]
         d_theta = goal_pos_theta - self.ctrld_robot.get_current_orientation()
         if d_theta < 0 and abs(d_theta) > np.pi:
             d_theta = goal_pos_theta - (self.ctrld_robot.get_current_orientation() - 2 * np.pi)
@@ -553,8 +559,8 @@ class RobotPid(object):
             d_theta = (goal_pos_theta - 2 * np.pi) - self.ctrld_robot.get_current_orientation()
 
 
-        if self.goal_pos_init_flag:
-            self.goal_pos_init_flag = False
+        if self.goal_change_flag:
+            goal_change_flag = False
             self.pid_d_x = 0
             self.pid_d_y = 0
             self.pid_d_theta = 0
@@ -594,6 +600,114 @@ class RobotPid(object):
         self.cmd.omega = Vr
         self.cmd.theta = goal_pos_theta
 
+        self.prev_goal_pos_x = self.next_goal_pos_x
+        self.prev_goal_pos_y = self.next_goal_pos_y
+
+    def pid_straight(self, goal_pos_x, goal_pos_y, goal_pos_theta, ignore_penalty_area=False, avoid=True):
+        """
+        Parameters
+        ----------
+        goal_pos_x: float 目的地のx座標
+        goal_pos_y: float 目的地のy座標
+        goal_pos_theta: float 目的の角度
+        ignore_penalty_area: boolean Trueならペナルティエリアに進入する、Falseなら進入しない
+        avoid: boolean Trueなら障害物回避を行う
+        """
+
+        #dt計算
+        self.dt = rospy.Time.now() - self.last_loop_time
+        self.last_loop_time = rospy.Time.now()
+
+        #経路再計算
+        if self.path_replan_flag == True:
+            self.path_replan_flag = False
+            self.recursion_count = 0
+
+            tmp_x = goal_pos_x
+            tmp_y = goal_pos_y
+
+
+            tmp_x, tmp_y = self.avoid_penalty_area(tmp_x, tmp_y)
+            tmp_x, tmp_y = self.avoid_goal(tmp_x, tmp_y)
+
+            if avoid:
+                tmp_x, tmp_y = self.path_plan(tmp_x, tmp_y)
+
+            if not ignore_penalty_area:
+                tmp_x, tmp_y = self._clip_penalty_area(tmp_x, tmp_y, offset=self.ctrld_robot.size_r)
+
+            self.next_goal_pos_x = tmp_x
+            self.next_goal_pos_y = tmp_y
+
+            if self.next_goal_pos_x != self.prev_goal_pos_x or self.next_goal_pos_y != self.prev_goal_pos_y:
+                self.goal_change_flag = True
+
+
+        if self.goal_change_flag:
+            goal_change_flag = False
+            self.pid_line_param = functions.line_parameters(self.ctrld_robot.get_current_position()[0], self.ctrld_robot.get_current_position()[1], self.next_goal_pos_x, self.next_goal_pos_y)
+            self.pid_start_pos = self.ctrld_robot.get_current_position()
+
+        dx = self.next_goal_pos_x - self.ctrld_robot.get_current_position()[0]
+        dy = self.next_goal_pos_y - self.ctrld_robot.get_current_position()[1]
+        dist = np.sqrt(dx**2 + dy**2)
+
+        perpendicular_foot = np.array([0, 0])
+        if self.pid_line_param[0] == 0 or self.pid_line_param[1] == 0:
+            perpendicular_foot = self.ctrld_robot.get_current_position()
+        else:
+            perpendicular_foot[0] = (self.ctrld_robot.get_current_position()[1] * self.pid_line_param[1] + (self.pid_line_param[1]**2 / self.pid_line_param[0]) * self.ctrld_robot.get_current_position()[0] - self.pid_line_param[2]) / (self.pid_line_param[0] + self.pid_line_param[1]**2 / self.pid_line_param[0])
+            perpendicular_foot[1] = (-self.pid_line_param[0] * perpendicular_foot[0] -self.pid_line_param[2]) / self.pid_line_param[1]
+
+        dist_normal = perpendicular_foot - np.array(self.ctrld_robot.get_current_position())
+        dist_projection = np.array([self.next_goal_pos_x, self.next_goal_pos_y]) - perpendicular_foot
+
+        d_theta = goal_pos_theta - self.ctrld_robot.get_current_orientation()
+
+        if d_theta < 0 and abs(d_theta) > np.pi:
+            d_theta = goal_pos_theta - (self.ctrld_robot.get_current_orientation() - 2 * np.pi)
+
+        if d_theta > 0 and abs(d_theta) > np.pi:
+            d_theta = (goal_pos_theta - 2 * np.pi) - self.ctrld_robot.get_current_orientation()
+
+
+        self.pid_d_normal = dist_normal - self.pid_p_prev_normal
+        self.pid_d_projection = dist_projection - self.pid_p_prev_projection
+        self.pid_d_theta = d_theta - self.pid_p_prev_theta
+
+        self.pid_p_prev_normal = dist_normal
+        self.pid_p_prev_projection = dist_projection
+        self.pid_p_prev_theta = d_theta
+
+        self.pid_p_normal = dist_normal
+        self.pid_p_projection = dist_projection
+        self.pid_p_theta = d_theta
+
+
+        V_normal = self.Kpv_normal * self.pid_p_normal + self.Kdv_normal * self.pid_d_normal / self.dt.to_sec()
+        V_projection = self.Kpv_projection * self.pid_p_projection + self.Kdv_projection * self.pid_d_projection / self.dt.to_sec()
+        Vx = V_normal[0] + V_projection[0]
+        Vy = V_normal[1] + V_projection[1]
+        Vr = self.Kpr * self.pid_p_theta + self.Kdr * self.pid_d_theta / self.dt.to_sec()
+
+        max_velocity = rospy.get_param("/robot_max_velocity", default=config.ROBOT_MAX_VELOCITY) # m/s 機体の最高速度
+        vel_vector = np.array([Vx, Vy])
+        vel_vector_norm = np.linalg.norm(vel_vector)
+        if vel_vector_norm > max_velocity:
+            vel_vector = vel_vector * max_velocity / vel_vector_norm
+            Vx = vel_vector[0]
+            Vy = vel_vector[1]
+
+        self.cmd.vel_x = Vx
+        self.cmd.vel_y = Vy
+        self.cmd.vel_surge = Vx*math.cos(self.ctrld_robot.get_current_orientation())+Vy*math.sin(self.ctrld_robot.get_current_orientation())
+        self.cmd.vel_sway = -Vx*math.sin(self.ctrld_robot.get_current_orientation())+Vy*math.cos(self.ctrld_robot.get_current_orientation())
+        self.cmd.omega = Vr
+        self.cmd.theta = goal_pos_theta
+
+        self.prev_goal_pos_x = self.next_goal_pos_x
+        self.prev_goal_pos_y = self.next_goal_pos_y
+
     def pid_circle(self, center_x, center_y, x, y, theta):        
         """
         2019/08/04 当初敵の撹乱などに利用予定だったが作業時間の都合上今は利用していない
@@ -604,8 +718,8 @@ class RobotPid(object):
         d_x = center_x - self.ctrld_robot.get_current_position()[0]
         d_y = center_y - self.ctrld_robot.get_current_position()[1]
         d_theta = theta - self.ctrld_robot.get_current_orientation()
-        if self.goal_pos_init_flag:
-            self.goal_pos_init_flag = False
+        if self.path_replan_flag:
+            self.path_replan_flag = False
             self.pid_d_theta = d_theta
             self.pid_p_prev_theta = d_theta
         else:
@@ -635,4 +749,4 @@ class RobotPid(object):
             self.cmd.omega=Vr
 
     def replan_timer_callback(self, event):
-        self.goal_pos_init_flag = True
+        self.path_replan_flag = True
