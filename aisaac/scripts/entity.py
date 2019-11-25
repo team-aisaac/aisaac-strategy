@@ -155,7 +155,11 @@ class Robot(Entity):
         self._vision_position_y = y
         self._vision_orientation = theta
 
-
+    # ロボットの持つ信念を初期化する
+    def reset_own_belief(self):
+        self._current_position_x_sigma = config.INITIAL_POSITION_SIGMA
+        self._current_position_y_sigma = config.INITIAL_POSITION_SIGMA
+        self._current_orientation_sigma = config.INITIAL_POSITION_SIGMA
 
     # def set_current_position(self, x, y, theta):
     #     None

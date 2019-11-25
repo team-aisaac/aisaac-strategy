@@ -146,6 +146,10 @@ class Robot(object):
         while not rospy.is_shutdown():
             # start = time.time()
 
+            # 場外にいる場合、カルマンフィルタの信念(分散)を初期化する
+            if self.ctrld_robot.get_id() not in self.objects.get_active_robot_ids():
+                self.ctrld_robot.reset_own_belief()
+
             # カルマンフィルタ,恒等関数フィルタの適用
             # vision_positionからcurrent_positionを決定してつめる
             for robot in self.robot_friend:
