@@ -12,6 +12,7 @@ ACTION_POSITION_SIGMA = config.ACTION_POSITION_SIGMA
 ACTION_ORIENTATION_SIGMA = config.ACTION_ORIENTATION_SIGMA
 
 def kalman_filter(robot):
+
     vision_x, vision_y, vision_theta = robot.get_vision_position()
 
     "0.00のときは通信がはじまっていないので何もしない"
@@ -71,5 +72,20 @@ def kalman_filter(robot):
     robot.set_current_position_for_filter(updated_x, updated_y, updated_theta, updated_x_sigma,updated_y_sigma, updated_theta_sigma)
 
 def identity_filter(robot):
+    if detect_outlier(robot):
+        "外れ値ならばなにもしない"
+        return None
+
     x, y, theta = robot.get_vision_position()
     robot.set_current_position(x, y, theta)
+
+def detect_outlier(robot):
+    # vision_positionが1ステップ前のcurrent_positionから10cm以上動いていたら異常値とみなしTrueをかえす
+    # カルマンフィルタは異常値にロバストなので必要ないが、Identityでは必要
+    # また、フィールドから出た際にはvision_positionがアップデートされないのでなにもしなくてよい
+    x, y, _ = robot.get_vision_position()
+    x_, y_ = robot.get_current_position()
+    if (x - x_) ** 2 + (y - y_) ** 2 > 0.1:
+        return True
+    else:
+        return False
