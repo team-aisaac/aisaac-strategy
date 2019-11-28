@@ -153,8 +153,8 @@ class Robot(object):
             # vision_positionからcurrent_positionを決定してつめる
             for robot in self.robot_friend:
                 if robot.get_id() == self.ctrld_robot.get_id():
-                    #kalman_filter(self.ctrld_robot)
-                    identity_filter(self.ctrld_robot)
+                    kalman_filter(self.ctrld_robot)
+                    #identity_filter(self.ctrld_robot)
                 else:
                     identity_filter(robot)
             for enemy in self.robot_enemy:
