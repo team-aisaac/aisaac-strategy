@@ -19,7 +19,7 @@ class RobotPid(object):
         self.cmd = cmd
 
         self.path_replan_flag = True
-        self.goal_change_flag = False
+        self.goal_change_flag = True
 
         self.pid_circle_center_x = 0
         self.pid_circle_center_y = 0
@@ -39,8 +39,8 @@ class RobotPid(object):
         self.pid_p_prev_projection = np.array([0, 0]) 
         self.pid_p_prev_theta = 0
 
-        self.Kpv_normal = 2.2
-        self.Kdv_normal = 1.0
+        self.Kpv_normal = 5.0
+        self.Kdv_normal = 2.0
         self.Kpv_projection = 2.2
         self.Kdv_projection = 1.0
 
@@ -560,7 +560,7 @@ class RobotPid(object):
 
 
         if self.goal_change_flag:
-            goal_change_flag = False
+            self.goal_change_flag = False
             self.pid_d_x = 0
             self.pid_d_y = 0
             self.pid_d_theta = 0
@@ -585,7 +585,7 @@ class RobotPid(object):
         Vr = self.Kpr * self.pid_p_theta + self.Kdr * self.pid_d_theta / self.dt.to_sec()
 
 
-        max_velocity = rospy.get_param("/robot_max_velocity", default=config.ROBOT_MAX_VELOCITY) # m/s 機体の最高速度
+        max_velocity = self.ctrld_robot.get_max_velocity()
         vel_vector = np.array([Vx, Vy])
         vel_vector_norm = np.linalg.norm(vel_vector)
         if vel_vector_norm > max_velocity:
@@ -642,9 +642,8 @@ class RobotPid(object):
             if self.next_goal_pos_x != self.prev_goal_pos_x or self.next_goal_pos_y != self.prev_goal_pos_y:
                 self.goal_change_flag = True
 
-
         if self.goal_change_flag:
-            goal_change_flag = False
+            self.goal_change_flag = False
             self.pid_line_param = functions.line_parameters(self.ctrld_robot.get_current_position()[0], self.ctrld_robot.get_current_position()[1], self.next_goal_pos_x, self.next_goal_pos_y)
             self.pid_start_pos = self.ctrld_robot.get_current_position()
 
@@ -652,11 +651,11 @@ class RobotPid(object):
         dy = self.next_goal_pos_y - self.ctrld_robot.get_current_position()[1]
         dist = np.sqrt(dx**2 + dy**2)
 
-        perpendicular_foot = np.array([0, 0])
-        if self.pid_line_param[0] == 0 or self.pid_line_param[1] == 0:
+        perpendicular_foot = np.array([0.0, 0.0])
+        if self.pid_line_param[0] == 0. or self.pid_line_param[1] == 0.:
             perpendicular_foot = self.ctrld_robot.get_current_position()
         else:
-            perpendicular_foot[0] = (self.ctrld_robot.get_current_position()[1] * self.pid_line_param[1] + (self.pid_line_param[1]**2 / self.pid_line_param[0]) * self.ctrld_robot.get_current_position()[0] - self.pid_line_param[2]) / (self.pid_line_param[0] + self.pid_line_param[1]**2 / self.pid_line_param[0])
+            perpendicular_foot[0] = (-self.ctrld_robot.get_current_position()[1] * self.pid_line_param[1] + (self.pid_line_param[1]**2 / self.pid_line_param[0]) * self.ctrld_robot.get_current_position()[0] - self.pid_line_param[2]) / (self.pid_line_param[0] + self.pid_line_param[1]**2 / self.pid_line_param[0])
             perpendicular_foot[1] = (-self.pid_line_param[0] * perpendicular_foot[0] -self.pid_line_param[2]) / self.pid_line_param[1]
 
         dist_normal = perpendicular_foot - np.array(self.ctrld_robot.get_current_position())
@@ -690,7 +689,7 @@ class RobotPid(object):
         Vy = V_normal[1] + V_projection[1]
         Vr = self.Kpr * self.pid_p_theta + self.Kdr * self.pid_d_theta / self.dt.to_sec()
 
-        max_velocity = rospy.get_param("/robot_max_velocity", default=config.ROBOT_MAX_VELOCITY) # m/s 機体の最高速度
+        max_velocity = self.ctrld_robot.get_max_velocity()
         vel_vector = np.array([Vx, Vy])
         vel_vector_norm = np.linalg.norm(vel_vector)
         if vel_vector_norm > max_velocity:

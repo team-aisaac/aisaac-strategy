@@ -21,8 +21,8 @@ class RobotKick(object):
         self.pid = pid
         self.status = status
         self.cmd = cmd
-        self.dispersion1 = [10] * 1
-        self.dispersion2 = [10] * 1
+        self.dispersion1 = [30] * 1
+        self.dispersion2 = [30] * 1
         self.rot_dispersion = [10] * 1
 
         self.kick_access_threshold1 = 0.1
@@ -30,9 +30,9 @@ class RobotKick(object):
         self.kick_feint_threshold1 = 0.2
         self.kick_feint_threshold2 = 0.2
         self.kick_rot_access_threshold = 0.1
-        self.dribble_access_threshold1 = 0.03
+        self.dribble_access_threshold1 = 0.02
         self.dribble_access_threshold2 = 0.05
-        self.dribble_rot_access_threshold = 0.1
+        self.dribble_rot_access_threshold = 0.05
         self.pass_stage = 0
         self.dribble_stage = 0
         self._kick_start_time = rospy.Time.now()
@@ -346,7 +346,7 @@ class RobotKick(object):
 
             #目標地付近までドリブル
             elif self.dribble_stage == 1:
-                rospy.set_param("/robot_max_velocity", 0.5)
+                self.ctrld_robot.set_max_velocity(config.ROBOT_DRIBBLE_VELOCITY)
                 pose_theta = math.atan2( (target_y - self.ctrld_robot.get_current_position()[1]) , (target_x - self.ctrld_robot.get_current_position()[0]) )
                 area = 0.5
                 if functions.distance_btw_two_points(self.ball_params.get_current_position(),
@@ -365,7 +365,7 @@ class RobotKick(object):
                     self.dribble_stage = 2
 
                 self.cmd.dribble_power = self.dribble_power
-                self.pid.pid_linear(target_x, target_y, pose_theta, ignore_penalty_area=ignore_penalty_area, avoid=False)
+                self.pid.pid_straight(target_x, target_y, pose_theta, ignore_penalty_area=ignore_penalty_area, avoid=False)
 
             #目標地付近になったらドリブラーを止めて引きずる(バックスピン防止)
             elif self.dribble_stage == 2:
@@ -385,4 +385,4 @@ class RobotKick(object):
                     return
 
                 self.cmd.dribble_power = 0
-                self.pid.pid_linear(target_x, target_y, pose_theta, ignore_penalty_area=ignore_penalty_area, avoid=False)
+                self.pid.pid_straight(target_x, target_y, pose_theta, ignore_penalty_area=ignore_penalty_area, avoid=False)
