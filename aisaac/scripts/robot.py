@@ -137,7 +137,6 @@ class Robot(object):
         self.cmd.shutdown_flag = True
         self.store_and_publish_commands()
 
-
     def run(self):
         # Loop 処理
         loop_rate = rospy.Rate(ROBOT_LOOP_RATE)
@@ -154,13 +153,15 @@ class Robot(object):
             # vision_positionからcurrent_positionを決定してつめる
             for robot in self.robot_friend:
                 if robot.get_id() == self.ctrld_robot.get_id():
-                    kalman_filter(self.ctrld_robot)
-                    #identity_filter(self.ctrld_robot)
+                    #kalman_filter(self.ctrld_robot)
+                    identity_filter(self.ctrld_robot)
                 else:
                     identity_filter(robot)
             for enemy in self.robot_enemy:
                 identity_filter(enemy)
 
+
+            self.ctrld_robot.set_max_velocity(rospy.get_param("/robot_max_velocity", default=config.ROBOT_MAX_VELOCITY)) # m/s 機体の最高速度
 
             if self.status.robot_status == "move_linear":
                 self.pid.pid_linear(self.ctrld_robot.get_future_position()[0],
