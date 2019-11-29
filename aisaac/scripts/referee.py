@@ -38,10 +38,10 @@ class Referee:
 
     """---Refereeから現在のball place positionをもらう---"""
     def _place_ball_position_callback(self, msg):
-        self._place_ball_position = msg
         if self.team_side == "right":
-            self._place_ball_position.x = -msg.x
-            self._place_ball_position.y = -msg.y
+            self._place_ball_position = (PlaceBall)(-msg.x, -msg.y)
+        else:
+            self._place_ball_position = msg
 
     def get_referee_msg(self):
         referee_msg = {

@@ -194,7 +194,7 @@ class Robot(object):
                                     place=True)
             elif self.status.robot_status == "ball_place_dribble":
                 self.kick.dribble_ball(self.ctrld_robot.get_pass_target_position()[0],
-                                    self.ctrld_robot.get_pass_target_position()[1])
+                                    self.ctrld_robot.get_pass_target_position()[1], ignore_penalty_area=True)
 
             elif self.status.robot_status == "shoot":
                 self.kick.shoot_ball()
