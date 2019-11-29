@@ -163,16 +163,16 @@ class RobotKick(object):
 
             elif self.pass_stage == 1:
                 if not is_shoot:
-                    kick_power_x = math.sqrt(distance) * self.const
+                    kick_power_x = min(math.sqrt(distance) * self.const, config.MAX_KICK_POWER_X)
                 else:
                     # 12.0: フィールドの横幅
-                    kick_power_x = math.sqrt(12.0) * self.const
+                    kick_power_x = config.MAX_KICK_POWER_X
                 if is_tip_kick:
-                    kick_power_z = math.sqrt(distance) * self.const
+                    kick_power_z = min(math.sqrt(distance) * self.const, MAX_KICK_POWER_Z)
                     self.kick_xz(power_x=kick_power_x, power_z=kick_power_z, ignore_penalty_area=ignore_penalty_area)
                 else:
                     if place:
-                        kick_power_x = math.sqrt(distance) * self.const_place
+                        kick_power_x = min(math.sqrt(distance) * self.const_place, config.MAX_KICK_POWER_X)
                     self.kick_xz(power_x=kick_power_x, ignore_penalty_area=ignore_penalty_area)
 
             """
@@ -281,13 +281,13 @@ class RobotKick(object):
         if auto_kick:
             distance = functions.distance_btw_two_points((target_x, target_y), next_target_xy)
             if not is_shoot:
-                kick_power_x = math.sqrt(distance) * self.const
+                kick_power_x = min(math.sqrt(distance) * self.const, config.MAX_KICK_POWER_X)
             else:
                 # 12.0: フィールドの横幅
-                kick_power_x = math.sqrt(12.0) * self.const
+                kick_power_x = config.MAX_KICK_POWER_X
 
             if is_tip_kick:
-                kick_power_x = math.sqrt(12.0) * self.const
+                kick_power_x = config.MAX_KICK_POWER_X
                 self.cmd.kick_speed_z = kick_power_x
 
             self.cmd.kick_speed_x = kick_power_x

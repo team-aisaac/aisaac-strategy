@@ -153,8 +153,8 @@ class Robot(object):
             # vision_positionからcurrent_positionを決定してつめる
             for robot in self.robot_friend:
                 if robot.get_id() == self.ctrld_robot.get_id():
-                    #kalman_filter(self.ctrld_robot)
-                    identity_filter(self.ctrld_robot)
+                    kalman_filter(self.ctrld_robot)
+                    #identity_filter(self.ctrld_robot)
                 else:
                     identity_filter(robot)
             for enemy in self.robot_enemy:
@@ -194,7 +194,7 @@ class Robot(object):
                                     place=True)
             elif self.status.robot_status == "ball_place_dribble":
                 self.kick.dribble_ball(self.ctrld_robot.get_pass_target_position()[0],
-                                    self.ctrld_robot.get_pass_target_position()[1])
+                                    self.ctrld_robot.get_pass_target_position()[1], ignore_penalty_area=True)
 
             elif self.status.robot_status == "shoot":
                 self.kick.shoot_ball()

@@ -1,5 +1,6 @@
 #!/usr/bin/env  python
 # coding:utf-8
+import math
 
 ROBOT_LOOP_RATE = 60.
 WORLD_LOOP_RATE = 60.
@@ -7,8 +8,11 @@ WORLD_LOOP_RATE = 60.
 NUM_FRIEND_ROBOT = 5
 NUM_ENEMY_ROBOT = 16
 
-ROBOT_MAX_VELOCITY = 3.5  # m/s 機体の最高速度
+ROBOT_MAX_VELOCITY = 3.0  # m/s 機体の最高速度
 ROBOT_DRIBBLE_VELOCITY = 0.5 #ドリブル速度
+
+MAX_KICK_POWER_X = math.sqrt(12.0) * 2.0
+MAX_KICK_POWER_Z = math.sqrt(12.0) * 2.0
 
 # カルマンフィルタ用
 INITIAL_POSITION_SIGMA = 1
