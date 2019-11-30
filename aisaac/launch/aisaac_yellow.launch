@@ -34,7 +34,7 @@
     <!-- <node name="decision_making" pkg="aisaac" type="decision_making.py" output="screen" /> -->
     <!-- <param name="team_color" type="string" value="$(arg color)" /> -->
 
-    <node name="world_model" pkg="aisaac" type="world_model.py" output="screen"/>
+    <!-- <node name="world_model" pkg="aisaac" type="world_model.py" output="screen"/> -->
 
     <node name="launch_manager" pkg="launch_manager" type="launch_manager.py" required="true"/>
 

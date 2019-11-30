@@ -7,7 +7,7 @@
 
   <!-- Run Sender -->
   <node name="sender" pkg="grsim_wrapper" type="command_sender.py" required="true">
-    <param name="server_address" type="string" value="127.0.0.1" />
+    <param name="server_address" type="string" value="192.168.0.30" />
     <param name="server_port" value="20011" />
     <!-- <remap from="/robot_0/robot_commands" to="/ssl_joy/ssl_joystick/robot_commands" /> -->
   </node>
