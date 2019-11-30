@@ -45,7 +45,7 @@ class Objects(object):
             self.get_robot_by_id(robot_id).set_role(role)
         self.roles = roles # 保存
 
-        rospy.Timer(rospy.Duration(5.0), self.redefine_roles)
+        rospy.Timer(rospy.Duration(1.0), self.redefine_roles)
 
         self.ball = entity.Ball()
 
@@ -71,11 +71,11 @@ class Objects(object):
             roles = ["RFW"]
         else:
             roles = ["RFW"]
-            print(str(self.node)+": Error! Current active robot ids: " +
+            rospy.loginfo_throttle(5.0, str(self.node)+": Error! Current active robot ids: " +
                   str(self._active_robot_ids))
 
         if self.roles != roles:
-            print(str(self.node)+": Changed roles: "+str(roles))
+            rospy.loginfo(str(self.node)+": Changed roles: "+str(roles))
 
         for robot_id, role in zip(self._active_robot_ids, roles):
             self.get_robot_by_id(robot_id).set_role(role)
