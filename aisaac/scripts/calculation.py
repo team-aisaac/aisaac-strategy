@@ -22,7 +22,7 @@ WORLD_LOOP_RATE = config.WORLD_LOOP_RATE
 # Publisher用クラス
 class Publisher():
     def __init__(self):
-        self.team_color = str(rospy.get_param("~robot_color"))
+        self.team_color = str(rospy.get_param("friend_color"))
 
         self.ball_sub_params_pub = rospy.Publisher("/" + self.team_color + "/ball_sub_params", Ball_sub_params, queue_size=10)
         self.def_pos_pub = rospy.Publisher("/" + self.team_color + "/def_pos", Def_pos, queue_size=10)
@@ -37,14 +37,12 @@ class Calculation():
     def __init__(self):
         rospy.init_node("Calculation_node")
         
-        self.robot_color = str(rospy.get_param("~robot_color"))
-        # self.robot_id = str(rospy.get_param("~robot_num"))
+        self.robot_color = str(rospy.get_param("friend_color"))
+        self.robot_side = str(rospy.get_param("team_side"))
 
         # Composition
         self.objects = Objects(
-            self.robot_color, config.NUM_FRIEND_ROBOT, config.NUM_ENEMY_ROBOT, node="calculation")
-
-        # self.ctrld_robot = self.objects.robot[int(self.robot_id)]
+            self.robot_color, self.robot_side, config.NUM_FRIEND_ROBOT, config.NUM_ENEMY_ROBOT, node="calculation")
 
         self.robot_friend = self.objects.robot
         self.robot_enemy = self.objects.enemy
@@ -406,3 +404,5 @@ if __name__ == "__main__":
         except:
             import traceback
             traceback.print_exc()
+            if rospy.get_param("is_test", False):
+                break

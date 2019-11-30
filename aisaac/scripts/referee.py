@@ -10,6 +10,7 @@ from std_msgs.msg import String
 class Referee:
     def __init__(self, objects):
         self.team_color = objects.team_color
+        self.team_side = objects.team_side
         #self.world_state = WorldState(objects)
 
         """refereeから受信する情報"""
@@ -40,7 +41,10 @@ class Referee:
 
     """---Refereeから現在のball place positionをもらう---"""
     def _place_ball_position_callback(self, msg):
-        self._place_ball_position = msg
+        if self.team_side == "right":
+            self._place_ball_position = (PlaceBall)(-msg.x, -msg.y)
+        else:
+            self._place_ball_position = msg
 
     def get_referee_msg(self):
         referee_msg = {

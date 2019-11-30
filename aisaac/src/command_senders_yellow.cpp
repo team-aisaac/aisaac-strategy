@@ -37,7 +37,7 @@ const uint8_t ESCAPE_MASK = 0x20;
 #define SERIAL_PORT "/dev/ttyUSB0" // SDevice file corrensponding to serial interface
 #define MAX_DATA_TYPE 3
 
-#define VEL_MAX 1500
+#define VEL_MAX 3500
 
 #define ENABLE_DBG             // Toggle when using printf() function
 #ifndef ENABLE_DBG
@@ -105,19 +105,22 @@ public:
 //      float th = 1.57;
 //      float calib = 3.14;
 
-      x_vector = int16_t(msg->vel_surge * 1000);
-      y_vector = int16_t(msg->vel_sway * 1000);
-      omega = int16_t(-msg->omega * (180.0 / M_PI) * 10);
-      float vector_sum = pow(x_vector,2) + pow(y_vector,2); 
+        int32_t x_tmp = 0;
+        int32_t y_tmp = 0;
+
+      x_tmp = int32_t(msg->vel_surge * 1000);
+      y_tmp = int32_t(msg->vel_sway * 1000);
+      omega = int16_t(msg->omega * (180.0 / M_PI) * 10);
+      float vector_sum = pow(x_tmp,2) + pow(y_tmp,2); 
       if(sqrt(vector_sum) > VEL_MAX){
           float k = sqrt(vector_sum) / VEL_MAX;
-          x_vector = x_vector / k;
-          y_vector = y_vector / k;
+          x_tmp = x_tmp / k;
+          y_tmp = y_tmp / k;
       }
 
-        int16_t tmp = y_vector;
-        y_vector = x_vector;
-        x_vector = -tmp;
+      x_vector = x_tmp;
+      y_vector = y_tmp;
+
 
       float theta_deg = msg->theta * (180 / M_PI);
       while(!(0 <= theta_deg && theta_deg < 360)){
@@ -216,9 +219,6 @@ public:
     }
 
 
-    int16_t tmp = x_vector;
-    x_vector = y_vector;
-    y_vector = -tmp;
       DBG("x_vector: %4d ", x_vector);
       DBG("y_vector: %4d ", y_vector);
       DBG("th_vector: %4d ", th_vector);

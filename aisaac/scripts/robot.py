@@ -29,8 +29,8 @@ ROBOT_LOOP_RATE = config.ROBOT_LOOP_RATE
 
 class Robot(object):
     def __init__(self, robot_id=None):
-        rospy.init_node("robot")
-        self.robot_color = str(rospy.get_param("~robot_color"))
+        self.robot_color = str(rospy.get_param("friend_color"))
+        self.robot_side = str(rospy.get_param("team_side"))
 
         if not robot_id:
             self.robot_id = str(rospy.get_param("~robot_num"))
@@ -48,7 +48,7 @@ class Robot(object):
         self._command_pub = RobotCommandPublisherWrapper(self.robot_color, self.robot_id)
 
         # Composition
-        self.objects = Objects(self.robot_color, self.robot_total, self.enemy_total, node="robot"+str(self.robot_id))
+        self.objects = Objects(self.robot_color, self.robot_side, self.robot_total, self.enemy_total, node="robot"+str(self.robot_id))
         self.ctrld_robot = self.objects.robot[int(self.robot_id)] # type: entity.Robot
 
         self.robot_friend = self.objects.robot
@@ -137,7 +137,6 @@ class Robot(object):
         self.cmd.shutdown_flag = True
         self.store_and_publish_commands()
 
-
     def run(self):
         # Loop 処理
         loop_rate = rospy.Rate(ROBOT_LOOP_RATE)
@@ -145,6 +144,10 @@ class Robot(object):
 
         while not rospy.is_shutdown():
             # start = time.time()
+
+            # 場外にいる場合、カルマンフィルタの信念(分散)を初期化する
+            if self.ctrld_robot.get_id() not in self.objects.get_active_robot_ids():
+                self.ctrld_robot.reset_own_belief()
 
             # カルマンフィルタ,恒等関数フィルタの適用
             # vision_positionからcurrent_positionを決定してつめる
@@ -158,6 +161,8 @@ class Robot(object):
                 identity_filter(enemy)
 
 
+            self.ctrld_robot.set_max_velocity(rospy.get_param("/robot_max_velocity", default=config.ROBOT_MAX_VELOCITY)) # m/s 機体の最高速度
+
             if self.status.robot_status == "move_linear":
                 self.pid.pid_linear(self.ctrld_robot.get_future_position()[0],
                                     self.ctrld_robot.get_future_position()[1],
@@ -165,6 +170,10 @@ class Robot(object):
             elif self.status.robot_status == "move_circle":
                 self.pid.pid_circle(self.pid.pid_circle_center_x, self.pid.pid_circle_center_y,
                                     self.ctrld_robot.get_future_position()[0],
+                                    self.ctrld_robot.get_future_position()[1],
+                                    self.ctrld_robot.get_future_orientation())
+            if self.status.robot_status == "move_linear_straight":
+                self.pid.pid_straight(self.ctrld_robot.get_future_position()[0],
                                     self.ctrld_robot.get_future_position()[1],
                                     self.ctrld_robot.get_future_orientation())
 
@@ -185,7 +194,7 @@ class Robot(object):
                                     place=True)
             elif self.status.robot_status == "ball_place_dribble":
                 self.kick.dribble_ball(self.ctrld_robot.get_pass_target_position()[0],
-                                    self.ctrld_robot.get_pass_target_position()[1])
+                                    self.ctrld_robot.get_pass_target_position()[1], ignore_penalty_area=True)
 
             elif self.status.robot_status == "shoot":
                 self.kick.shoot_ball()
@@ -308,12 +317,18 @@ def run_robot():
 
 
 if __name__ == "__main__":
+    rospy.init_node("robot")
+
     while True and not rospy.is_shutdown():
         try:
+            # import cProfile
+            # cProfile.run('run_robot()','profile_robot_'+str(rospy.get_param("~robot_num"))+'.txt')
             run_robot()
         except:
             import traceback
             traceback.print_exc()
+            if rospy.get_param("is_test", False):
+                break
 
 
 """
