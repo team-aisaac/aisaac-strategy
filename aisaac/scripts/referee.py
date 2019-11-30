@@ -5,6 +5,7 @@
 import rospy
 from consai_msgs.msg import RefereeTeamInfo, PlaceBall
 from std_msgs.msg import Int8
+from std_msgs.msg import String
 
 class Referee:
     def __init__(self, objects):
@@ -22,6 +23,8 @@ class Referee:
         rospy.Subscriber("/" + self.team_color + "/refbox/stage", Int8, self._stage_callback)
         rospy.Subscriber("/" + self.team_color + "/refbox/blue_info", RefereeTeamInfo, self._teaminfo_callback)
         rospy.Subscriber("/" + self.team_color + "/refbox/place_ball_position", PlaceBall, self._place_ball_position_callback)
+        self._referee_branch_publisher = rospy.Publisher(
+                "/" + self.team_color + "/referee/referee_branch", String)
 
     """---Refereeからcommandをもらう---"""
     def _command_callback(self, msg):
@@ -134,5 +137,7 @@ class Referee:
         elif (self._command == "data: 16" and self.team_color == 'blue') or (self._command == "data: 17" and self.team_color == 'yellow'):
             #BALL_PLACEMENT_BLUE = 17;
             referee_branch = "BALL_PLACEMENT_ENEMY"
+
+        self._referee_branch_publisher.publish(referee_branch)
 
         return referee_branch
