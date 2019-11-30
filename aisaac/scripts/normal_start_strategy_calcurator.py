@@ -453,26 +453,26 @@ class NormalStartPenaltyDefenceStrategyCalcurator(StrategyCalcuratorBase):
             elif robot.get_role() == "LDF":
                 #固定値へ移動
                 status.status = "move_linear"
-                status.pid_goal_pos_x = -4.4
-                status.pid_goal_pos_y = 1.2
+                status.pid_goal_pos_x = -4.0
+                status.pid_goal_pos_y = 4.0
                 status.pid_goal_theta = math.atan2((self._ball_params.get_current_position()[1] - robot.get_current_position()[1]) , (self._ball_params.get_current_position()[0] - robot.get_current_position()[0]))
             elif robot.get_role() == "RDF":
                 #固定値へ移動
                 status.status = "move_linear"
-                status.pid_goal_pos_x = -4.4
-                status.pid_goal_pos_y = 0.4
+                status.pid_goal_pos_x = -3.5
+                status.pid_goal_pos_y = 4.0
                 status.pid_goal_theta = math.atan2((self._ball_params.get_current_position()[1] - robot.get_current_position()[1]) , (self._ball_params.get_current_position()[0] - robot.get_current_position()[0]))
             elif robot.get_role() == "LFW":
                 #固定値へ移動
                 status.status = "move_linear"
-                status.pid_goal_pos_x = -4.4
-                status.pid_goal_pos_y = -0.4
+                status.pid_goal_pos_x = -3.0
+                status.pid_goal_pos_y = 4.0
                 status.pid_goal_theta = math.atan2((self._ball_params.get_current_position()[1] - robot.get_current_position()[1]) , (self._ball_params.get_current_position()[0] - robot.get_current_position()[0]))
             elif robot.get_role() == "RFW":
                 #固定値へ移動
                 status.status = "move_linear"
-                status.pid_goal_pos_x = -4.4
-                status.pid_goal_pos_y = -1.2
+                status.pid_goal_pos_x = -2.5
+                status.pid_goal_pos_y = 4.0
                 status.pid_goal_theta = math.atan2((self._ball_params.get_current_position()[1] - robot.get_current_position()[1]) , (self._ball_params.get_current_position()[0] - robot.get_current_position()[0]))
             else:
                 status.status = "none"
