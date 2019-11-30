@@ -2,7 +2,10 @@
 
 const express = require('express')
 const consola = require('consola')
-const { Nuxt, Builder } = require('nuxt')
+const {
+  Nuxt,
+  Builder
+} = require('nuxt')
 const app = express()
 
 // Import ROS Libraries
@@ -18,7 +21,10 @@ async function start () {
   // Init Nuxt.js
   const nuxt = new Nuxt(config)
 
-  const { host, port } = nuxt.options.server
+  const {
+    host,
+    port
+  } = nuxt.options.server
 
   // Build only in dev mode
   if (config.dev) {
@@ -40,11 +46,6 @@ async function start () {
   // Listen the socket server
   socketStart(server)
   consola.info('Socket.IO starts')
-
-  // Initialize ros node
-  const nh = await rosnodejs.initNode('/talker_node')
-  pub = nh.advertise('/chatter', stdMsgs.String)
-  consola.info('ROS Node starts')
 }
 
 function rosSend (message) {
@@ -54,11 +55,23 @@ function rosSend (message) {
 }
 
 let messageQueue = []
+
 function socketStart (server) {
   // Websocketサーバーインスタンスを生成する
   const io = require('socket.io').listen(server)
   // クライアントからサーバーに接続があった場合のイベントを作成する
   io.on('connection', (socket) => {
+    // Initialize ros node
+    rosnodejs.initNode('/talker_node').then((nh) => {
+      pub = nh.advertise('/chatter', stdMsgs.String)
+      nh.subscribe('/yellow/referee/referee_branch', stdMsgs.String,
+        (data) => {
+          socket.emit('hello')
+        })
+    })
+
+    consola.info('ROS Node starts')
+
     // 接続されたクライアントのidをコンソールに表示する
     consola.info('id: ' + socket.id + ' is connected')
     // サーバー側で保持しているメッセージをクライアント側に送信する
