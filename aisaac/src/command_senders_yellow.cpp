@@ -316,21 +316,21 @@ int main(int argc, char** argv)
   senders[2].open_port("/dev/ttyUSB2");
   senders[3].open_port("/dev/ttyUSB3");
   senders[4].open_port("/dev/ttyUSB4");
-  command_sub[0] = nh.subscribe("/yellow/robot_0/robot_commands", 100, &Sender::command_callback, &senders[0]);
-  odom_sub[0] = nh.subscribe("/yellow/robot_0/odom", 100, &Sender::odom_callback, &senders[0]);
-  shutdown_sub[0] = nh.subscribe("/yellow/shutdown", 100, &Sender::shutdown_callback, &senders[0]);
-  command_sub[1] = nh.subscribe("/yellow/robot_1/robot_commands", 100, &Sender::command_callback, &senders[1]);
-  odom_sub[1] = nh.subscribe("/yellow/robot_1/odom", 100, &Sender::odom_callback, &senders[1]);
-  shutdown_sub[1] = nh.subscribe("/yellow/shutdown", 100, &Sender::shutdown_callback, &senders[1]);
-  command_sub[2] = nh.subscribe("/yellow/robot_2/robot_commands", 100, &Sender::command_callback, &senders[2]);
-  odom_sub[2] = nh.subscribe("/yellow/robot_2/odom", 100, &Sender::odom_callback, &senders[2]);
-  shutdown_sub[2] = nh.subscribe("/yellow/shutdown", 100, &Sender::shutdown_callback, &senders[2]);
-  command_sub[3] = nh.subscribe("/yellow/robot_3/robot_commands", 100, &Sender::command_callback, &senders[3]);
-  odom_sub[3] = nh.subscribe("/yellow/robot_3/odom", 100, &Sender::odom_callback, &senders[3]);
-  shutdown_sub[3] = nh.subscribe("/yellow/shutdown", 100, &Sender::shutdown_callback, &senders[3]);
-  command_sub[4] = nh.subscribe("/yellow/robot_4/robot_commands", 100, &Sender::command_callback, &senders[4]);
-  odom_sub[4] = nh.subscribe("/yellow/robot_4/odom", 100, &Sender::odom_callback, &senders[4]);
-  shutdown_sub[4] = nh.subscribe("/yellow/shutdown", 100, &Sender::shutdown_callback, &senders[4]);
+  command_sub[0] = nh.subscribe("/yellow/robot_0/robot_commands", 1, &Sender::command_callback, &senders[0]);
+  odom_sub[0] = nh.subscribe("/yellow/robot_0/odom", 1, &Sender::odom_callback, &senders[0]);
+  shutdown_sub[0] = nh.subscribe("/yellow/shutdown", 1, &Sender::shutdown_callback, &senders[0]);
+  command_sub[1] = nh.subscribe("/yellow/robot_1/robot_commands", 1, &Sender::command_callback, &senders[1]);
+  odom_sub[1] = nh.subscribe("/yellow/robot_1/odom", 1, &Sender::odom_callback, &senders[1]);
+  shutdown_sub[1] = nh.subscribe("/yellow/shutdown", 1, &Sender::shutdown_callback, &senders[1]);
+  command_sub[2] = nh.subscribe("/yellow/robot_2/robot_commands", 1, &Sender::command_callback, &senders[2]);
+  odom_sub[2] = nh.subscribe("/yellow/robot_2/odom", 1, &Sender::odom_callback, &senders[2]);
+  shutdown_sub[2] = nh.subscribe("/yellow/shutdown", 1, &Sender::shutdown_callback, &senders[2]);
+  command_sub[3] = nh.subscribe("/yellow/robot_3/robot_commands", 1, &Sender::command_callback, &senders[3]);
+  odom_sub[3] = nh.subscribe("/yellow/robot_3/odom", 1, &Sender::odom_callback, &senders[3]);
+  shutdown_sub[3] = nh.subscribe("/yellow/shutdown", 1, &Sender::shutdown_callback, &senders[3]);
+  command_sub[4] = nh.subscribe("/yellow/robot_4/robot_commands", 1, &Sender::command_callback, &senders[4]);
+  odom_sub[4] = nh.subscribe("/yellow/robot_4/odom", 1, &Sender::odom_callback, &senders[4]);
+  shutdown_sub[4] = nh.subscribe("/yellow/shutdown", 1, &Sender::shutdown_callback, &senders[4]);
 
   errorFlag = 0;
 
@@ -354,7 +354,6 @@ int main(int argc, char** argv)
 //         ROS_INFO("Loop");
 
         ros::spinOnce();
-        r.sleep();
     }
   return 0;
 }
