@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   consai_msgs
   std_msgs
   message_generation
+  aisaac_communication
 )
 
 add_service_files(
@@ -41,6 +42,9 @@ add_executable(command_senders_yellow
 add_executable(command_sender
     src/command_sender.cpp
 )
+add_executable(sender_xbee_yellow
+    src/sender_xbee_yellow.cpp
+)
 target_link_libraries(command_senders_blue
     ${catkin_LIBRARIES}
 )
@@ -48,6 +52,9 @@ target_link_libraries(command_senders_yellow
     ${catkin_LIBRARIES}
 )
 target_link_libraries(command_sender
+    ${catkin_LIBRARIES}
+)
+target_link_libraries(sender_xbee_yellow
     ${catkin_LIBRARIES}
 )
 
