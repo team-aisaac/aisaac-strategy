@@ -396,7 +396,14 @@ class NormalStartKickOffDefenceStrategyCalcurator(StrategyCalcuratorBase):
                 #敵kickerとballの延長線上に移動
                 status.status = "move_linear"
                 if nearest_enemy_id != None:
-                    status.pid_goal_pos_x, status.pid_goal_pos_y = functions.calculate_internal_dividing_point(self._enemy[nearest_enemy_id].get_current_position()[0], self._enemy[nearest_enemy_id].get_current_position()[1], self._ball_params.get_current_position()[0], self._ball_params.get_current_position()[1], functions.distance_btw_two_points(self._enemy[nearest_enemy_id].get_current_position(), self._ball_params.get_current_position()) + 0.8, -0.8)
+                    status.pid_goal_pos_x, status.pid_goal_pos_y = functions.calculate_internal_dividing_point(
+                        self._objects.get_enemy_by_id(nearest_enemy_id).get_current_position()[0], 
+                        self._objects.get_enemy_by_id(nearest_enemy_id).get_current_position()[1], 
+                        self._ball_params.get_current_position()[0], 
+                        self._ball_params.get_current_position()[1], 
+                        functions.distance_btw_two_points(self._objects.get_enemy_by_id(nearest_enemy_id).get_current_position(), 
+                        self._ball_params.get_current_position()) + 0.8, 
+                        -0.8)
                     status.pid_goal_theta = math.atan2((self._ball_params.get_current_position()[1] - robot.get_current_position()[1]) , (self._ball_params.get_current_position()[0] - robot.get_current_position()[0]))
                     if status.pid_goal_pos_x >= -0.2 and status.pid_goal_pos_y >= 0:
                         status.pid_goal_pos_x = -0.2

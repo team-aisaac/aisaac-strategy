@@ -13,7 +13,7 @@ from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
 from python_qt_binding.QtCore import Qt, QPointF, QRectF
 from python_qt_binding import QT_BINDING_VERSION
-from python_qt_binding.QtGui import QPainter, QPen, QColor
+from python_qt_binding.QtGui import QPainter, QPen, QColor, QTextOption
 from python_qt_binding.QtGui import QMouseEvent
 g_PYQT_MAJOR_VERSION = int(QT_BINDING_VERSION.split('.')[0])
 if g_PYQT_MAJOR_VERSION == 4:
@@ -23,6 +23,7 @@ elif g_PYQT_MAJOR_VERSION == 5:
 
 from nav_msgs.msg import Odometry
 from std_msgs.msg import UInt16MultiArray as UIntArray
+from std_msgs.msg import String
 from geometry_msgs.msg import PoseStamped, TwistStamped
 from geometry_msgs.msg import Point
 from consai_msgs.msg import GeometryFieldSize, FieldLineSegment, FieldCircularArc
@@ -129,6 +130,9 @@ class PaintWidget(QWidget):
         self.sub_enemiesID = rospy.Subscriber("existing_enemies_id",
                 UIntArray, self.callbackEnemiesID)
 
+        self.refereeBranch = String()
+        self.sub_referee_branch = rospy.Subscriber("referee_branch", String, self.callbackRefereeBranch)
+
         self.enemyOdoms = [Odometry()] * self._ID_MAX
         self.sub_enemyOdoms = []
 
@@ -199,6 +203,9 @@ class PaintWidget(QWidget):
 
     def callbackEnemiesID(self, msg):
         self.enemyIDArray = msg
+
+    def callbackRefereeBranch(self, msg):
+        self.refereeBranch = msg
 
 
     def callbackEnemiesOdom(self, msg, robot_id):
@@ -299,12 +306,13 @@ class PaintWidget(QWidget):
         self.drawField(painter)
         
         self.drawAvoidingPoints(painter)
-        self.drawTargets(painter)
+
 
         self.drawFriends(painter)
         self.drawEnemis(painter)
         self.drawBallVelocity(painter)
         self.drawBall(painter)
+        self.drawTargets(painter)
 
         if self._is_ballpos_replacement or self._is_robotpos_replacement:
             self.drawPosReplacement(painter)
@@ -752,9 +760,15 @@ class PaintWidget(QWidget):
 
         text = "(" + str(round(mouse.x(),2)) + ", " + str(round(mouse.y(),2)) + ")"
         draw_pos = self.convertToDrawWorld(mouse.x(), mouse.y())
-
+        
         painter.setPen(Qt.black)
         painter.drawText(draw_pos, text)
+
+        mouse = self._current_mouse_pos
+        mouse = self.convertToRealWorld(mouse.x(), mouse.y() + 20)
+        draw_pos = self.convertToDrawWorld(mouse.x(), mouse.y())
+        painter.setPen(Qt.black)
+        painter.drawText(draw_pos, self.refereeBranch.data)
 
 
     def drawPosReplacement(self, painter):

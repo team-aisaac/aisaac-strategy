@@ -5,6 +5,9 @@ import functions
 import config
 import numpy as np
 import rospy
+import tf
+
+from geometry_msgs.msg import PoseStamped
 
 ROBOT_LOOP_RATE = config.ROBOT_LOOP_RATE
 
@@ -44,6 +47,9 @@ class RobotPid(object):
         self.Kpv_projection = 2.2
         self.Kdv_projection = 1.0
 
+        topic_position = "robot_"+str(self.robot_id)+"/move_base_simple/goal"
+        topic_velocity = "robot_"+str(self.robot_id)+"/move_base_simple/target_velocity"
+        self._target_pose_publisher = rospy.Publisher(topic_position, PoseStamped, queue_size=10)
         # self.Kpv = 3.615645812128088
         # self.Kpr = 3.0
         # self.Kdv = 1.9759837181620452
@@ -519,6 +525,19 @@ class RobotPid(object):
         ignore_penalty_area: boolean Trueならペナルティエリアに進入する、Falseなら進入しない
         avoid: boolean Trueなら障害物回避を行う
         """
+
+        target_pose = PoseStamped()
+        target_pose.pose.position.x = goal_pos_x
+        target_pose.pose.position.y = goal_pos_y
+        
+        quaternion = tf.transformations.quaternion_from_euler(0, 0 , goal_pos_theta)
+        target_pose.pose.orientation.x = quaternion[0]
+        target_pose.pose.orientation.y = quaternion[1]
+        target_pose.pose.orientation.z = quaternion[2]
+        target_pose.pose.orientation.w = quaternion[3]
+        
+        target_pose.header.stamp = rospy.Time.now()
+        self._target_pose_publisher.publish(target_pose)
 
         #dt計算
         self.dt = rospy.Time.now() - self.last_loop_time

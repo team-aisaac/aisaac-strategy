@@ -6,6 +6,7 @@ from referee import Referee
 from objects import Objects
 
 import strategy
+from strategy_calcurator import StrategyCalcuratorBase
 from normal_start_strategy_calcurator import NormalStartStrategyCalcurator, NormalStartKickOffStrategyCalcurator, NormalStartKickOffDefenceStrategyCalcurator, NormalStartPenaltyDefenceStrategyCalcurator
 from stop_strategy_calcurator import StopStrategyCalculator
 from direct_free_attack_strategy_calcurator import DirectFreeAttack
@@ -14,6 +15,7 @@ from indirect_free_attack_strategy_calcurator import IndirectFreeAttack
 from indirect_free_defence_strategy_calcurator import IndirectFreeDefence
 from penalty_attack_strategy_calcurator import PenaltyAttack
 from friend_ball_placement_strategy_calcurator import FriendBallPlacement
+from enemy_ball_placement_strategy_calculator import EnemyBallPlacement
 from context import StrategyContext
 from world_model_status_publisher import WorldModelStatusPublisher
 
@@ -51,7 +53,8 @@ class WorldModel(object):
             'direct_free_defence': DirectFreeDefence(self._objects),
             'indirect_free_attack': IndirectFreeAttack(self._objects),
             'indirect_free_defence': IndirectFreeDefence(self._objects),
-            'friend_ball_placement': FriendBallPlacement(self._objects)
+            'friend_ball_placement': FriendBallPlacement(self._objects),
+            'enemy_ball_placement': EnemyBallPlacement(self._objects)
         }
         self._status_publisher = WorldModelStatusPublisher(
             self._team_color, robot_ids=self._objects.get_robot_ids())
@@ -101,7 +104,7 @@ class WorldModel(object):
         return self._referee
 
     def get_status_publisher(self):
-        # type: () -> StatusPublisher
+        # type: () -> WorldModelStatusPublisher
         return self._status_publisher
 
     def get_strategy_calcurator(self, key):
@@ -273,8 +276,8 @@ def run_world_model():
                 strat = strat_calcrator.calcurate(strat_ctx, place_ball_position)
             elif referee_branch == "BALL_PLACEMENT_ENEMY":
                 strat_ctx.update("enemy_kick", False, namespace="world_model")
-                strat_calcrator = world_model.get_strategy_calcurator("stop")
-                strat = strat_calcrator.calcurate(strat_ctx)
+                strat_calcrator = world_model.get_strategy_calcurator("enemy_ball_placement")
+                strat = strat_calcrator.calcurate(strat_ctx, referee.get_place_ball_position())
 
             # referee_branchが変更されたときに呼び出される
             if tmp_last_referee_branch != referee_branch:

@@ -81,12 +81,12 @@ def in_penalty_area(point_xy, offset=0.0):
     y = point_xy[1]
 
     penalty_area_range_l = [
-        [-6.0, -4.8],
-        [-1.2, 1.2]
+        [config.PENALTY_AREA_FRIEND_LEFT, config.PENALTY_AREA_FRIEND_RIGHT],
+        [config.PENALTY_AREA_FRIEND_BOTTOM, config.PENALTY_AREA_FRIEND_TOP]
     ]
     penalty_area_range_r = [
-        [4.8, 6.0],
-        [-1.2, 1.2]
+        [config.PENALTY_AREA_ENEMY_LEFT, config.PENALTY_AREA_ENEMY_RIGHT],
+        [config.PENALTY_AREA_ENEMY_BOTTOM, config.PENALTY_AREA_ENEMY_TOP]
     ]
 
     if penalty_area_range_l[0][0] - offset < x < penalty_area_range_l[0][1] + offset \
@@ -135,3 +135,7 @@ def clip_vector2(vec, clip_length):
     vec[0] = (return_length / vec_length) * vec[0]
     vec[1] = (return_length / vec_length) * vec[1]
     return vec[0], vec[1]
+
+def get_unit_vector2(vec):
+    vec_length = np.linalg.norm(vec)
+    return (vec[0] / vec_length, vec[1] / vec_length)

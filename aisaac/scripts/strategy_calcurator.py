@@ -90,8 +90,7 @@ class StrategyCalcuratorBase(object):
 
     def _get_active_enemy_ids(self):
         # type: () -> List[int]
-        active_enemy_ids = copy.deepcopy(self._enemy_ids)
-        # TODO: アクティブな敵ロボットのIDリストにする
+        active_enemy_ids = self._objects.get_active_enemy_ids()
         return active_enemy_ids
 
     def _get_robot_ids_ordered_by_distance(self, point_x, point_y):

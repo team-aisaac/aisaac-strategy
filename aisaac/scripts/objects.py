@@ -74,10 +74,9 @@ class Objects(object):
             rospy.loginfo_throttle(5.0, str(self.node)+": Error! Current active robot ids: " +
                   str(self._active_robot_ids))
 
-        if self.roles != roles:
-            rospy.loginfo(str(self.node)+": Changed roles: "+str(roles))
-
         for robot_id, role in zip(self._active_robot_ids, roles):
+            if self.roles != roles:
+                rospy.loginfo(str(self.node)+": Assigned \""+role+"\" to robot" + str(robot_id))
             self.get_robot_by_id(robot_id).set_role(role)
 
         self.roles = roles

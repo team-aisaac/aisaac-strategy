@@ -72,9 +72,9 @@ def kalman_filter(robot):
     robot.set_current_position_for_filter(updated_x, updated_y, updated_theta, updated_x_sigma,updated_y_sigma, updated_theta_sigma)
 
 def identity_filter(robot):
-    if detect_outlier(robot):
-        "外れ値ならばなにもしない"
-        return None
+    # if detect_outlier(robot):
+    #     "外れ値ならばなにもしない"
+    #     return None
 
     x, y, theta = robot.get_vision_position()
     robot.set_current_position(x, y, theta)
