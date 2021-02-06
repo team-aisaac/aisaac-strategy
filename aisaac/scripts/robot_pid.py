@@ -7,7 +7,7 @@ import numpy as np
 import rospy
 import tf
 
-from geometry_msgs.msg import PoseStamped
+from geometry_msgs.msg import PoseStamped, Point
 
 ROBOT_LOOP_RATE = config.ROBOT_LOOP_RATE
 
@@ -48,8 +48,9 @@ class RobotPid(object):
         self.Kdv_projection = 1.0
 
         topic_position = "robot_"+str(self.robot_id)+"/move_base_simple/goal"
-        topic_velocity = "robot_"+str(self.robot_id)+"/move_base_simple/target_velocity"
         self._target_pose_publisher = rospy.Publisher(topic_position, PoseStamped, queue_size=10)
+        topic_avoiding_point = "robot_"+str(self.robot_id)+"/avoiding_point"
+        self._avoiding_point_publisher = rospy.Publisher(topic_avoiding_point, Point, queue_size=10)
         # self.Kpv = 3.615645812128088
         # self.Kpr = 3.0
         # self.Kdv = 1.9759837181620452
@@ -562,6 +563,11 @@ class RobotPid(object):
 
             self.next_goal_pos_x = tmp_x
             self.next_goal_pos_y = tmp_y
+
+            point = Point()
+            point.x = tmp_x
+            point.y = tmp_y
+            self._avoiding_point_publisher.publish(point)
 
             if self.next_goal_pos_x != self.prev_goal_pos_x or self.next_goal_pos_y != self.prev_goal_pos_y:
                 self.goal_change_flag = True

@@ -134,6 +134,7 @@ class PaintWidget(QWidget):
         self.refereeBranch = String()
         self.sub_referee_branch = rospy.Subscriber("referee_branch", String, self.callbackRefereeBranch)
 
+        self.passTargetPointFrameCount = 0
         self.passTargetPoint = Point()
         self.sub_passTargetPoint = rospy.Subscriber("pass_target_point", Point, self.callbackPassTargetPoint)
 
@@ -195,6 +196,8 @@ class PaintWidget(QWidget):
         self._pub_replace_robot = rospy.Publisher(
                 'replacement_robot', ReplaceRobot, queue_size=10)
 
+        self.resizeDrawWorld()
+
 
     def callbackGeometry(self, msg):
         self.field_geometry = msg
@@ -225,6 +228,8 @@ class PaintWidget(QWidget):
 
     def callbackPassTargetPoint(self, msg):
         self.passTargetPoint = msg
+        # 10フレーム以内に更新があれば表示するためのカウンタ
+        self.passTargetPointFrameCount = 0
 
     def callbackDebugPoint0(self, msg):
         self.debugPoint[0] = msg
@@ -346,7 +351,7 @@ class PaintWidget(QWidget):
         self.drawField(painter)
         
         self.drawAvoidingPoints(painter)
-
+        self.drawAvoidingPaths(painter)
 
         self.drawFriends(painter)
         self.drawEnemis(painter)
@@ -655,6 +660,7 @@ class PaintWidget(QWidget):
         painter.drawEllipse(point, size, size)
 
     def drawPassTargetPoint(self, painter):
+        
         posX = self.passTargetPoint.x
         posY = self.passTargetPoint.y
         
@@ -663,7 +669,11 @@ class PaintWidget(QWidget):
 
         painter.setPen(Qt.black)
         painter.setBrush(Qt.blue)
-        painter.drawEllipse(point, size, size)
+
+        # 10フレーム以内に更新があれば表示 
+        if self.passTargetPointFrameCount <= 10:
+            painter.drawEllipse(point, size, size)
+            self.passTargetPointFrameCount = self.passTargetPointFrameCount + 1
 
     def drawBallVelocity(self, painter):
         ballPos = self.ballOdom.pose.pose.position
@@ -784,6 +794,20 @@ class PaintWidget(QWidget):
         painter.setPen(Qt.red)
         painter.drawText(textPoint, text)
 
+    def drawAvoidingPaths(self, painter):
+        for robot_id in self.friendsIDArray.data:
+
+            current_point = self.friendOdoms[robot_id].pose.pose.position
+            avoiding_point = self.avoidingPoints[robot_id]
+            target_point = self.targetPositions[robot_id].pose.position
+
+            current_point = self.convertToDrawWorld(current_point.x, current_point.y)
+            avoiding_point = self.convertToDrawWorld(avoiding_point.x, avoiding_point.y)
+            target_point = self.convertToDrawWorld(target_point.x, target_point.y)
+
+            painter.setPen(QPen(Qt.yellow,2))
+            painter.drawLine(current_point, avoiding_point)
+            painter.drawLine(avoiding_point, target_point)
 
     def drawAvoidingPoints(self, painter):
         for robot_id in self.friendsIDArray.data:
