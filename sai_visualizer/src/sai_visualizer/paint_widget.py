@@ -28,6 +28,7 @@ from geometry_msgs.msg import PoseStamped, TwistStamped
 from geometry_msgs.msg import Point
 from consai_msgs.msg import GeometryFieldSize, FieldLineSegment, FieldCircularArc
 from consai_msgs.msg import ReplaceBall, ReplaceRobot
+from aisaac.msg import Status
 
 from geometry import Geometry
 
@@ -133,6 +134,21 @@ class PaintWidget(QWidget):
         self.refereeBranch = String()
         self.sub_referee_branch = rospy.Subscriber("referee_branch", String, self.callbackRefereeBranch)
 
+        self.passTargetPoint = Point()
+        self.sub_passTargetPoint = rospy.Subscriber("pass_target_point", Point, self.callbackPassTargetPoint)
+
+        self.debugPoint = [Point()] * 10
+        rospy.Subscriber("debug_point_0", Point, self.callbackDebugPoint0)
+        rospy.Subscriber("debug_point_1", Point, self.callbackDebugPoint1)
+        rospy.Subscriber("debug_point_2", Point, self.callbackDebugPoint2)
+        rospy.Subscriber("debug_point_3", Point, self.callbackDebugPoint3)
+        rospy.Subscriber("debug_point_4", Point, self.callbackDebugPoint4)
+        rospy.Subscriber("debug_point_5", Point, self.callbackDebugPoint5)
+        rospy.Subscriber("debug_point_6", Point, self.callbackDebugPoint6)
+        rospy.Subscriber("debug_point_7", Point, self.callbackDebugPoint7)
+        rospy.Subscriber("debug_point_8", Point, self.callbackDebugPoint8)
+        rospy.Subscriber("debug_point_9", Point, self.callbackDebugPoint9)
+        
         self.enemyOdoms = [Odometry()] * self._ID_MAX
         self.sub_enemyOdoms = []
 
@@ -206,6 +222,30 @@ class PaintWidget(QWidget):
 
     def callbackRefereeBranch(self, msg):
         self.refereeBranch = msg
+
+    def callbackPassTargetPoint(self, msg):
+        self.passTargetPoint = msg
+
+    def callbackDebugPoint0(self, msg):
+        self.debugPoint[0] = msg
+    def callbackDebugPoint1(self, msg):
+        self.debugPoint[1] = msg
+    def callbackDebugPoint2(self, msg):
+        self.debugPoint[2] = msg
+    def callbackDebugPoint3(self, msg):
+        self.debugPoint[3] = msg
+    def callbackDebugPoint4(self, msg):
+        self.debugPoint[4] = msg
+    def callbackDebugPoint5(self, msg):
+        self.debugPoint[5] = msg
+    def callbackDebugPoint6(self, msg):
+        self.debugPoint[6] = msg
+    def callbackDebugPoint7(self, msg):
+        self.debugPoint[7] = msg
+    def callbackDebugPoint8(self, msg):
+        self.debugPoint[8] = msg
+    def callbackDebugPoint9(self, msg):
+        self.debugPoint[9] = msg
 
 
     def callbackEnemiesOdom(self, msg, robot_id):
@@ -312,6 +352,7 @@ class PaintWidget(QWidget):
         self.drawEnemis(painter)
         self.drawBallVelocity(painter)
         self.drawBall(painter)
+        self.drawPassTargetPoint(painter)
         self.drawTargets(painter)
 
         if self._is_ballpos_replacement or self._is_robotpos_replacement:
@@ -613,6 +654,16 @@ class PaintWidget(QWidget):
         painter.setBrush(Qt.red)
         painter.drawEllipse(point, size, size)
 
+    def drawPassTargetPoint(self, painter):
+        posX = self.passTargetPoint.x
+        posY = self.passTargetPoint.y
+        
+        point = self.convertToDrawWorld(posX,posY)
+        size = self.geometry.BALL_RADIUS * self.scaleOnField
+
+        painter.setPen(Qt.black)
+        painter.setBrush(Qt.blue)
+        painter.drawEllipse(point, size, size)
 
     def drawBallVelocity(self, painter):
         ballPos = self.ballOdom.pose.pose.position

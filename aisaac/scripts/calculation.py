@@ -53,7 +53,7 @@ class Calculation():
         self.def_pos = Def_pos()
 
         self.ball_frame = 10    # ボールの軌道直線フィッティングと速度の計算フレーム数
-        self.ball_move_threshold = 0.05 # ボールが移動したと判定する閾値[m]
+        self.ball_move_threshold = 0.01 # ボールが移動したと判定する閾値[m]
         self.same_pos_count = 0 # 停止判定用カウント
         self.ball_pos_count = 0 # 計算用カウント、フレーム単位でカウント
         self.calc_flag = False  # 計算フラグ、停止判定時は計算しない
@@ -154,8 +154,8 @@ class Calculation():
             # self.ball_vel_y_array[self.ball_pos_count-1] = self.ball_params.get_current_velosity()[1]
             # self.ball_vel_array[self.ball_pos_count] = math.sqrt(self.ball_params.get_current_velosity()[0]**2 + self.ball_params.get_current_velosity()[1]**2)
             if functions.distance_btw_two_points(
-                (self.ball_pos_x_array[self.ball_pos_count-1],self.ball_pos_y_array[self.ball_pos_count-1]),
-                (self.ball_pos_x_array[self.ball_pos_count],self.ball_pos_y_array[self.ball_pos_count])) < self.ball_move_threshold:
+                (self.ball_pos_x_array[self.ball_pos_count-2],self.ball_pos_y_array[self.ball_pos_count-2]),
+                (self.ball_pos_x_array[self.ball_pos_count-1],self.ball_pos_y_array[self.ball_pos_count-1])) < self.ball_move_threshold:
 
                 self.same_pos_count+=1
                 if self.same_pos_count >= self.ball_frame/2:

@@ -7,6 +7,7 @@ import functions
 import rospy
 import functions
 import config
+from geometry_msgs.msg import Point
 
 
 class RobotKick(object):
@@ -59,6 +60,9 @@ class RobotKick(object):
         self.lines4, = self.ax.plot(self.plot_x, self.plot_y)
         self.ax.set_xlim(-7, 7)
         self.ax.set_ylim(-7, 7)
+
+        self._pass_target_pos_publisher = \
+            rospy.Publisher("/"+self.pid.objects.team_color+"/pass_target_point", Point, queue_size=10)
 
     def kick_xz(self, power_x=10.0, power_z=0.0, ignore_penalty_area=False):
         area = 1.0
@@ -115,6 +119,11 @@ class RobotKick(object):
         is_tip_kick  boolean Trueならtip kick
         place        boolean Trueなら目標位置でballが静止するようにKick
         """
+        point = Point()
+        point.x = target_x
+        point.y = target_y
+        self._pass_target_pos_publisher.publish(point)
+
         distance = math.sqrt((target_x - self.ball_params.get_current_position()[0])**2 + (target_y - self.ball_params.get_current_position()[1])**2)
         if distance != 0:
             #print self.pass_stage
