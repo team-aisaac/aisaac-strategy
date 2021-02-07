@@ -107,7 +107,7 @@ class WorldModel(object):
         custom_referee_branch_subs = rospy.Subscriber("/force_referee_branch", String, self.force_referee_branch)
         self.custom_referee_branch = ""
 
-        self.world_model_fps_publisher = rospy.Publisher("fps/world_model", Float32)
+        self.world_model_fps_publisher = rospy.Publisher("fps/world_model", Float32, queue_size=1)
 
     def force_referee_branch(self, msg):
         self.custom_referee_branch = msg.data

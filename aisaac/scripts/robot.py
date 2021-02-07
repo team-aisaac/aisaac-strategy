@@ -78,7 +78,7 @@ class Robot(object):
         self._current_loop_time = 0
         self._last_loop_time = 0
         rospy.Timer(rospy.Duration(1.0), self.print_fps_callback)
-        self.robot_fps_publisher = rospy.Publisher("fps/robot_"+str(robot_id), Float32)
+        self.robot_fps_publisher = rospy.Publisher("fps/robot_"+str(robot_id), Float32, queue_size=1)
 
         self.loop_rate = rospy.Rate(ROBOT_LOOP_RATE)
         rospy.loginfo("start robot node: "+self.robot_id)
