@@ -19,9 +19,12 @@ from enemy_ball_placement_strategy_calculator import EnemyBallPlacement
 from context import StrategyContext
 from world_model_status_publisher import WorldModelStatusPublisher
 
-from std_msgs.msg import String
+from std_msgs.msg import String, Float32
 
 from filter import identity_filter
+import robot
+import threading
+import time
 
 import config
 
@@ -39,6 +42,21 @@ class WorldModel(object):
         """----上の5つの変数、インスタンスをまとめたもの、callbackをもつ---"""
         self._objects = Objects(
             self._team_color, self._team_side, config.NUM_FRIEND_ROBOT, config.NUM_ENEMY_ROBOT, node="world_model")
+
+        self.robot_pys = []
+        self.robot_py_ths = []
+
+        self.robot_ids = self._objects.get_robot_ids()
+
+        # スレッドを使わないときはここをコメントアウト --ここから--
+        for robot_id in self.robot_ids:
+            robot_py = robot.Robot(robot_id)
+            self.robot_pys.append(robot_py)
+            th = threading.Thread(target=robot_py.run)
+            th.setDaemon(True)
+            th.start()
+            self.robot_py_ths.append(th)
+        # スレッドを使わないときはここをコメントアウト --ここまで--
 
         """---Referee---"""
         self._referee = Referee(self._objects)
@@ -89,6 +107,8 @@ class WorldModel(object):
         custom_referee_branch_subs = rospy.Subscriber("/force_referee_branch", String, self.force_referee_branch)
         self.custom_referee_branch = ""
 
+        self.world_model_fps_publisher = rospy.Publisher("fps/world_model", Float32)
+
     def force_referee_branch(self, msg):
         self.custom_referee_branch = msg.data
 
@@ -119,6 +139,12 @@ class WorldModel(object):
         # type: () -> Objects
         return self._objects
 
+    def print_fps_callback(self, event):
+        if len(self._fps) > 0:
+            msg = Float32()
+            msg.data = sum(self._fps)/len(self._fps)
+            self.world_model_fps_publisher.publish(msg)
+            self._fps = []
 
 def run_world_model():
     world_model = WorldModel()
@@ -126,6 +152,11 @@ def run_world_model():
 
     rospy.loginfo("setting global param")
     rospy.set_param("/robot_max_velocity", config.ROBOT_MAX_VELOCITY)
+
+    world_model._fps = []
+    world_model._current_loop_time = 0
+    world_model._last_loop_time = 0
+    rospy.Timer(rospy.Duration(1.0), world_model.print_fps_callback)
 
     rospy.loginfo("start world model node")
     # assignment_x = [-4, -3, -2, -1, 0, 1, 2, 3]
@@ -149,6 +180,10 @@ def run_world_model():
         last_referee_branch = "NONE"
 
         while not rospy.is_shutdown():
+            world_model._current_loop_time = time.time()
+            elapsed_time = world_model._current_loop_time - world_model._last_loop_time
+            world_model._fps.append(1./elapsed_time)
+
             # 恒等関数フィルタの適用
             # vision_positionからcurrent_positionを決定してつめる
             for robot in world_model.get_objects().robot:
@@ -305,7 +340,15 @@ def run_world_model():
             
             status_publisher.publish_all(strat)
             world_model.trigger_loop_events()
+
+            # # robot.py kousinn
+            # for robot_py in world_model.robot_pys:
+            #     robot_py.run_once()
+            #     #print(robot_py.robot_id)
+
+            world_model._last_loop_time = world_model._current_loop_time
             loop_rate.sleep()
+
     except Exception as e:
         import traceback
         traceback.print_exc()

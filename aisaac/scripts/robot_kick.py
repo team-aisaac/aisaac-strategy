@@ -177,7 +177,7 @@ class RobotKick(object):
                     # 12.0: フィールドの横幅
                     kick_power_x = config.MAX_KICK_POWER_X
                 if is_tip_kick:
-                    kick_power_z = min(math.sqrt(distance) * self.const, MAX_KICK_POWER_Z)
+                    kick_power_z = min(math.sqrt(distance) * self.const, config.MAX_KICK_POWER_Z)
                     self.kick_xz(power_x=kick_power_x, power_z=kick_power_z, ignore_penalty_area=ignore_penalty_area)
                 else:
                     if place:

@@ -13,6 +13,8 @@ import copy
 
 class Objects(object):
 
+    _node_name = None
+
     # シングルトン化
     __instance = None
     def __new__(cls, *args, **keys):
@@ -20,43 +22,49 @@ class Objects(object):
             cls.__instance = object.__new__(cls)
         return cls.__instance
 
-    def __init__(self, team_color, team_side, robot_total, enemy_total, node=""):
-        # type: (str, int, int) -> None
-        self.team_color = team_color
-        self.team_side = team_side
-        self.robot_total = robot_total
-        self.enemy_total = enemy_total
+    def __init__(self, team_color, team_side, robot_total, enemy_total, node="default"):
+        # type: (str, int, int, int, str) -> None
 
-        self._robot_ids = range(self.robot_total)
-        self._enemy_ids = range(self.enemy_total)
+        # シングルトンなので2度呼ばれたときに再作成しないようにする
+        if not self._node_name:            
+            self._node_name = node
+            rospy.loginfo("initialized Objects: as \""+self._node_name+"\"")
 
-        self._active_robot_ids = range(self.robot_total)
-        self._active_enemy_ids = range(self.robot_total)
+            self.team_color = team_color
+            self.team_side = team_side
+            self.robot_total = robot_total
+            self.enemy_total = enemy_total
 
-        self.robot = [entity.Robot(id=i) for i in self._robot_ids]  # type: typing.List[entity.Robot]
-        self.enemy = [entity.Robot(id=i) for i in self._enemy_ids]  # type: typing.List[entity.Robot]
+            self._robot_ids = range(self.robot_total)
+            self._enemy_ids = range(self.enemy_total)
 
-        # roles = ["RFW", "LFW", "RDF", "LDF", "GK"]
-        # for robot, role in zip(self.robot, roles):
-        #     robot.set_role(role)
+            self._active_robot_ids = range(self.robot_total)
+            self._active_enemy_ids = range(self.robot_total)
 
-        roles = ["RFW", "LFW", "RDF", "LDF", "GK"]
-        for robot_id, role in zip(self._robot_ids, roles):
-            self.get_robot_by_id(robot_id).set_role(role)
-        self.roles = roles # 保存
+            self.robot = [entity.Robot(id=i) for i in self._robot_ids]  # type: typing.List[entity.Robot]
+            self.enemy = [entity.Robot(id=i) for i in self._enemy_ids]  # type: typing.List[entity.Robot]
 
-        rospy.Timer(rospy.Duration(1.0), self.redefine_roles)
+            # roles = ["RFW", "LFW", "RDF", "LDF", "GK"]
+            # for robot, role in zip(self.robot, roles):
+            #     robot.set_role(role)
 
-        self.ball = entity.Ball()
+            roles = ["RFW", "LFW", "RDF", "LDF", "GK"]
+            for robot_id, role in zip(self._robot_ids, roles):
+                self.get_robot_by_id(robot_id).set_role(role)
+            self.roles = roles # 保存
 
-        """---ボール軌道の考慮時間幅(linear Regressionで軌道予測するため)---"""
-        self.ball_dynamics_window = 5
-        self.ball_dynamics = [[0., 0.] for i in range(self.ball_dynamics_window)]
+            rospy.Timer(rospy.Duration(1.0), self.redefine_roles)
 
-        self.odom_listener()
-        self.existing_listener()
+            self.ball = entity.Ball()
 
-        self.node = node
+            """---ボール軌道の考慮時間幅(linear Regressionで軌道予測するため)---"""
+            self.ball_dynamics_window = 5
+            self.ball_dynamics = [[0., 0.] for i in range(self.ball_dynamics_window)]
+
+            self.odom_listener()
+            self.existing_listener()
+        else:
+            rospy.loginfo("argument of Objects: \"node="+node+"\" not used because already initialized as \"" + self._node_name + "\".")
 
     def redefine_roles(self, event):
         if len(self._active_robot_ids) == 5:
@@ -71,12 +79,12 @@ class Objects(object):
             roles = ["RFW"]
         else:
             roles = ["RFW"]
-            rospy.loginfo_throttle(5.0, str(self.node)+": Error! Current active robot ids: " +
+            rospy.loginfo_throttle(5.0, str(self._node_name)+": Error! Current active robot ids: " +
                   str(self._active_robot_ids))
 
         for robot_id, role in zip(self._active_robot_ids, roles):
             if self.roles != roles:
-                rospy.loginfo(str(self.node)+": Assigned \""+role+"\" to robot" + str(robot_id))
+                rospy.loginfo(str(self._node_name)+": Assigned \""+role+"\" to robot" + str(robot_id))
             self.get_robot_by_id(robot_id).set_role(role)
 
         self.roles = roles

@@ -16,6 +16,7 @@ from context import RobotContext
 
 from objects import Objects
 from robot_command_publisher_wrapper import RobotCommandPublisherWrapper
+from std_msgs.msg import String, Float32
 
 from filter import kalman_filter, identity_filter
 
@@ -23,6 +24,7 @@ import config
 import numpy as np
 import functions
 import copy
+import time
 
 ROBOT_LOOP_RATE = config.ROBOT_LOOP_RATE
 
@@ -32,10 +34,10 @@ class Robot(object):
         self.robot_color = str(rospy.get_param("friend_color"))
         self.robot_side = str(rospy.get_param("team_side"))
 
-        if not robot_id:
+        if robot_id is None:
             self.robot_id = str(rospy.get_param("~robot_num"))
         else:
-            self.robot_id = robot_id
+            self.robot_id = str(robot_id)
 
         self.robot_total = config.NUM_FRIEND_ROBOT
         self.enemy_total = config.NUM_ENEMY_ROBOT
@@ -63,20 +65,23 @@ class Robot(object):
         self.keeper = RobotKeeper(self.kick)
 
         # listner 起動
-        # self.odom_listener()
-        # self.goal_pose_listener()
-        # self.target_pose_listener()
         self.status_listener()
-
-
-
-        self.set_pid_server()
         self.def_pos_listener()
+        self.set_pid_server()
         rospy.Timer(rospy.Duration(1.0/30.0), self.pid.replan_timer_callback)
 
         self._last_pub_time = rospy.Time.now()
         self._last_vel_surge_sway_vec = [0.0, 0.0]
         self._last_omega = 0.0
+
+        self._fps = []
+        self._current_loop_time = 0
+        self._last_loop_time = 0
+        rospy.Timer(rospy.Duration(1.0), self.print_fps_callback)
+        self.robot_fps_publisher = rospy.Publisher("fps/robot_"+str(robot_id), Float32)
+
+        self.loop_rate = rospy.Rate(ROBOT_LOOP_RATE)
+        rospy.loginfo("start robot node: "+self.robot_id)
 
     def store_and_publish_commands(self):
         acc_clip_threshold_max = 0.075
@@ -140,13 +145,24 @@ class Robot(object):
         self.cmd.shutdown_flag = True
         self.store_and_publish_commands()
 
+    def print_fps_callback(self, event):
+        if len(self._fps) > 0:
+            msg = Float32()
+            msg.data = sum(self._fps)/len(self._fps)
+            self.robot_fps_publisher.publish(msg)
+            self._fps = []
+
     def run(self):
         # Loop 処理
-        loop_rate = rospy.Rate(ROBOT_LOOP_RATE)
-        rospy.loginfo("start robot node: "+self.robot_id)
 
         while not rospy.is_shutdown():
-            # start = time.time()
+            self.run_once()
+
+    def run_once(self):
+        if True: # インデント変えたくなかっただけのif True
+            self._current_loop_time = time.time()
+            elapsed_time = self._current_loop_time - self._last_loop_time
+            self._fps.append(1./elapsed_time)
 
             # 場外にいる場合、カルマンフィルタの信念(分散)を初期化する
             if self.ctrld_robot.get_id() not in self.objects.get_active_robot_ids():
@@ -265,10 +281,9 @@ class Robot(object):
                 self.shutdown_cmd()
 
             self.store_and_publish_commands()
-            loop_rate.sleep()
 
-            #elapsed_time = time.time() - start
-            #print ("elapsed_time:{0}".format(1./elapsed_time) + "[Hz]")
+            self._last_loop_time = self._current_loop_time
+            self.loop_rate.sleep()
 
         """
 

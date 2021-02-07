@@ -44,8 +44,8 @@
     <!-- <node name="rqt_console" pkg="rqt_console" type="rqt_console" /> -->
     <!-- <node name="plot" pkg="rqt_plot" type="rqt_plot" /> -->
 
-    <!-- Run Robot -->
-    <node name="robot0" pkg="aisaac" type="robot.py" output="screen"> <!-- launch-prefix="xterm -e"> -->
+    <!-- Run Robot --> <!-- launch-prefix="xterm -e"> -->
+    <!-- <node name="robot0" pkg="aisaac" type="robot.py" output="screen">
       <param name="robot_num" type="int" value="0" />
     </node>
 
@@ -63,7 +63,7 @@
 
     <node name="robot4" pkg="aisaac" type="robot.py" output="screen">
       <param name="robot_num" type="int" value="4" />
-    </node>
+    </node> -->
 
   <!--
     <node name="robot5" pkg="aisaac" type="robot.py" output="screen">
