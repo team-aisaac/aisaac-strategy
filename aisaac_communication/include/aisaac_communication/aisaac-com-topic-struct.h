@@ -2,18 +2,21 @@
 
 namespace aisaac {
     struct kickParamStruct {
-        unsigned char sensorUse;
-        bool kickType;
-        unsigned char kickStrength;
+        uint8_t sensorUse : 3;
+        uint8_t kickType : 1;
+        uint8_t kickStrength : 3;
     };
 
     struct commandToRobot {
-        unsigned short int x_vector;
-        unsigned short int y_vector;
-        unsigned short int theta;
-        unsigned short int omega;
-        unsigned short int calibrationData;
+        int16_t x_vector;
+        int16_t y_vector;
+        uint8_t angleTypeSelect : 1;
+        uint16_t angle : 12;
+        uint8_t calibrationValid : 1;
+        uint16_t calibrationXPosition : 14;
+        uint16_t calibrationYPosition : 14;
+        uint16_t calibrationAngle : 12;
         kickParamStruct kickParameter;
-        unsigned short int worldCoordinateAngle;
+        uint8_t miscByte;
     };
 }

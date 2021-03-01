@@ -74,7 +74,7 @@ namespace aisaac
     }
     void AisaacBitmapHandler::generateFT4(commandToRobot command, std::vector<unsigned char> &out) {
         out.clear();
-        unsigned char tmp = 0;
+        uint8_t tmp = 0;
         if (isShutdown) {
             // x_vector, y_vector, theta(th_vector), omega = 0
             // Index:0 DATAType4 0b100 + x_vector 0x0
@@ -85,83 +85,87 @@ namespace aisaac
             out.push_back(0x0);
             // Index:3 y_vector 0x0
             out.push_back(0x0);
-            // Index:4 y_vector 0x0 + theta 0x0
-            out.push_back(0x0);
-            // Index:5 theta 0x0 + 0
-            out.push_back(0x0);
-            // Index:6 omega 0x0
-            out.push_back(0x0);
-            // Index:7 omega 0x0
+            // Index:4 y_vector + angleTypeSelect:OMEGA(1) + angle 0x10 
+            out.push_back(0x10);
+            // Index:5 angle 0x0
             out.push_back(0x0);
         } else {
             // Index:0 DATAType4 0b100 + X_VECTOR 5bits
-            tmp = ((0b100) << 5) | ((command.x_vector >> 11)&0b11111);
+            uint16_t uxvector = std::abs(command.x_vector);
+            tmp = ((0b100) << 5) | (command.x_vector >= 0 ? 0 : 0b10000) | ((uxvector >> 11)&0b1111);
             out.push_back(tmp);
             // Index:1 x_vector 0x0
-            tmp = (command.x_vector >> 3) & 0xFF;
+            tmp = (uxvector >> 3) & 0xFF;
             out.push_back(tmp);
             // Index:2 x_vector + y_vector
-            tmp = ((command.x_vector & 0b111) << 5) | ((command.y_vector >> 11) & 0b11111);
+            uint16_t uyvector = std::abs(command.y_vector);
+            tmp = ((uxvector & 0b111) << 5) | (command.y_vector >= 0 ? 0 : 0b10000) | ((uyvector >> 11) & 0b1111);
             out.push_back(tmp);
             // Index:3 y_vector
-            tmp = (command.y_vector >> 3) & 0xFF;
+            tmp = (uyvector >> 3) & 0xFF;
             out.push_back(tmp);
-            // Index:4 y_vector + theta
-            tmp = ((command.y_vector & 0b111) << 5) | ((command.theta >> 7) & 0b11111);
+            // Index:4 y_vector + angleTypeSelect(1) + angle(4)
+            tmp = ((uyvector & 0b111) << 5) | ((command.angleTypeSelect << 4) & 0b10000) | ((command.angle >> 8) & 0b1111);
             out.push_back(tmp);
-            // Index:5 theta + 0
-            tmp = ((command.theta & 0b01111111) << 1);
-            out.push_back(tmp);
-            // Index:6 omega
-            tmp = command.omega << 8;
-            out.push_back(tmp);
-            // Index:7 omega
-            tmp = command.omega & 0xFF;
+            // Index:5 angle
+            tmp = command.angle & 0xFF;
             out.push_back(tmp);
         }
-        // Index: 8 CALIB_DATA
-        tmp = (command.calibrationData >> 5) & 0xFF;
+        // Index:6 calibrationValid(1) + calibrationXPosition(7)
+        tmp = (command.calibrationValid << 7) | ((command.calibrationXPosition >> 7) & 0b1111111);
         out.push_back(tmp);
-        // Index: 9 CALIB_DATA + Kick
-        tmp = ((command.calibrationData & 0b11111) << 3) | ((command.kickParameter.sensorUse & 0b11) << 1) | (command.kickParameter.kickType & 0b1);
+        // Index:7 calibrationXPosition(7) + calibrationYPosition(1)
+        tmp = ((command.calibrationXPosition & 0b11111110) << 1) | ((command.calibrationYPosition >> 13) & 0b1);
         out.push_back(tmp);
-        // Index: 10 Kick
-        tmp = ((command.kickParameter.kickStrength & 0b111111) << 2);
+        // Index:8 calibrationYPosition(8)
+        tmp = (command.calibrationYPosition >> 5) & 0xFF;
         out.push_back(tmp);
-        // Index: 11 world coordination 
-        tmp = ((command.worldCoordinateAngle >> 4) & 0xFF);
+        // Index:9 calibrationYPosition(5) + calibrationAngle(3)
+        tmp = ((command.calibrationYPosition & 0b11111) << 3) | ((command.calibrationAngle >> 9) & 0b111);
         out.push_back(tmp);
-        // Index: 11 world coordination
-        tmp = ((command.worldCoordinateAngle & 0b1111) << 4);
+        // Index:10 calibrationAngle(8)
+        tmp = ((command.calibrationAngle >> 1) & 0xFF);
+        out.push_back(tmp);
+        // Index:11 calibrationAngle(1) + KickParams
+        tmp = ((command.calibrationAngle & 0b1) << 7) | ((command.kickParameter.sensorUse & 0b111) << 4) | ((command.kickParameter.kickType & 0b1) << 3) | (command.kickParameter.kickStrength & 0b111);
+        out.push_back(tmp);
+        // Index:12 Misc Byte
+        tmp = command.miscByte & 0xFF;
         out.push_back(tmp);
     }
     int AisaacBitmapHandler::parseFT4(std::vector<unsigned char> in, commandToRobot &out) {
         if (in.size() != 13) return -1;
         if ((in[0] >> 5) != 0b100) return -1;
-        unsigned short tmp = 0;
-        tmp = (unsigned short)(in[0] & 0x1F);
-        tmp = (tmp << 8) | (unsigned short)in[1];
-        tmp = (tmp << 3) | (unsigned short)((in[2] & 0b11100000) >> 5);
-        out.x_vector = tmp;
-        tmp = (unsigned short)(in[2] & 0x1F);
-        tmp = (tmp << 8) | (unsigned short)in[3];
-        tmp = (tmp << 3) | (unsigned short)((in[4] & 0b11100000) >> 5);
-        out.y_vector = tmp;
-        tmp = (unsigned short)(in[4] & 0x1F);
-        tmp = (tmp << 7) | (unsigned short)((in[5] & 0b11111110) >> 1);
-        out.theta = tmp;
-        tmp = (unsigned short)in[6];
-        tmp = (tmp << 8) | (unsigned short)in[7];
-        out.omega = tmp;
-        tmp = (unsigned short)in[8];
-        tmp = (tmp << 5) | (unsigned short)((in[9] & 0b11111000) >> 3);
-        out.calibrationData = tmp;
-        out.kickParameter.sensorUse = (unsigned char)((in[9] & 0b110) >> 1);
-        out.kickParameter.kickType = (bool)(in[9] & 0b1);
-        out.kickParameter.kickStrength = (unsigned char)((in[10] & 0b11111100) >> 2);
-        tmp = (unsigned short)in[11];
-        tmp = (tmp << 4) | (unsigned short)((in[12] & 0xF0) >> 4);
-        out.worldCoordinateAngle = tmp;
+        int16_t tmpShort = 0;
+        uint16_t tmpUShort = 0;
+        tmpShort = (short)(in[0] & 0xF);
+        tmpShort = (tmpShort << 8) | (short)in[1];
+        tmpShort = (tmpShort << 3) | (short)((in[2] & 0b11100000) >> 5);
+        out.x_vector = tmpShort * ((in[0] & 0b10000) == 0b10000 ? -1.0 : 1.0);
+        tmpShort = (short)(in[2] & 0xF);
+        tmpShort = (tmpShort << 8) | (unsigned short)in[3];
+        tmpShort = (tmpShort << 3) | (unsigned short)((in[4] & 0b11100000) >> 5);
+        out.y_vector = tmpShort * ((in[2] & 0b10000) == 0b10000 ? -1.0 : 1.0);
+        out.angleTypeSelect = (unsigned char)((in[4] >> 4) & 0b1);
+        tmpUShort = (unsigned short)(in[4] & 0xF);
+        tmpUShort = (tmpUShort << 8) | (unsigned short)(in[5] & 0xFF);
+        out.angle = tmpUShort;
+        out.calibrationValid = (unsigned char)((in[6] >> 7) & 0b1);
+        tmpUShort = (unsigned short)((in[6] >> 1) & 0b1111111);
+        tmpUShort = (tmpUShort << 7) | (((unsigned short)in[7] & 0b11111110) >> 1);
+        out.calibrationXPosition = tmpUShort;
+        tmpUShort = (unsigned short)(in[7] & 0b1);
+        tmpUShort = (tmpUShort << 8) | (unsigned short)(in[8] & 0xFF);
+        tmpUShort = (tmpUShort << 5) | (unsigned short)((in[9] & 0b11111000) >> 3);
+        out.calibrationYPosition = tmpUShort;
+        tmpUShort = (unsigned short)(in[9] & 0b111);
+        tmpUShort = (tmpUShort << 8) | (unsigned short)(in[10] & 0xFF);
+        tmpUShort = (tmpUShort << 1) | (unsigned short)((in[11] & 0b10000000) >> 7);
+        out.calibrationAngle = tmpUShort;
+        out.kickParameter.sensorUse = (unsigned char)((in[11] & 0b01110000) >> 4);
+        out.kickParameter.kickType = (unsigned char)((in[11] & 0b1000) >> 3);
+        out.kickParameter.kickStrength = (unsigned char)(in[11] & 0b111);
+        out.miscByte = (unsigned char)in[12];
         return 0;
     }
     void AisaacBitmapHandler::sendCommand(int robotID, std::vector<unsigned char> in) {

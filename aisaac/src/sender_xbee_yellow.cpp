@@ -50,20 +50,15 @@ public:
             x_tmp = x_tmp / k;
             y_tmp = y_tmp / k;
         }
-        commands.x_vector = (unsigned short int)x_tmp;
-        commands.y_vector = (unsigned short int)y_tmp;
+        commands.x_vector = (int16_t)x_tmp;
+        commands.y_vector = (int16_t)y_tmp;
         
-        float theta_deg = msg->theta * (180 / M_PI);
-        while(!(0 <= theta_deg && theta_deg < 360)){
-            if(theta_deg < 0){
-                theta_deg += 360;
-            }else{
-                theta_deg -= 360;
-            }
-        }
-        commands.theta = (unsigned short int)uint16_t(theta_deg);
+        commands.angleTypeSelect = 1;   // omega 
+        commands.angle = (uint16_t)int16_t(msg->omega * (180.0 / M_PI) * 10);
 
-        commands.omega = (unsigned short int)int16_t(msg->omega * (180.0 / M_PI) * 10);
+        commands.calibrationValid = 0;
+        commands.calibrationXPosition = 0;
+        commands.calibrationYPosition = 0;
 
         double current_orientation_deg = current_orientation[2] * (180 / M_PI);
         while(!(0 <= current_orientation_deg && current_orientation_deg < 360)){
@@ -73,7 +68,7 @@ public:
                 current_orientation_deg -= 360;
             }
         }
-        commands.calibrationData = (unsigned short int)uint16_t(current_orientation_deg);
+        commands.calibrationAngle = (uint16_t)uint16_t(current_orientation_deg);
 
         if(msg->kick_power > 0){
             commands.kickParameter.sensorUse = 1;   // kick_flag
@@ -85,7 +80,7 @@ public:
             commands.kickParameter.kickStrength = 0;
         }
 
-        commands.worldCoordinateAngle = 0;
+        commands.miscByte = 0;
 
         std::vector<unsigned char> commandvec;
         sender->generateFT4(commands, commandvec);
