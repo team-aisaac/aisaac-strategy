@@ -2,15 +2,13 @@
 # -*- coding: utf-8 -*-
 
 import math
-from abc import ABCMeta, abstractmethod
 
-from strategy import StrategyBase, InitialStaticStrategy, StopStaticStrategy, DynamicStrategy
+from strategy import StrategyBase, DynamicStrategy
 from strategy_calcurator import StrategyCalcuratorBase
-from context import StrategyContext
-from objects import Objects
+from common.context import StrategyContext
 from aisaac.msg import Status
 import copy
-import functions
+from common import functions
 import rospy
 import numpy as np
 
@@ -400,9 +398,9 @@ class NormalStartKickOffDefenceStrategyCalcurator(StrategyCalcuratorBase):
                         self._objects.get_enemy_by_id(nearest_enemy_id).get_current_position()[0], 
                         self._objects.get_enemy_by_id(nearest_enemy_id).get_current_position()[1], 
                         self._ball_params.get_current_position()[0], 
-                        self._ball_params.get_current_position()[1], 
-                        functions.distance_btw_two_points(self._objects.get_enemy_by_id(nearest_enemy_id).get_current_position(), 
-                        self._ball_params.get_current_position()) + 0.8, 
+                        self._ball_params.get_current_position()[1],
+                        functions.distance_btw_two_points(self._objects.get_enemy_by_id(nearest_enemy_id).get_current_position(),
+                                                          self._ball_params.get_current_position()) + 0.8,
                         -0.8)
                     status.pid_goal_theta = math.atan2((self._ball_params.get_current_position()[1] - robot.get_current_position()[1]) , (self._ball_params.get_current_position()[0] - robot.get_current_position()[0]))
                     if status.pid_goal_pos_x >= -0.2 and status.pid_goal_pos_y >= 0:

@@ -1,7 +1,7 @@
 # !/usr/bin/env  python
 # coding:utf-8
 
-from objects import Objects
+from world.objects import Objects
 
 
 class WorldState(object):

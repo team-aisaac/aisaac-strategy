@@ -1,14 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from strategy import StrategyBase, StopStaticStrategy, DynamicStrategy
 from strategy_calcurator import StrategyCalcuratorBase
-import functions
+from common import functions
 from aisaac.msg import Status
-import copy
 import numpy as np
 import rospy
-import config
+
 
 class StopStrategyCalculator(StrategyCalcuratorBase):
     def __init__(self, objects):

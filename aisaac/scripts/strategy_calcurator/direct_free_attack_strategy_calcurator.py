@@ -1,17 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import math
-from abc import ABCMeta, abstractmethod
-
-from strategy import StrategyBase, InitialStaticStrategy, StopStaticStrategy, DynamicStrategy
-from strategy_calcurator import StrategyCalcuratorBase
-from context import StrategyContext
+from strategy import StrategyBase
+from common.context import StrategyContext
 from indirect_free_attack_strategy_calcurator import IndirectFreeAttack
-from objects import Objects
 from aisaac.msg import Status
-import functions
-import copy
+from common import functions
 
 try:
     from typing import Tuple, List, Dict

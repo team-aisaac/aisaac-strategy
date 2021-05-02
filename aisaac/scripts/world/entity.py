@@ -1,8 +1,6 @@
 #!/usr/bin/env  python
 # coding:utf-8
-import numpy as np
-import random
-from context import RobotContext
+from common.context import RobotContext
 import config
 
 class Entity(object):

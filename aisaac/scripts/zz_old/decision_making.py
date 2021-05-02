@@ -3,22 +3,15 @@
 #hello world
 import math
 import numpy as np
-import entity
-import sys
-import time
-import concurrent.futures
+from world import entity
 from sklearn.cluster import KMeans
 import rospy
 #from consai_msgs.msg import VisionPacket, VisionIDList
 from consai_msgs.msg import robot_commands
-from consai_msgs.msg import Pose
 from nav_msgs.msg import Odometry
-from geometry_msgs.msg import Quaternion
 import tf
 from consai_msgs.msg import RefereeTeamInfo
 from std_msgs.msg import Int8
-import struct
-import serial
 import time
 #from aisaac.srv import Kick
 from aisaac.msg import Status

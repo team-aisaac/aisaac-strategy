@@ -3,9 +3,8 @@
 import numpy as np
 import math
 import matplotlib.pyplot as plt
-import functions
+from common import functions
 import rospy
-import functions
 import config
 from geometry_msgs.msg import Point
 

@@ -4,7 +4,7 @@
 from aisaac.msg import Status
 import rospy
 import config
-from strategy import StrategyBase
+from strategy_calcurator.strategy import StrategyBase
 
 try:
     from typing import Dict, List

@@ -1,17 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import math
 from abc import ABCMeta, abstractmethod
 
-from strategy import StrategyBase, InitialStaticStrategy, StopStaticStrategy, DynamicStrategy
-from context import StrategyContext
-from objects import Objects
-from world_state import WorldState
-from aisaac.msg import Status
-import functions
+from strategy import InitialStaticStrategy, StopStaticStrategy, DynamicStrategy
+from world.objects import Objects
+from common import functions
 import config
-import copy
 
 try:
     from typing import Tuple, List, Dict

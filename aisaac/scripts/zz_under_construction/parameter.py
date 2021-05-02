@@ -1,21 +1,6 @@
 #!/usr/bin/env  python
 # coding:utf-8
-import itertools
-import math
-import rospy
-import numpy as np
-from consai_msgs.msg import Pose
-from consai_msgs.msg import robot_commands
 #from aisaac.srv import Kick
-from aisaac.msg import Status
-from nav_msgs.msg import Odometry
-from geometry_msgs.msg import Quaternion
-import tf
-import entity
-import matplotlib.pyplot as plt
-from matplotlib import animation
-import functions
-from robot_functions import RobotPid
 ROBOT_LOOP_RATE = 60.
 DT =  1. / ROBOT_LOOP_RATE
 COEFFICIENT = 1.

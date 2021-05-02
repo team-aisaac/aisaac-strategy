@@ -4,26 +4,24 @@ import rospy
 import rosservice
 
 from consai_msgs.msg import robot_commands
-from aisaac.msg import Status, Ball_sub_params, Def_pos
+from aisaac.msg import Status, Def_pos
 from aisaac.srv import pid
 
-from robot_kick import RobotKick
-from robot_pid import RobotPid
-from robot_status import RobotStatus
-from robot_defence import RobotDefence
-from robot_keeper import RobotKeeper
-from context import RobotContext
+from robot_status.robot_kick import RobotKick
+from robot_status.robot_pid import RobotPid
+from robot_status.robot_status import RobotStatus
+from robot_status.robot_defence import RobotDefence
+from robot_status.robot_keeper import RobotKeeper
 
-from objects import Objects
-from robot_command_publisher_wrapper import RobotCommandPublisherWrapper
-from std_msgs.msg import String, Float32
+from world.objects import Objects
+from common.robot_command_publisher_wrapper import RobotCommandPublisherWrapper
+from std_msgs.msg import Float32
 
-from filter import kalman_filter, identity_filter
+from common.filter import identity_filter
 
 import config
 import numpy as np
-import functions
-import copy
+from common import functions
 import time
 
 ROBOT_LOOP_RATE = config.ROBOT_LOOP_RATE

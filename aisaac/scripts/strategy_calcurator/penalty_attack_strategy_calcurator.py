@@ -1,17 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import math
-from abc import ABCMeta, abstractmethod
-
-from strategy import StrategyBase, InitialStaticStrategy, StopStaticStrategy, DynamicStrategy
+from strategy import DynamicStrategy
 from strategy_calcurator import StrategyCalcuratorBase
-from context import StrategyContext
-from indirect_free_attack_strategy_calcurator import IndirectFreeAttack
-from objects import Objects
 from aisaac.msg import Status
-import functions
-import copy
+from common import functions
 
 try:
     from typing import Tuple, List, Dict
@@ -84,7 +77,7 @@ class PenaltyAttack(StrategyCalcuratorBase):
                     status.status = "penalty_shoot"
 
                     if functions.distance_btw_two_points(self._objects.ball.get_current_position(),
-                            self._objects.get_robot_by_id(robot_id).get_current_position()) > 1.0:
+                                                         self._objects.get_robot_by_id(robot_id).get_current_position()) > 1.0:
                         strategy_context.update("penalty_finish", True, namespace="world_model")
                         strategy_context.update("defence_or_attack", False, namespace="world_model")
 
