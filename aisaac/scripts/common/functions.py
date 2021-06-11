@@ -139,3 +139,6 @@ def clip_vector2(vec, clip_length):
 def get_unit_vector2(vec):
     vec_length = np.linalg.norm(vec)
     return (vec[0] / vec_length, vec[1] / vec_length)
+
+def get_inner_product(vec1, vec2):
+    return vec1[0] * vec2[0] + vec1[1] * vec2[1]

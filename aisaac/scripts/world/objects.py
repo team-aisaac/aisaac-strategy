@@ -219,7 +219,11 @@ class Objects(object):
         ball_x = msg.pose.pose.position.x
         ball_y = msg.pose.pose.position.y
         ball_t = tf.transformations.euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))[2]
+        ball_v_x = msg.twist.twist.linear.x
+        ball_v_y = msg.twist.twist.linear.y
+        ball_v_t = msg.twist.twist.linear.z
         self.ball.set_current_position(x = ball_x, y = ball_y, theta=ball_t)
+        self.ball.set_current_velocity(vx = ball_v_x, vy = ball_v_y, vtheta=ball_v_t)
         _ = self.ball_dynamics.pop(0)
         self.ball_dynamics.append([ball_x, ball_y])
 

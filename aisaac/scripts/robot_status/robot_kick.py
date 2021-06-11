@@ -1,6 +1,7 @@
 #!/usr/bin/env  python
 # coding:utf-8
 import numpy as np
+from scipy import optimize
 import math
 import matplotlib.pyplot as plt
 from common import functions
@@ -101,15 +102,17 @@ class RobotKick(object):
         post_offset = 0.2
 
         if _target == "center":
-            self.pass_ball(config.GOAL_ENEMY_CENTER[0], config.GOAL_ENEMY_CENTER[1], should_wait=should_wait, is_shoot=True, ignore_penalty_area=ignore_penalty_area)
+            self.pass_ball(config.GOAL_ENEMY_CENTER[0], config.GOAL_ENEMY_CENTER[1],
+                           should_wait=should_wait, is_shoot=True, ignore_penalty_area=ignore_penalty_area)
         elif _target == "left":
-            self.pass_ball(config.GOAL_ENEMY_LEFT[0], config.GOAL_ENEMY_LEFT[1] - post_offset, should_wait=should_wait, is_shoot=True, ignore_penalty_area=ignore_penalty_area)
+            self.pass_ball(config.GOAL_ENEMY_LEFT[0], config.GOAL_ENEMY_LEFT[1] - post_offset,
+                           should_wait=should_wait, is_shoot=True, ignore_penalty_area=ignore_penalty_area)
         elif _target == "right":
-            self.pass_ball(config.GOAL_ENEMY_RIGHT[0], config.GOAL_ENEMY_RIGHT[1] + post_offset, should_wait=should_wait, is_shoot=True, ignore_penalty_area=ignore_penalty_area)
+            self.pass_ball(config.GOAL_ENEMY_RIGHT[0], config.GOAL_ENEMY_RIGHT[1] + post_offset,
+                           should_wait=should_wait, is_shoot=True, ignore_penalty_area=ignore_penalty_area)
 
-    
-
-    def pass_ball(self, target_x, target_y, should_wait=False, is_shoot=False, is_tip_kick=False, ignore_penalty_area=False, place=False):
+    def pass_ball(self, target_x, target_y, should_wait=False, is_shoot=False, is_tip_kick=False,
+                  ignore_penalty_area=False, place=False):
         """
         Parameters
         ----------
@@ -201,8 +204,9 @@ class RobotKick(object):
         return a, b
 
     def receive_ball(self, target_x, target_y):
+        alpha = float(self.get_one_touch_aim_alpha(config.GOAL_ENEMY_CENTER[0], config.GOAL_ENEMY_CENTER[1]))
         self._recieve_ball((target_x, target_y),
-                           self.ball_params.get_current_position())
+                           (math.cos(alpha), math.sin(alpha)))
 
     def receive_and_direct_shoot(self, target_xy, target="random"):
         _candidates = ["left", "right", "center"]
@@ -314,6 +318,22 @@ class RobotKick(object):
         #     #self.lines3.set_data([self.ball_params.ball_future_x, hx], [self.ball_params.ball_future_y, hy])
         #     #self.lines4.set_data([self.ball_params.ball_future_x, target_x], [self.ball_params.ball_future_y, target_y])
         #     plt.pause(.01)
+
+    def get_one_touch_aim_alpha(self, target_x, target_y):
+        cur_x, cur_y, cur_theta = self.ctrld_robot.get_current_position(theta=True)
+        beta = 1.0
+        gamma = 1.0
+        k = 1.0
+        g = np.array([target_x, target_y])
+        def f(alpha):
+            v0 = np.array(self.ball_params.get_current_velocity())
+            Rp = np.array([np.cos(alpha), np.sin(alpha)])
+            Rh = np.array([-np.sin(alpha), np.cos(alpha)])
+            v1 = beta * np.inner(Rp, v0) * Rp + gamma * (v0 - 2 * np.inner(v0, Rh) * Rh ) + k * Rh
+            return np.absolute(np.inner(v1, g))
+
+        return optimize.minimize_scalar(f, bounds=(0, 2 * 3.142)).x
+
 
     def dribble_ball(self, target_x, target_y, ignore_penalty_area=False):
         distance = math.sqrt((target_x - self.ball_params.get_current_position()[0])**2 + (target_y - self.ball_params.get_current_position()[1])**2)

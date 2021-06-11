@@ -1,5 +1,7 @@
 #!/usr/bin/env  python
 # coding:utf-8
+import math
+
 from common.context import RobotContext
 import config
 
@@ -43,6 +45,15 @@ class Entity(object):
 
     def get_current_orientation(self):
         return self._current_orientation
+
+    def get_current_front_unit_vector(self):
+        return math.cos(self.get_current_orientation()), \
+               math.sin(self.get_current_orientation())
+
+    def get_current_left_unit_vector(self):
+        return math.cos(self.get_current_orientation() + math.pi / 2.0), \
+               math.sin(self.get_current_orientation() + math.pi / 2.0)
+
 
     def set_current_velocity(self, vx, vy, vtheta=None):
         self._current_velocity_x = vx
