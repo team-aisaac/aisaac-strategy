@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <vector>
 #include <functional>
+#include <cstdlib>
 
 namespace aisaac
 {

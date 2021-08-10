@@ -33,10 +33,11 @@ namespace aisaac {
         return 0;
     }
     void AisaacWifiLinux::wifiInit() {
+        std::cout << "Init wifi Debug" << std::endl;
         udpSock = socket(AF_INET, SOCK_DGRAM, 0);
         if (udpSock == -1) std::cerr << "Failed: open udpSock" << std::endl;
         memset(&addr, 0, sizeof(addr));
         addr.sin_family = AF_INET;
-        addr.sin_port = htons(1080);
+        addr.sin_port = htons(11312);
     }
 }

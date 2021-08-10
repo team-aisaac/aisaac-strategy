@@ -12,6 +12,7 @@
 #include "aisaac_communication/aisaac-bitmap-handler.h"
 #include "aisaac_communication/aisaac-com-topic-struct.h"
 #include "aisaac_communication/aisaac-xbee-linux.h"
+#include "aisaac_communication/aisaac-wifi-linux.h"
 
 #define VEL_MAX 3500
 
@@ -134,12 +135,15 @@ int main(int argc, char **argv) {
     xbeeIF.setShortDestAddr(addr16);
     xbeeIF.setXBeeOptions(0, 0, 0);
 
+    aisaac::AisaacWifiLinux wifiIF;
+
     aisaac::Sender sender(numRobots, &nh);
     sender.setXBeeInterface(&xbeeIF);
+    sender.setWiFiInterface(&wifiIF);
     
     // Address settings
     std::vector<unsigned char> destAddr = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-    sender.setNodePHYAddress(0, aisaac::phyTechnology::xbee, destAddr);
+    sender.setNodePHYAddress(0, aisaac::phyTechnology::xbee, destAddr); // Node0: ROS PC
     destAddr = {0x00, 0x13, 0xA2, 0x00, 0x00, 0x00, 0x00, 0x01};
     sender.setNodePHYAddress(1, aisaac::phyTechnology::xbee, destAddr);
     destAddr = {0x00, 0x13, 0xA2, 0x00, 0x00, 0x00, 0x00, 0x02};
@@ -156,6 +160,8 @@ int main(int argc, char **argv) {
     sender.setNodePHYAddress(7, aisaac::phyTechnology::xbee, destAddr);
     destAddr = {0x00, 0x13, 0xA2, 0x00, 0x00, 0x00, 0x00, 0x08};
     sender.setNodePHYAddress(8, aisaac::phyTechnology::xbee, destAddr);
+    // std::vector<unsigned char> destAddr32bit = {192, 168, 0, 11};
+    // sender.setNodePHYAddress(8, aisaac::phyTechnology::wifi, destAddr32bit);
 
     TopicRxHandler trHandlers[numRobots];
     ros::Subscriber command_sub[numRobots], odom_sub[numRobots], shutdown_sub;
