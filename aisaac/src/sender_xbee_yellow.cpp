@@ -38,7 +38,7 @@ namespace aisaac {
 
 class TopicRxHandler {
 public:
-    TopicRxHandler() {}
+    TopicRxHandler() : sequenceNumber(0) {}
     void command_callback(const consai_msgs::robot_commandsConstPtr& msg) {
         aisaac::commandToRobot commands;
 
@@ -84,7 +84,7 @@ public:
 
         std::vector<unsigned char> commandvec;
         sender->generateFT4(commands, commandvec);
-        sender->sendCommand(robotID, commandvec);
+        sender->sendCommand(robotID, sequenceNumber++, commandvec);
     }
     void odom_callback(const nav_msgs::Odometry& msg) {
         tf::Quaternion quat(msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w);
@@ -102,6 +102,7 @@ public:
     int robotID = 0;
 private:
     double current_orientation[3] = {0, 0, 0};
+    unsigned char sequenceNumber;
     aisaac::Sender *sender;
 };
 

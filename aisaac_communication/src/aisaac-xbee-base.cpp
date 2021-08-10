@@ -43,10 +43,10 @@ namespace aisaac {
             out.push_back(in);
         }
     }
-    void AisaacXBeeBase::constructXBeeFrame(std::vector<unsigned char>&in, std::vector<unsigned char>&out) {
-        constructTransmitRequestFrame(in, out);
+    void AisaacXBeeBase::constructXBeeFrame(std::vector<unsigned char>&in, unsigned char sequenceNumber, std::vector<unsigned char>&out) {
+        constructTransmitRequestFrame(in, sequenceNumber, out);
     }
-    void AisaacXBeeBase::constructTransmitRequestFrame(std::vector<unsigned char>& in, std::vector<unsigned char>& out) {
+    void AisaacXBeeBase::constructTransmitRequestFrame(std::vector<unsigned char>& in, unsigned char sequenceNumber, std::vector<unsigned char>& out) {
         out.clear();    // Clear output vector
         out.push_back(0x7E);    // Start delimiter
         unsigned char checkSum = 0;
@@ -57,7 +57,7 @@ namespace aisaac {
         checkSum = 0;   // Reset check sum
         // API Frame
         escape(0x10, checkSum, out); // Frame type 0x10 Transmit Request
-        escape(frameID++, checkSum, out);   // Frame ID
+        escape(sequenceNumber, checkSum, out);   // Frame ID
         // 64bit destination address
         for (int i = 0; i < 8; i++) escape(longDestAddr[i], checkSum, out);
         // 16bit destination address

@@ -168,7 +168,7 @@ namespace aisaac
         out.miscByte = (unsigned char)in[12];
         return 0;
     }
-    void AisaacBitmapHandler::sendCommand(int robotID, std::vector<unsigned char> in) {
+    void AisaacBitmapHandler::sendCommand(int robotID, unsigned char sequenceNumber, std::vector<unsigned char> in) {
         if (robotID < 0 || robotID > numRobots) return;
         if (nodeList[robotID].phyTech == phyTechnology::undef) {
             return;
@@ -176,7 +176,7 @@ namespace aisaac
             if (xbeeActivated) {
                 xbeeIF->setLongDestAddr(nodeList[robotID].addr);
                 std::vector<unsigned char> comXBee;
-                xbeeIF->constructXBeeFrame(in, comXBee);
+                xbeeIF->constructXBeeFrame(in, sequenceNumber, comXBee);
                 xbeeIF->send(comXBee);
             } else {
                 // Send Via ROS node
@@ -184,7 +184,7 @@ namespace aisaac
             }
         } else if (nodeList[robotID].phyTech == phyTechnology::wifi) {
             if (wifiActivated) {
-                wifiIF->send(nodeList[robotID].addr, in);
+                wifiIF->send(nodeList[robotID].addr, robotID, sequenceNumber, in);
             } else {
                 // Send Via ROS node
                 std::cout << "Send WiFi node via ROS node(XBee)" << std::endl;

@@ -28,7 +28,7 @@ namespace aisaac
         void setShutdown(bool);
         void generateFT4(commandToRobot, std::vector<unsigned char>&);
         int parseFT4(std::vector<unsigned char> in, commandToRobot &out);
-        void sendCommand(int, std::vector<unsigned char>);
+        void sendCommand(int, unsigned char, std::vector<unsigned char>);
         void messageHub(std::vector<unsigned char> in);
         virtual void messageReceiver(int reason, std::vector<unsigned char> message);
         // DEBUG
