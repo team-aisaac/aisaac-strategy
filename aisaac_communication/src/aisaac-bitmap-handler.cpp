@@ -91,16 +91,16 @@ namespace aisaac
             // Index:5 angle 0x0
             out.push_back(0x0);
         } else {
-            // Index:0 DATAType4 0b100 + X_VECTOR 5bits
+            // Index:0 DATAType4 0b100 + CoordinateSystemType 2bits + X_VECTOR 3bits
             uint16_t uxvector = std::abs(command.x_vector);
-            tmp = ((0b100) << 5) | (command.x_vector >= 0 ? 0 : 0b10000) | ((uxvector >> 11)&0b1111);
+            tmp = ((0b100) << 5) | ((command.robotCommandCoordinateSystemType & 0b11) << 3) | (command.x_vector >= 0 ? 0 : 0b100) | ((uxvector >> 12)&0b11);
             out.push_back(tmp);
             // Index:1 x_vector 0x0
-            tmp = (uxvector >> 3) & 0xFF;
+            tmp = (uxvector >> 4) & 0xFF;
             out.push_back(tmp);
             // Index:2 x_vector + y_vector
             uint16_t uyvector = std::abs(command.y_vector);
-            tmp = ((uxvector & 0b111) << 5) | (command.y_vector >= 0 ? 0 : 0b10000) | ((uyvector >> 11) & 0b1111);
+            tmp = ((uxvector & 0b1111) << 4) | (command.y_vector >= 0 ? 0 : 0b1000) | ((uyvector >> 11) & 0b111);
             out.push_back(tmp);
             // Index:3 y_vector
             tmp = (uyvector >> 3) & 0xFF;
@@ -113,16 +113,18 @@ namespace aisaac
             out.push_back(tmp);
         }
         // Index:6 calibrationValid(1) + calibrationXPosition(7)
-        tmp = (command.calibrationValid << 7) | ((command.calibrationXPosition >> 7) & 0b1111111);
+        uint16_t uCalibXPos = std::abs(command.calibrationXPosition);
+        tmp = (command.calibrationValid << 7) | (command.calibrationXPosition >= 0 ? 0 : 0b1000000) | ((uCalibXPos >> 7) & 0b111111);
         out.push_back(tmp);
         // Index:7 calibrationXPosition(7) + calibrationYPosition(1)
-        tmp = ((command.calibrationXPosition & 0b11111110) << 1) | ((command.calibrationYPosition >> 13) & 0b1);
+        tmp = ((command.calibrationXPosition & 0b11111110) << 1) | (command.calibrationYPosition >= 0 ? 0 : 1 );
         out.push_back(tmp);
         // Index:8 calibrationYPosition(8)
-        tmp = (command.calibrationYPosition >> 5) & 0xFF;
+        uint16_t uCalibYPos = std::abs(command.calibrationYPosition);
+        tmp = (uCalibYPos >> 5) & 0xFF;
         out.push_back(tmp);
         // Index:9 calibrationYPosition(5) + calibrationAngle(3)
-        tmp = ((command.calibrationYPosition & 0b11111) << 3) | ((command.calibrationAngle >> 9) & 0b111);
+        tmp = ((uCalibYPos & 0b11111) << 3) | ((command.calibrationAngle >> 9) & 0b111);
         out.push_back(tmp);
         // Index:10 calibrationAngle(8)
         tmp = ((command.calibrationAngle >> 1) & 0xFF);
@@ -139,26 +141,33 @@ namespace aisaac
         if ((in[0] >> 5) != 0b100) return -1;
         int16_t tmpShort = 0;
         uint16_t tmpUShort = 0;
-        tmpShort = (short)(in[0] & 0xF);
-        tmpShort = (tmpShort << 8) | (short)in[1];
-        tmpShort = (tmpShort << 3) | (short)((in[2] & 0b11100000) >> 5);
-        out.x_vector = tmpShort * ((in[0] & 0b10000) == 0b10000 ? -1.0 : 1.0);
-        tmpShort = (short)(in[2] & 0xF);
-        tmpShort = (tmpShort << 8) | (unsigned short)in[3];
+        // robotCommandCoordinateSystemType
+        out.robotCommandCoordinateSystemType = (uint8_t)((in[0] >> 3) & 0b11);
+        // x_vector
+        tmpShort = (int16_t)(in[0] & 0b111);
+        tmpShort = (tmpShort << 12) | (short)in[1];
+        tmpShort = (tmpShort << 4) | (short)((in[2] & 0b11110000) >> 4);
+        out.x_vector = tmpShort * ((in[0] & 0b100) == 0b100 ? -1 : 1);
+        // y_vector
+        tmpShort = (short)(in[2] & 0b111);
+        tmpShort = (tmpShort << 11) | (unsigned short)in[3];
         tmpShort = (tmpShort << 3) | (unsigned short)((in[4] & 0b11100000) >> 5);
-        out.y_vector = tmpShort * ((in[2] & 0b10000) == 0b10000 ? -1.0 : 1.0);
+        out.y_vector = tmpShort * ((in[2] & 0b1000) == 0b1000 ? -1 : 1);
         out.angleTypeSelect = (unsigned char)((in[4] >> 4) & 0b1);
+        // angle
         tmpUShort = (unsigned short)(in[4] & 0xF);
         tmpUShort = (tmpUShort << 8) | (unsigned short)(in[5] & 0xFF);
         out.angle = tmpUShort;
         out.calibrationValid = (unsigned char)((in[6] >> 7) & 0b1);
-        tmpUShort = (unsigned short)((in[6] >> 1) & 0b1111111);
-        tmpUShort = (tmpUShort << 7) | (((unsigned short)in[7] & 0b11111110) >> 1);
-        out.calibrationXPosition = tmpUShort;
-        tmpUShort = (unsigned short)(in[7] & 0b1);
-        tmpUShort = (tmpUShort << 8) | (unsigned short)(in[8] & 0xFF);
-        tmpUShort = (tmpUShort << 5) | (unsigned short)((in[9] & 0b11111000) >> 3);
-        out.calibrationYPosition = tmpUShort;
+        // calibrationXPosition
+        tmpShort = (unsigned short)((in[6]) & 0b111111);
+        tmpShort = (tmpUShort << 7) | (((unsigned short)in[7] & 0b11111110) >> 1);
+        out.calibrationXPosition = tmpShort * ((in[6] & 0b1000000) == 0b1000000 ? -1 : 1);
+        // calibrationYPosition
+        tmpShort = (unsigned short)(in[8] & 0xFF);
+        tmpShort = (tmpUShort << 5) | (unsigned short)((in[9] & 0b11111000) >> 3);
+        out.calibrationYPosition = tmpShort * ((in[7] & 0b1) == 0b1 ? -1 : 1);
+        // calibrationAngle
         tmpUShort = (unsigned short)(in[9] & 0b111);
         tmpUShort = (tmpUShort << 8) | (unsigned short)(in[10] & 0xFF);
         tmpUShort = (tmpUShort << 1) | (unsigned short)((in[11] & 0b10000000) >> 7);
