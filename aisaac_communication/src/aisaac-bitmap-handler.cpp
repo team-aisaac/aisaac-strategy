@@ -145,37 +145,37 @@ namespace aisaac
         out.robotCommandCoordinateSystemType = (uint8_t)((in[0] >> 3) & 0b11);
         // x_vector
         tmpShort = (int16_t)(in[0] & 0b111);
-        tmpShort = (tmpShort << 8) | (short)in[1];
-        tmpShort = (tmpShort << 4) | (short)((in[2] & 0b11110000) >> 4);
+        tmpShort = (tmpShort << 8) | (int16_t)in[1];
+        tmpShort = (tmpShort << 4) | (int16_t)((in[2] & 0b11110000) >> 4);
         out.x_vector = tmpShort * ((in[0] & 0b100) == 0b100 ? -1 : 1);
         // y_vector
-        tmpShort = (short)(in[2] & 0b111);
-        tmpShort = (tmpShort << 8) | (unsigned short)in[3];
-        tmpShort = (tmpShort << 3) | (unsigned short)((in[4] & 0b11100000) >> 5);
+        tmpShort = (int16_t)(in[2] & 0b111);
+        tmpShort = (tmpShort << 8) | (int16_t)in[3];
+        tmpShort = (tmpShort << 3) | (int16_t)((in[4] & 0b11100000) >> 5);
         out.y_vector = tmpShort * ((in[2] & 0b1000) == 0b1000 ? -1 : 1);
-        out.angleTypeSelect = (unsigned char)((in[4] >> 4) & 0b1);
+        out.angleTypeSelect = (uint8_t)((in[4] >> 4) & 0b1);
         // angle
-        tmpUShort = (unsigned short)(in[4] & 0xF);
-        tmpUShort = (tmpUShort << 8) | (unsigned short)(in[5] & 0xFF);
+        tmpUShort = (uint16_t)(in[4] & 0xF);
+        tmpUShort = (tmpUShort << 8) | (uint16_t)(in[5] & 0xFF);
         out.angle = tmpUShort;
-        out.calibrationValid = (unsigned char)((in[6] >> 7) & 0b1);
+        out.calibrationValid = (uint8_t)((in[6] >> 7) & 0b1);
         // calibrationXPosition
-        tmpShort = (unsigned short)((in[6]) & 0b111111);
-        tmpShort = (tmpUShort << 7) | (((unsigned short)in[7] & 0b11111110) >> 1);
+        tmpShort = (int16_t)((in[6]) & 0b111111);
+        tmpShort = (tmpUShort << 7) | (((int16_t)in[7] & 0b11111110) >> 1);
         out.calibrationXPosition = tmpShort * ((in[6] & 0b1000000) == 0b1000000 ? -1 : 1);
         // calibrationYPosition
-        tmpShort = (unsigned short)(in[8] & 0xFF);
-        tmpShort = (tmpUShort << 5) | (unsigned short)((in[9] & 0b11111000) >> 3);
+        tmpShort = (int16_t)(in[8] & 0xFF);
+        tmpShort = (tmpUShort << 5) | (int16_t)((in[9] & 0b11111000) >> 3);
         out.calibrationYPosition = tmpShort * ((in[7] & 0b1) == 0b1 ? -1 : 1);
         // calibrationAngle
-        tmpUShort = (unsigned short)(in[9] & 0b111);
-        tmpUShort = (tmpUShort << 8) | (unsigned short)(in[10] & 0xFF);
-        tmpUShort = (tmpUShort << 1) | (unsigned short)((in[11] & 0b10000000) >> 7);
+        tmpUShort = (uint16_t)(in[9] & 0b111);
+        tmpUShort = (tmpUShort << 8) | (uint16_t)(in[10] & 0xFF);
+        tmpUShort = (tmpUShort << 1) | (uint16_t)((in[11] & 0b10000000) >> 7);
         out.calibrationAngle = tmpUShort;
-        out.kickParameter.sensorUse = (unsigned char)((in[11] & 0b01110000) >> 4);
-        out.kickParameter.kickType = (unsigned char)((in[11] & 0b1000) >> 3);
-        out.kickParameter.kickStrength = (unsigned char)(in[11] & 0b111);
-        out.miscByte = (unsigned char)in[12];
+        out.kickParameter.sensorUse = (uint8_t)((in[11] & 0b01110000) >> 4);
+        out.kickParameter.kickType = (uint8_t)((in[11] & 0b1000) >> 3);
+        out.kickParameter.kickStrength = (uint8_t)(in[11] & 0b111);
+        out.miscByte = (uint8_t)in[12];
         return 0;
     }
     void AisaacBitmapHandler::sendCommand(int robotID, unsigned char sequenceNumber, std::vector<unsigned char> in) {
