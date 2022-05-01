@@ -145,12 +145,12 @@ namespace aisaac
         out.robotCommandCoordinateSystemType = (uint8_t)((in[0] >> 3) & 0b11);
         // x_vector
         tmpShort = (int16_t)(in[0] & 0b111);
-        tmpShort = (tmpShort << 12) | (short)in[1];
+        tmpShort = (tmpShort << 8) | (short)in[1];
         tmpShort = (tmpShort << 4) | (short)((in[2] & 0b11110000) >> 4);
         out.x_vector = tmpShort * ((in[0] & 0b100) == 0b100 ? -1 : 1);
         // y_vector
         tmpShort = (short)(in[2] & 0b111);
-        tmpShort = (tmpShort << 11) | (unsigned short)in[3];
+        tmpShort = (tmpShort << 8) | (unsigned short)in[3];
         tmpShort = (tmpShort << 3) | (unsigned short)((in[4] & 0b11100000) >> 5);
         out.y_vector = tmpShort * ((in[2] & 0b1000) == 0b1000 ? -1 : 1);
         out.angleTypeSelect = (unsigned char)((in[4] >> 4) & 0b1);
