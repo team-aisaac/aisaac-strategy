@@ -45,6 +45,9 @@ add_executable(command_sender
 add_executable(sender_xbee_yellow
     src/sender_xbee_yellow.cpp
 )
+add_executable(sender_xbee_blue
+    src/sender_xbee_blue.cpp
+)
 target_link_libraries(command_senders_blue
     ${catkin_LIBRARIES}
 )
@@ -55,6 +58,9 @@ target_link_libraries(command_sender
     ${catkin_LIBRARIES}
 )
 target_link_libraries(sender_xbee_yellow
+    ${catkin_LIBRARIES}
+)
+target_link_libraries(sender_xbee_blue
     ${catkin_LIBRARIES}
 )
 
