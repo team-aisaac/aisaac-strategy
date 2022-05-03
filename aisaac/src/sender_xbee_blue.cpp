@@ -140,76 +140,76 @@ int main(int argc, char **argv) {
 
     const int numRobots = 8;
 
-    aisaac::AisaacXBeeLinux xbeeIF("/dev/xbee0");
-    xbeeIF.setBroadcastRadius(5);
-    std::vector<unsigned char> addr16 = {0xFF, 0xFE};
-    xbeeIF.setShortDestAddr(addr16);
-    xbeeIF.setXBeeOptions(0, 0, 0);
+    // aisaac::AisaacXBeeLinux xbeeIF("/dev/xbee0");
+    // xbeeIF.setBroadcastRadius(5);
+    // std::vector<unsigned char> addr16 = {0xFF, 0xFE};
+    // xbeeIF.setShortDestAddr(addr16);
+    // xbeeIF.setXBeeOptions(0, 0, 0);
 
     aisaac::AisaacWifiLinux wifiIF;
 
     aisaac::Sender sender(numRobots, &nh);
-    sender.setXBeeInterface(&xbeeIF);
+    // sender.setXBeeInterface(&xbeeIF);
     sender.setWiFiInterface(&wifiIF);
     
     // Address settings
     std::vector<unsigned char> destAddr = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-    sender.setNodePHYAddress(0, aisaac::phyTechnology::xbee, destAddr); // Node0: ROS PC
-    destAddr = {0x00, 0x13, 0xA2, 0x00, 0x00, 0x00, 0x00, 0x01};
-    std::vector<unsigned char> destAddr32bit = {192, 168, 0, 11};
-    sender.setNodePHYAddress(1, aisaac::phyTechnology::wifi, destAddr32bit);
-    sender.setNodePHYAddress(2, aisaac::phyTechnology::xbee, destAddr);
-    destAddr = {0x00, 0x13, 0xA2, 0x00, 0x00, 0x00, 0x00, 0x03};
-    sender.setNodePHYAddress(3, aisaac::phyTechnology::xbee, destAddr);
-    destAddr = {0x00, 0x13, 0xA2, 0x00, 0x00, 0x00, 0x00, 0x04};
-    sender.setNodePHYAddress(4, aisaac::phyTechnology::xbee, destAddr);
-    destAddr = {0x00, 0x13, 0xA2, 0x00, 0x00, 0x00, 0x00, 0x05};
-    sender.setNodePHYAddress(5, aisaac::phyTechnology::xbee, destAddr);
-    destAddr = {0x00, 0x13, 0xA2, 0x00, 0x00, 0x00, 0x00, 0x06};
-    sender.setNodePHYAddress(6, aisaac::phyTechnology::xbee, destAddr);
-    destAddr = {0x00, 0x13, 0xA2, 0x00, 0x00, 0x00, 0x00, 0x07};
-    sender.setNodePHYAddress(7, aisaac::phyTechnology::xbee, destAddr);
-    destAddr = {0x00, 0x13, 0xA2, 0x00, 0x00, 0x00, 0x00, 0x08};
-    sender.setNodePHYAddress(8, aisaac::phyTechnology::xbee, destAddr);
+    // sender.setNodePHYAddress(0, aisaac::phyTechnology::xbee, destAddr); // Node0: ROS PC
+    // destAddr = {0x00, 0x13, 0xA2, 0x00, 0x00, 0x00, 0x00, 0x01};
     // std::vector<unsigned char> destAddr32bit = {192, 168, 0, 11};
-    // sender.setNodePHYAddress(8, aisaac::phyTechnology::wifi, destAddr32bit);
+    // sender.setNodePHYAddress(1, aisaac::phyTechnology::wifi, destAddr32bit);
+    // sender.setNodePHYAddress(2, aisaac::phyTechnology::xbee, destAddr);
+    // destAddr = {0x00, 0x13, 0xA2, 0x00, 0x00, 0x00, 0x00, 0x03};
+    // sender.setNodePHYAddress(3, aisaac::phyTechnology::xbee, destAddr);
+    // destAddr = {0x00, 0x13, 0xA2, 0x00, 0x00, 0x00, 0x00, 0x04};
+    // sender.setNodePHYAddress(4, aisaac::phyTechnology::xbee, destAddr);
+    // destAddr = {0x00, 0x13, 0xA2, 0x00, 0x00, 0x00, 0x00, 0x05};
+    // sender.setNodePHYAddress(5, aisaac::phyTechnology::xbee, destAddr);
+    // destAddr = {0x00, 0x13, 0xA2, 0x00, 0x00, 0x00, 0x00, 0x06};
+    // sender.setNodePHYAddress(6, aisaac::phyTechnology::xbee, destAddr);
+    // destAddr = {0x00, 0x13, 0xA2, 0x00, 0x00, 0x00, 0x00, 0x07};
+    // sender.setNodePHYAddress(7, aisaac::phyTechnology::xbee, destAddr);
+    // destAddr = {0x00, 0x13, 0xA2, 0x00, 0x00, 0x00, 0x00, 0x08};
+    // sender.setNodePHYAddress(8, aisaac::phyTechnology::xbee, destAddr);
+    std::vector<unsigned char> destAddr32bit = {192, 168, 11, 5};
+    sender.setNodePHYAddress(1, aisaac::phyTechnology::wifi, destAddr32bit);
 
     TopicRxHandler trHandlers[numRobots];
     ros::Subscriber command_sub[numRobots], odom_sub[numRobots], shutdown_sub;
-    shutdown_sub = nh.subscribe("/yellow/shutdown", 1, &TopicRxHandler::shutdown_callback, &trHandlers[0]);
+    shutdown_sub = nh.subscribe("/blue/shutdown", 1, &TopicRxHandler::shutdown_callback, &trHandlers[0]);
 
     trHandlers[0].robotID = 1;
     trHandlers[0].setSender(&sender);
-    command_sub[0] = nh.subscribe("/yellow/robot_0/robot_commands", 1, &TopicRxHandler::command_callback, &trHandlers[0]);
-    odom_sub[0] = nh.subscribe("/yellow/robot_0/odom", 1, &TopicRxHandler::odom_callback, &trHandlers[0]);
+    command_sub[0] = nh.subscribe("/blue/robot_0/robot_commands", 1, &TopicRxHandler::command_callback, &trHandlers[0]);
+    odom_sub[0] = nh.subscribe("/blue/robot_0/odom", 1, &TopicRxHandler::odom_callback, &trHandlers[0]);
     trHandlers[1].robotID = 2;
     trHandlers[1].setSender(&sender);
-    command_sub[1] = nh.subscribe("/yellow/robot_1/robot_commands", 1, &TopicRxHandler::command_callback, &trHandlers[1]);
-    odom_sub[1] = nh.subscribe("/yellow/robot_1/odom", 1, &TopicRxHandler::odom_callback, &trHandlers[1]);
+    command_sub[1] = nh.subscribe("/blue/robot_1/robot_commands", 1, &TopicRxHandler::command_callback, &trHandlers[1]);
+    odom_sub[1] = nh.subscribe("/blue/robot_1/odom", 1, &TopicRxHandler::odom_callback, &trHandlers[1]);
     trHandlers[2].robotID = 3;
     trHandlers[2].setSender(&sender);
-    command_sub[2] = nh.subscribe("/yellow/robot_2/robot_commands", 1, &TopicRxHandler::command_callback, &trHandlers[2]);
-    odom_sub[2] = nh.subscribe("/yellow/robot_2/odom", 1, &TopicRxHandler::odom_callback, &trHandlers[2]);
+    command_sub[2] = nh.subscribe("/blue/robot_2/robot_commands", 1, &TopicRxHandler::command_callback, &trHandlers[2]);
+    odom_sub[2] = nh.subscribe("/blue/robot_2/odom", 1, &TopicRxHandler::odom_callback, &trHandlers[2]);
     trHandlers[3].robotID = 4;
     trHandlers[3].setSender(&sender);
-    command_sub[3] = nh.subscribe("/yellow/robot_3/robot_commands", 1, &TopicRxHandler::command_callback, &trHandlers[3]);
-    odom_sub[3] = nh.subscribe("/yellow/robot_3/odom", 1, &TopicRxHandler::odom_callback, &trHandlers[3]);
+    command_sub[3] = nh.subscribe("/blue/robot_3/robot_commands", 1, &TopicRxHandler::command_callback, &trHandlers[3]);
+    odom_sub[3] = nh.subscribe("/blue/robot_3/odom", 1, &TopicRxHandler::odom_callback, &trHandlers[3]);
     trHandlers[4].robotID = 5;
     trHandlers[4].setSender(&sender);
-    command_sub[4] = nh.subscribe("/yellow/robot_4/robot_commands", 1, &TopicRxHandler::command_callback, &trHandlers[4]);
-    odom_sub[4] = nh.subscribe("/yellow/robot_4/odom", 1, &TopicRxHandler::odom_callback, &trHandlers[4]);
+    command_sub[4] = nh.subscribe("/blue/robot_4/robot_commands", 1, &TopicRxHandler::command_callback, &trHandlers[4]);
+    odom_sub[4] = nh.subscribe("/blue/robot_4/odom", 1, &TopicRxHandler::odom_callback, &trHandlers[4]);
     trHandlers[5].robotID = 6;
     trHandlers[5].setSender(&sender);
-    command_sub[5] = nh.subscribe("/yellow/robot_5/robot_commands", 1, &TopicRxHandler::command_callback, &trHandlers[5]);
-    odom_sub[5] = nh.subscribe("/yellow/robot_5/odom", 1, &TopicRxHandler::odom_callback, &trHandlers[5]);
+    command_sub[5] = nh.subscribe("/blue/robot_5/robot_commands", 1, &TopicRxHandler::command_callback, &trHandlers[5]);
+    odom_sub[5] = nh.subscribe("/blue/robot_5/odom", 1, &TopicRxHandler::odom_callback, &trHandlers[5]);
     trHandlers[6].robotID = 7;
     trHandlers[6].setSender(&sender);
-    command_sub[6] = nh.subscribe("/yellow/robot_6/robot_commands", 1, &TopicRxHandler::command_callback, &trHandlers[6]);
-    odom_sub[6] = nh.subscribe("/yellow/robot_6/odom", 1, &TopicRxHandler::odom_callback, &trHandlers[6]);
+    command_sub[6] = nh.subscribe("/blue/robot_6/robot_commands", 1, &TopicRxHandler::command_callback, &trHandlers[6]);
+    odom_sub[6] = nh.subscribe("/blue/robot_6/odom", 1, &TopicRxHandler::odom_callback, &trHandlers[6]);
     trHandlers[7].robotID = 8;
     trHandlers[7].setSender(&sender);
-    command_sub[7] = nh.subscribe("/yellow/robot_7/robot_commands", 1, &TopicRxHandler::command_callback, &trHandlers[7]);
-    odom_sub[7] = nh.subscribe("/yellow/robot_7/odom", 1, &TopicRxHandler::odom_callback, &trHandlers[7]);
+    command_sub[7] = nh.subscribe("/blue/robot_7/robot_commands", 1, &TopicRxHandler::command_callback, &trHandlers[7]);
+    odom_sub[7] = nh.subscribe("/blue/robot_7/odom", 1, &TopicRxHandler::odom_callback, &trHandlers[7]);
 
     errorFlag = 0;
 
