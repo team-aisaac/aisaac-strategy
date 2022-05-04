@@ -56,11 +56,10 @@ public:
         } else if (robotCommandCoordinateSystemType == 1) {
             _commands.robotCommandCoordinateSystemType = 1; // World coordinate system
         }
-        _commands.x_vector = (int16_t)x_tmp;
-        _commands.y_vector = (int16_t)y_tmp;
+        _commands.targetX = (int16_t)x_tmp;
+        _commands.targetY = (int16_t)y_tmp;
 
-        _commands.angleTypeSelect = 1;   // omega 
-        _commands.angle = (uint16_t)int16_t(msg->omega * (180.0 / M_PI) * 10);
+        _commands.targetAngle = int16_t(msg->omega * (180.0 / M_PI) * 10);  // +-10800 or 0~3600
 
         if(msg->kick_power > 0){
             _commands.kickParameter.sensorUse = 1;   // kick_flag
@@ -80,9 +79,9 @@ public:
         tf::Quaternion quat(msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w);
         tf::Matrix3x3(quat).getRPY(current_orientation[0], current_orientation[1], current_orientation[2]);
 
-        _commands.calibrationValid = 1; // 1: Valid
-        _commands.calibrationXPosition = (int16_t)(x_position * 1000);  // m -> mm
-        _commands.calibrationYPosition = (int16_t)(y_position * 1000);  // m -> mm
+        _commands.visionDataValid = 1; // 1: Valid
+        _commands.currentX = (int16_t)(x_position * 1000);  // m -> mm
+        _commands.currentY = (int16_t)(y_position * 1000);  // m -> mm
 
         double current_orientation_deg = current_orientation[2] * (180 / M_PI);
         while(!(0 <= current_orientation_deg && current_orientation_deg < 360)){
@@ -92,7 +91,7 @@ public:
                 current_orientation_deg -= 360;
             }
         }
-        _commands.calibrationAngle = (uint16_t)current_orientation_deg;
+        _commands.currentAngle = (uint16_t)current_orientation_deg; // 0~3600
 
         _commands.miscByte = 0;
 
