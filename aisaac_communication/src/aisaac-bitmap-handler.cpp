@@ -141,13 +141,14 @@ namespace aisaac
         tmp = (uCurrentY >> 5) & 0xFF;
         out.push_back(tmp);
         // Index:9 currentY(5) + currentAngle(3)
-        tmp = ((uCurrentY & 0b11111) << 3) | ((command.currentAngle >> 9) & 0b111);
+        uint16_t uCurrentAngle = std::abs(command.currentAngle);
+        tmp = ((uCurrentY & 0b11111) << 3) | (command.currentAngle >= 0 ? 0 : 0b100) | ((uCurrentAngle >> 9) & 0b11);
         out.push_back(tmp);
         // Index:10 currentAngle(8)
-        tmp = ((command.currentAngle >> 1) & 0xFF);
+        tmp = ((uCurrentAngle >> 1) & 0xFF);
         out.push_back(tmp);
         // Index:11 currentAngle(1) + KickParams
-        tmp = ((command.currentAngle & 0b1) << 7) | ((command.kickParameter.sensorUse & 0b111) << 4) | ((command.kickParameter.kickType & 0b1) << 3) | (command.kickParameter.kickStrength & 0b111);
+        tmp = ((uCurrentAngle & 0b1) << 7) | ((command.kickParameter.sensorUse & 0b111) << 4) | ((command.kickParameter.kickType & 0b1) << 3) | (command.kickParameter.kickStrength & 0b111);
         out.push_back(tmp);
         // Index:12 Misc Byte
         tmp = command.miscByte & 0xFF;
@@ -184,10 +185,10 @@ namespace aisaac
         tmpShort = (tmpUShort << 5) | (int16_t)((in[9] & 0b11111000) >> 3);
         out.currentY = tmpShort * ((in[7] & 0b1) == 0b1 ? -1 : 1);
         // currentAngle: 12bit
-        tmpUShort = (uint16_t)(in[9] & 0b111);
-        tmpUShort = (tmpUShort << 8) | (uint16_t)(in[10] & 0xFF);
-        tmpUShort = (tmpUShort << 1) | (uint16_t)((in[11] & 0b10000000) >> 7);
-        out.currentAngle = tmpUShort;
+        tmpShort = (int16_t)(in[9] & 0b11);
+        tmpShort = (tmpUShort << 8) | (uint16_t)(in[10] & 0xFF);
+        tmpShort = (tmpUShort << 1) | (uint16_t)((in[11] & 0b10000000) >> 7);
+        out.currentAngle = tmpShort * ((in[9] & 0b100) == 0b100 ? -1 : 1);
         out.kickParameter.sensorUse = (uint8_t)((in[11] & 0b01110000) >> 4);
         out.kickParameter.kickType = (uint8_t)((in[11] & 0b1000) >> 3);
         out.kickParameter.kickStrength = (uint8_t)(in[11] & 0b111);

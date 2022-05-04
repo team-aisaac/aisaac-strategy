@@ -15,7 +15,7 @@ namespace aisaac {
         uint8_t visionDataValid : 1;
         int16_t currentX : 14;
         int16_t currentY : 14;
-        uint16_t currentAngle : 12;
+        int16_t currentAngle : 12;
         kickParamStruct kickParameter;
         uint8_t miscByte;
     };

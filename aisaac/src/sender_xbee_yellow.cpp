@@ -59,7 +59,7 @@ public:
         _commands.targetX = (int16_t)x_tmp;
         _commands.targetY = (int16_t)y_tmp;
 
-        _commands.targetAngle = int16_t(msg->omega * (180.0 / M_PI) * 10);  // +-10800 or 0~3600
+        _commands.targetAngle = int16_t(msg->omega * (180.0 / M_PI) * 10);  // -10800~10800 or -1800~1800
 
         if(msg->kick_power > 0){
             _commands.kickParameter.sensorUse = 1;   // kick_flag
@@ -84,14 +84,14 @@ public:
         _commands.currentY = (int16_t)(y_position * 1000);  // m -> mm
 
         double current_orientation_deg = current_orientation[2] * (180 / M_PI);
-        while(!(0 <= current_orientation_deg && current_orientation_deg < 360)){
-            if(current_orientation_deg < 0){
+        while(!(-180 <= current_orientation_deg && current_orientation_deg < 180)){
+            if(current_orientation_deg < -180){
                 current_orientation_deg += 360;
             }else{
                 current_orientation_deg -= 360;
             }
         }
-        _commands.currentAngle = (uint16_t)current_orientation_deg; // 0~3600
+        _commands.currentAngle = (int16_t)current_orientation_deg*10; // -1800~1800
 
         _commands.miscByte = 0;
 
