@@ -138,39 +138,16 @@ int main(int argc, char **argv) {
     ros::NodeHandle nh;
     ros::Rate r(30);
 
-    const int numRobots = 8;
-
-    // aisaac::AisaacXBeeLinux xbeeIF("/dev/xbee0");
-    // xbeeIF.setBroadcastRadius(5);
-    // std::vector<unsigned char> addr16 = {0xFF, 0xFE};
-    // xbeeIF.setShortDestAddr(addr16);
-    // xbeeIF.setXBeeOptions(0, 0, 0);
+    const int numRobots = 1;
 
     aisaac::AisaacWifiLinux wifiIF;
 
     aisaac::Sender sender(numRobots, &nh);
-    // sender.setXBeeInterface(&xbeeIF);
     sender.setWiFiInterface(&wifiIF);
     
     // Address settings
-    std::vector<unsigned char> destAddr = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+    // std::vector<unsigned char> destAddr = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
     // sender.setNodePHYAddress(0, aisaac::phyTechnology::xbee, destAddr); // Node0: ROS PC
-    // destAddr = {0x00, 0x13, 0xA2, 0x00, 0x00, 0x00, 0x00, 0x01};
-    // std::vector<unsigned char> destAddr32bit = {192, 168, 0, 11};
-    // sender.setNodePHYAddress(1, aisaac::phyTechnology::wifi, destAddr32bit);
-    // sender.setNodePHYAddress(2, aisaac::phyTechnology::xbee, destAddr);
-    // destAddr = {0x00, 0x13, 0xA2, 0x00, 0x00, 0x00, 0x00, 0x03};
-    // sender.setNodePHYAddress(3, aisaac::phyTechnology::xbee, destAddr);
-    // destAddr = {0x00, 0x13, 0xA2, 0x00, 0x00, 0x00, 0x00, 0x04};
-    // sender.setNodePHYAddress(4, aisaac::phyTechnology::xbee, destAddr);
-    // destAddr = {0x00, 0x13, 0xA2, 0x00, 0x00, 0x00, 0x00, 0x05};
-    // sender.setNodePHYAddress(5, aisaac::phyTechnology::xbee, destAddr);
-    // destAddr = {0x00, 0x13, 0xA2, 0x00, 0x00, 0x00, 0x00, 0x06};
-    // sender.setNodePHYAddress(6, aisaac::phyTechnology::xbee, destAddr);
-    // destAddr = {0x00, 0x13, 0xA2, 0x00, 0x00, 0x00, 0x00, 0x07};
-    // sender.setNodePHYAddress(7, aisaac::phyTechnology::xbee, destAddr);
-    // destAddr = {0x00, 0x13, 0xA2, 0x00, 0x00, 0x00, 0x00, 0x08};
-    // sender.setNodePHYAddress(8, aisaac::phyTechnology::xbee, destAddr);
     std::vector<unsigned char> destAddr32bit = {192, 168, 11, 5};
     sender.setNodePHYAddress(1, aisaac::phyTechnology::wifi, destAddr32bit);
 

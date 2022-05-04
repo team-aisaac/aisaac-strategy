@@ -93,9 +93,9 @@ namespace aisaac
         } else {
             // Index:0 DATAType4 0b100 + CoordinateSystemType 2bits + X_VECTOR 3bits
             uint16_t uxvector = std::abs(command.x_vector);
-            tmp = ((0b100) << 5) | ((command.robotCommandCoordinateSystemType & 0b11) << 3) | (command.x_vector >= 0 ? 0 : 0b100) | ((uxvector >> 12)&0b11);
+            tmp = ((0b100) << 5) | ((command.robotCommandCoordinateSystemType & 0b11) << 3) | (command.x_vector >= 0 ? 0 : 0b100) | ((uxvector >> 12) & 0b11);
             out.push_back(tmp);
-            // Index:1 x_vector 0x0
+            // Index:1 x_vector
             tmp = (uxvector >> 4) & 0xFF;
             out.push_back(tmp);
             // Index:2 x_vector + y_vector
@@ -114,10 +114,10 @@ namespace aisaac
         }
         // Index:6 calibrationValid(1) + calibrationXPosition(7)
         uint16_t uCalibXPos = std::abs(command.calibrationXPosition);
-        tmp = (command.calibrationValid << 7) | (command.calibrationXPosition >= 0 ? 0 : 0b1000000) | ((uCalibXPos >> 7) & 0b111111);
+        tmp = ((command.calibrationValid & 0b1) << 7)  | (command.calibrationXPosition >= 0 ? 0 : 0b1000000) | ((uCalibXPos >> 7) & 0b111111);
         out.push_back(tmp);
         // Index:7 calibrationXPosition(7) + calibrationYPosition(1)
-        tmp = ((command.calibrationXPosition & 0b11111110) << 1) | (command.calibrationYPosition >= 0 ? 0 : 1 );
+        tmp = ((command.calibrationXPosition & 0b1111111) << 1) | (command.calibrationYPosition >= 0 ? 0 : 1);
         out.push_back(tmp);
         // Index:8 calibrationYPosition(8)
         uint16_t uCalibYPos = std::abs(command.calibrationYPosition);
