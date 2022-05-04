@@ -92,45 +92,46 @@ namespace aisaac
             out.push_back(0x0);
         } else {
             // Index:0 DATAType4 0b100 + CoordinateSystemType 2bits + X_VECTOR 3bits
-            uint16_t uxvector = std::abs(command.x_vector);
-            tmp = ((0b100) << 5) | ((command.robotCommandCoordinateSystemType & 0b11) << 3) | (command.x_vector >= 0 ? 0 : 0b100) | ((uxvector >> 12) & 0b11);
+            uint16_t uTargetX = std::abs(command.targetX);
+            tmp = ((0b100) << 5) | ((command.robotCommandCoordinateSystemType & 0b11) << 3) | (command.targetX >= 0 ? 0 : 0b100) | ((uTargetX >> 11) & 0b11);
             out.push_back(tmp);
             // Index:1 x_vector
-            tmp = (uxvector >> 4) & 0xFF;
+            tmp = (uTargetX >> 3) & 0xFF;
             out.push_back(tmp);
             // Index:2 x_vector + y_vector
-            uint16_t uyvector = std::abs(command.y_vector);
-            tmp = ((uxvector & 0b1111) << 4) | (command.y_vector >= 0 ? 0 : 0b1000) | ((uyvector >> 11) & 0b111);
+            uint16_t uTargetY = std::abs(command.targetY);
+            tmp = ((uTargetX & 0b111) << 3) | (command.targetY >= 0 ? 0 : 0b10000) | ((uTargetY >> 9) & 0b1111);
             out.push_back(tmp);
             // Index:3 y_vector
-            tmp = (uyvector >> 3) & 0xFF;
+            tmp = (uTargetY >> 1) & 0xFF;
             out.push_back(tmp);
-            // Index:4 y_vector + angleTypeSelect(1) + angle(4)
-            tmp = ((uyvector & 0b111) << 5) | ((command.angleTypeSelect << 4) & 0b10000) | ((command.angle >> 8) & 0b1111);
+            // Index:4 y_vector + angle(7)
+            uint16_t uTargetAngle = std::abs(command.targetAngle);
+            tmp = ((uTargetY & 0b1) << 7) | (command.targetAngle >= 0 ? 0 : 0b1000000) | ((uTargetAngle >> 8) & 0b111111);
             out.push_back(tmp);
             // Index:5 angle
-            tmp = command.angle & 0xFF;
+            tmp = uTargetAngle & 0xFF;
             out.push_back(tmp);
         }
-        // Index:6 calibrationValid(1) + calibrationXPosition(7)
-        uint16_t uCalibXPos = std::abs(command.calibrationXPosition);
-        tmp = ((command.calibrationValid & 0b1) << 7)  | (command.calibrationXPosition >= 0 ? 0 : 0b1000000) | ((uCalibXPos >> 7) & 0b111111);
+        // Index:6 visionDataValid(1) + currentX(7)
+        uint16_t uCurrentX = std::abs(command.currentX);
+        tmp = ((command.visionDataValid & 0b1) << 7)  | (command.currentX >= 0 ? 0 : 0b1000000) | ((uCurrentX >> 7) & 0b111111);
         out.push_back(tmp);
-        // Index:7 calibrationXPosition(7) + calibrationYPosition(1)
-        tmp = ((command.calibrationXPosition & 0b1111111) << 1) | (command.calibrationYPosition >= 0 ? 0 : 1);
+        // Index:7 currentX(7) + currentY(1)
+        tmp = ((uCurrentX & 0b1111111) << 1) | (command.currentY >= 0 ? 0 : 1);
         out.push_back(tmp);
-        // Index:8 calibrationYPosition(8)
-        uint16_t uCalibYPos = std::abs(command.calibrationYPosition);
-        tmp = (uCalibYPos >> 5) & 0xFF;
+        // Index:8 currentY(8)
+        uint16_t uCurrentY = std::abs(command.currentY);
+        tmp = (uCurrentY >> 5) & 0xFF;
         out.push_back(tmp);
-        // Index:9 calibrationYPosition(5) + calibrationAngle(3)
-        tmp = ((uCalibYPos & 0b11111) << 3) | ((command.calibrationAngle >> 9) & 0b111);
+        // Index:9 currentY(5) + currentAngle(3)
+        tmp = ((uCurrentY & 0b11111) << 3) | ((command.currentAngle >> 9) & 0b111);
         out.push_back(tmp);
-        // Index:10 calibrationAngle(8)
-        tmp = ((command.calibrationAngle >> 1) & 0xFF);
+        // Index:10 currentAngle(8)
+        tmp = ((command.currentAngle >> 1) & 0xFF);
         out.push_back(tmp);
-        // Index:11 calibrationAngle(1) + KickParams
-        tmp = ((command.calibrationAngle & 0b1) << 7) | ((command.kickParameter.sensorUse & 0b111) << 4) | ((command.kickParameter.kickType & 0b1) << 3) | (command.kickParameter.kickStrength & 0b111);
+        // Index:11 currentAngle(1) + KickParams
+        tmp = ((command.currentAngle & 0b1) << 7) | ((command.kickParameter.sensorUse & 0b111) << 4) | ((command.kickParameter.kickType & 0b1) << 3) | (command.kickParameter.kickStrength & 0b111);
         out.push_back(tmp);
         // Index:12 Misc Byte
         tmp = command.miscByte & 0xFF;
@@ -143,35 +144,34 @@ namespace aisaac
         uint16_t tmpUShort = 0;
         // robotCommandCoordinateSystemType
         out.robotCommandCoordinateSystemType = (uint8_t)((in[0] >> 3) & 0b11);
-        // x_vector
-        tmpShort = (int16_t)(in[0] & 0b111);
+        // targetX: 14bit
+        tmpShort = (int16_t)(in[0] & 0b11);
         tmpShort = (tmpShort << 8) | (int16_t)in[1];
-        tmpShort = (tmpShort << 4) | (int16_t)((in[2] & 0b11110000) >> 4);
-        out.x_vector = tmpShort * ((in[0] & 0b100) == 0b100 ? -1 : 1);
-        // y_vector
-        tmpShort = (int16_t)(in[2] & 0b111);
+        tmpShort = (tmpShort << 3) | (int16_t)((in[2] & 0b11100000) >> 5);
+        out.targetX = tmpShort * ((in[0] & 0b100) == 0b100 ? -1 : 1);
+        // targetY: 14bit
+        tmpShort = (int16_t)(in[2] & 0b1111);
         tmpShort = (tmpShort << 8) | (int16_t)in[3];
-        tmpShort = (tmpShort << 3) | (int16_t)((in[4] & 0b11100000) >> 5);
-        out.y_vector = tmpShort * ((in[2] & 0b1000) == 0b1000 ? -1 : 1);
-        out.angleTypeSelect = (uint8_t)((in[4] >> 4) & 0b1);
-        // angle
-        tmpUShort = (uint16_t)(in[4] & 0xF);
-        tmpUShort = (tmpUShort << 8) | (uint16_t)(in[5] & 0xFF);
-        out.angle = tmpUShort;
-        out.calibrationValid = (uint8_t)((in[6] >> 7) & 0b1);
-        // calibrationXPosition
+        tmpShort = (tmpShort << 1) | (int16_t)((in[4] & 0b10000000) >> 1);
+        out.targetY = tmpShort * ((in[2] & 0b10000) == 0b10000 ? -1 : 1);
+        // targetAngle: 12bit
+        tmpShort = (uint16_t)(in[4] & 0b1111111);
+        tmpShort = (tmpUShort << 8) | (uint16_t)(in[5] & 0xFF);
+        out.targetAngle = tmpShort;
+        out.visionDataValid = (uint8_t)((in[6] >> 7) & 0b1);
+        // currentX: 14bit
         tmpShort = (int16_t)((in[6]) & 0b111111);
         tmpShort = (tmpUShort << 7) | (((int16_t)in[7] & 0b11111110) >> 1);
-        out.calibrationXPosition = tmpShort * ((in[6] & 0b1000000) == 0b1000000 ? -1 : 1);
-        // calibrationYPosition
+        out.currentX = tmpShort * ((in[6] & 0b1000000) == 0b1000000 ? -1 : 1);
+        // currentY: 14bit
         tmpShort = (int16_t)(in[8] & 0xFF);
         tmpShort = (tmpUShort << 5) | (int16_t)((in[9] & 0b11111000) >> 3);
-        out.calibrationYPosition = tmpShort * ((in[7] & 0b1) == 0b1 ? -1 : 1);
-        // calibrationAngle
+        out.currentY = tmpShort * ((in[7] & 0b1) == 0b1 ? -1 : 1);
+        // currentAngle: 12bit
         tmpUShort = (uint16_t)(in[9] & 0b111);
         tmpUShort = (tmpUShort << 8) | (uint16_t)(in[10] & 0xFF);
         tmpUShort = (tmpUShort << 1) | (uint16_t)((in[11] & 0b10000000) >> 7);
-        out.calibrationAngle = tmpUShort;
+        out.currentAngle = tmpUShort;
         out.kickParameter.sensorUse = (uint8_t)((in[11] & 0b01110000) >> 4);
         out.kickParameter.kickType = (uint8_t)((in[11] & 0b1000) >> 3);
         out.kickParameter.kickStrength = (uint8_t)(in[11] & 0b111);

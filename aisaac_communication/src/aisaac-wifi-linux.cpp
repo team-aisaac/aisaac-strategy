@@ -22,7 +22,7 @@ namespace aisaac {
         unsigned char message[16];   // Header 4 Bytes + Max frame length: 12(Frame Type4)
         // Protocol version: 1.4
         message[0] = 1;
-        message[1] = 4;
+        message[1] = 5;
         message[2] = (unsigned char)robotID;  // Robot ID number
         message[3] = sequenceNumber;  // Sequence number
         // Pack command data
