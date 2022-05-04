@@ -74,6 +74,22 @@ namespace aisaac
         std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
     }
     void AisaacBitmapHandler::generateFT4(commandToRobot command, std::vector<unsigned char> &out) {
+
+        std::cout << "command";
+        std::cout << " robotCommandCoordinateSystemType: " << (int)command.robotCommandCoordinateSystemType;
+        std::cout << " targetX: " << command.targetX;
+        std::cout << " targetY: " << command.targetY;
+        std::cout << " targetAngle: " << command.targetAngle;
+        std::cout << " visionDataValid: " << (int)command.visionDataValid;
+        std::cout << " currentX: " << command.currentX;
+        std::cout << " currentY: " << command.currentY;
+        std::cout << " currentAngle: " << (int)command.currentAngle;
+        std::cout << " kickParameter.sensorUse: " << (int)command.kickParameter.sensorUse;
+        std::cout << " kickParameter.kickType: " << (int)command.kickParameter.kickType;
+        std::cout << " kickParameter.kickStrength: " << (int)command.kickParameter.kickStrength;
+        std::cout << " miscByte: " << (int)command.miscByte;
+        std::cout << std::endl;
+
         out.clear();
         uint8_t tmp = 0;
         if (isShutdown) {
