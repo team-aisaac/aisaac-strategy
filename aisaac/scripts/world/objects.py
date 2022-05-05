@@ -85,7 +85,8 @@ class Objects(object):
         for robot_id, role in zip(self._active_robot_ids, roles):
             if self.roles != roles:
                 rospy.loginfo(str(self._node_name)+": Assigned \""+role+"\" to robot" + str(robot_id))
-            self.get_robot_by_id(robot_id).set_role(role)
+            if not self.get_robot_by_id(robot_id) is None:
+                self.get_robot_by_id(robot_id).set_role(role)
 
         self.roles = roles
 

@@ -18,7 +18,8 @@ class StopStrategyCalculator(StrategyCalcuratorBase):
         strategy_context.update("enemy_kick", False, namespace="world_model")
         self._dynamic_strategy.clone_from(self._static_strategies['initial'])
 
-        rospy.set_param("/robot_max_velocity", 1.5)
+        if rospy.get_param("/robot_max_velocity") > 1.5:
+            rospy.set_param("/robot_max_velocity", 1.5)
 
         ball = self._objects.ball
 
