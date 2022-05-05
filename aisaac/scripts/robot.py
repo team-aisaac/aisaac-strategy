@@ -1,5 +1,6 @@
 #!/usr/bin/env  python
 # coding:utf-8
+import math
 import rospy
 import rosservice
 
@@ -112,6 +113,17 @@ class Robot(object):
         if -omega_acc_clip_threshold_min < clipped_omega_acc < omega_acc_clip_threshold_min:
             self.cmd.omega = self._last_omega + clipped_omega_acc
 
+        _length = math.sqrt(self.cmd.vel_surge ** 2 + self.cmd.vel_sway ** 2) 
+        if _length != 0.0:
+            self.cmd.vel_surge = self.ctrld_robot.get_max_velocity() / _length * self.cmd.vel_surge
+            self.cmd.vel_sway = self.ctrld_robot.get_max_velocity() / _length * self.cmd.vel_sway
+        # rospy.loginfo(self.ctrld_robot.get_max_velocity())
+
+        if self.cmd.omega > math.pi / 2:
+            self.cmd.omega = math.pi / 2
+        if self.cmd.omega < -math.pi / 2:
+            self.cmd.omega = -math.pi / 2
+
         self.ctrld_robot.handle_loop_callback()
 
         self._command_pub.publish(self.cmd)
@@ -176,7 +188,6 @@ class Robot(object):
                     identity_filter(robot)
             for enemy in self.robot_enemy:
                 identity_filter(enemy)
-
 
             self.ctrld_robot.set_max_velocity(rospy.get_param("/robot_max_velocity", default=config.ROBOT_MAX_VELOCITY)) # m/s 機体の最高速度
 

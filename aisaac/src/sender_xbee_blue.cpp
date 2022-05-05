@@ -138,7 +138,7 @@ int main(int argc, char **argv) {
     ros::NodeHandle nh;
     ros::Rate r(30);
 
-    const int numRobots = 1;
+    const int numRobots = 8;
 
     aisaac::AisaacWifiLinux wifiIF;
 
