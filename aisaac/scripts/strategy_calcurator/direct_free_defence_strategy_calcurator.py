@@ -4,8 +4,8 @@
 import math
 from common import functions
 
-from strategy import StrategyBase, DynamicStrategy
-from strategy_calcurator import StrategyCalcuratorBase
+from .strategy import StrategyBase, DynamicStrategy
+from .strategy_calcurator import StrategyCalcuratorBase
 from common.context import StrategyContext
 from aisaac.msg import Status
 import config

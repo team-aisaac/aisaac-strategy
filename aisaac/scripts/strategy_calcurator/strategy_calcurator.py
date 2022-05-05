@@ -3,7 +3,8 @@
 
 from abc import ABCMeta, abstractmethod
 
-from strategy import InitialStaticStrategy, StopStaticStrategy, DynamicStrategy
+import world.entity
+from .strategy import InitialStaticStrategy, StopStaticStrategy, DynamicStrategy
 from world.objects import Objects
 from common import functions
 import config
@@ -21,8 +22,7 @@ class Util(object):
     """
     @staticmethod
     def get_distance(point_a, point_b):
-        # type: (Tuple[float, float],
-        #        Tuple[float, float]) -> float
+        # type: (Tuple[float, float], Tuple[float, float]) -> float
         return functions.distance_btw_two_points(point_a, point_b)
 
 
@@ -63,7 +63,7 @@ class StrategyCalcuratorBase(object):
     def __init__(self, objects):
         # type: (Objects) -> None
         self._objects = objects # type: Objects
-        self._robot = self._objects.robot # type: entity.
+        self._robot = self._objects.robot # type: entity.Robot
         self._enemy = self._objects.enemy
         self._ball_params = self._objects.ball
         self._robot_ids = self._objects.get_robot_ids()
@@ -126,7 +126,7 @@ class StrategyCalcuratorBase(object):
             return False
 
     def _get_free_enemy_id(self, exception_robot_id, exception_enemy_id):
-        # type: () -> List[int]
+        # type: (int, int) -> List[int]
         #フリーで最もゴールに近い敵idを返す
         active_robot_ids = self._get_active_robot_ids()
         active_enemy_ids = self._get_active_enemy_ids()

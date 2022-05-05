@@ -1,5 +1,10 @@
 #!/usr/bin/env  python
 # coding:utf-8
+
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import rospy
 
 from world.referee import Referee
@@ -128,7 +133,7 @@ class WorldModel(object):
         return self._status_publisher
 
     def get_strategy_calcurator(self, key):
-        # type: () -> StrategyCalcuratorBase
+        # type: (str) -> StrategyCalcuratorBase
         return self._stcalcurator[key]
 
     def get_strategy_context(self):

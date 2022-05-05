@@ -3,8 +3,8 @@
 
 import math
 
-from strategy import StrategyBase
-from strategy_calcurator import StrategyCalcuratorBase
+from .strategy import StrategyBase
+from .strategy_calcurator import StrategyCalcuratorBase
 from common.context import StrategyContext
 from aisaac.msg import Status
 from common import functions

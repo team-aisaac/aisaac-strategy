@@ -428,7 +428,7 @@ class RobotPid(object):
         self.Kdv = msg.Kdv
         self.Kdr = msg.Kdr
 
-        print self.Kpv, self.Kpr, self.Kdv, self.Kdr
+        print(self.Kpv, self.Kpr, self.Kdv, self.Kdr)
 
         return 1
 
