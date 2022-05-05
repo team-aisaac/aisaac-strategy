@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from strategy_calcurator import StrategyCalcuratorBase
+from .strategy_calcurator import StrategyCalcuratorBase
 from common import functions
 from aisaac.msg import Status
 import numpy as np

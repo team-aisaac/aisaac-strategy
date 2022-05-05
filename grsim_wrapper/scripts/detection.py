@@ -18,7 +18,7 @@ class VisionReceiver:
         self._our_side = rospy.get_param('team_side', 'right').upper()
         self._ID_MAX = rospy.get_param('id_max', 12)
         self._host = rospy.get_param('~multicast_addr', '224.5.23.2')
-        self._port = rospy.get_param('~multicast_port', 10006)
+        self._port = rospy.get_param('~multicast_port', 10020)
 
         self._sock = multicast.Multicast(self._host, self._port)
 

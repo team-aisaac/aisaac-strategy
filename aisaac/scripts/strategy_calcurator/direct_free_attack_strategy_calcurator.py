@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from strategy import StrategyBase
+from .strategy import StrategyBase
 from common.context import StrategyContext
-from indirect_free_attack_strategy_calcurator import IndirectFreeAttack
+from .indirect_free_attack_strategy_calcurator import IndirectFreeAttack
 from aisaac.msg import Status
 from common import functions
 

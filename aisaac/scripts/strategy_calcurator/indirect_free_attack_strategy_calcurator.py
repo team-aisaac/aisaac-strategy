@@ -4,8 +4,8 @@
 import math
 import numpy as np
 
-from strategy import StrategyBase, DynamicStrategy
-from strategy_calcurator import StrategyCalcuratorBase
+from .strategy import StrategyBase, DynamicStrategy
+from .strategy_calcurator import StrategyCalcuratorBase
 from common.context import StrategyContext
 from aisaac.msg import Status
 from common import functions
@@ -297,7 +297,7 @@ class IndirectFreeAttack(StrategyCalcuratorBase):
             elif robot.get_role() == "RDF":
                 status.status = "defence3"
             else:
-                print 'error'
+                print('error')
 
             self._dynamic_strategy.set_robot_status(robot_id, status)
         return self._dynamic_strategy

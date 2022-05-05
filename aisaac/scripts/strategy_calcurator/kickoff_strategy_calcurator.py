@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from strategy import StrategyBase
-from strategy_calcurator import StrategyCalcuratorBase
+from .strategy import StrategyBase
+from .strategy_calcurator import StrategyCalcuratorBase
 from common.context import StrategyContext
 from aisaac.msg import Status
 import copy

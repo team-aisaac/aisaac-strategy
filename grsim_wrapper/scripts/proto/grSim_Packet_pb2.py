@@ -7,23 +7,23 @@ from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
-from google.protobuf import descriptor_pb2
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
 
 
-import grSim_Commands_pb2
-import grSim_Replacement_pb2
+import grSim_Commands_pb2 as grSim__Commands__pb2
+import grSim_Replacement_pb2 as grSim__Replacement__pb2
 
 
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='grSim_Packet.proto',
   package='',
+  syntax='proto2',
+  serialized_options=None,
   serialized_pb=_b('\n\x12grSim_Packet.proto\x1a\x14grSim_Commands.proto\x1a\x17grSim_Replacement.proto\"Z\n\x0cgrSim_Packet\x12!\n\x08\x63ommands\x18\x01 \x01(\x0b\x32\x0f.grSim_Commands\x12\'\n\x0breplacement\x18\x02 \x01(\x0b\x32\x12.grSim_Replacement')
   ,
-  dependencies=[grSim_Commands_pb2.DESCRIPTOR,grSim_Replacement_pb2.DESCRIPTOR,])
-_sym_db.RegisterFileDescriptor(DESCRIPTOR)
+  dependencies=[grSim__Commands__pb2.DESCRIPTOR,grSim__Replacement__pb2.DESCRIPTOR,])
 
 
 
@@ -41,22 +41,23 @@ _GRSIM_PACKET = _descriptor.Descriptor(
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='replacement', full_name='grSim_Packet.replacement', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
   nested_types=[],
   enum_types=[
   ],
-  options=None,
+  serialized_options=None,
   is_extendable=False,
+  syntax='proto2',
   extension_ranges=[],
   oneofs=[
   ],
@@ -64,9 +65,10 @@ _GRSIM_PACKET = _descriptor.Descriptor(
   serialized_end=159,
 )
 
-_GRSIM_PACKET.fields_by_name['commands'].message_type = grSim_Commands_pb2._GRSIM_COMMANDS
-_GRSIM_PACKET.fields_by_name['replacement'].message_type = grSim_Replacement_pb2._GRSIM_REPLACEMENT
+_GRSIM_PACKET.fields_by_name['commands'].message_type = grSim__Commands__pb2._GRSIM_COMMANDS
+_GRSIM_PACKET.fields_by_name['replacement'].message_type = grSim__Replacement__pb2._GRSIM_REPLACEMENT
 DESCRIPTOR.message_types_by_name['grSim_Packet'] = _GRSIM_PACKET
+_sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 grSim_Packet = _reflection.GeneratedProtocolMessageType('grSim_Packet', (_message.Message,), dict(
   DESCRIPTOR = _GRSIM_PACKET,

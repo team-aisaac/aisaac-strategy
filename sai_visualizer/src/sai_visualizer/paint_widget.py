@@ -30,7 +30,7 @@ from consai_msgs.msg import GeometryFieldSize, FieldLineSegment, FieldCircularAr
 from consai_msgs.msg import ReplaceBall, ReplaceRobot
 from aisaac.msg import Status
 
-from geometry import Geometry
+from .geometry import Geometry
 
 
 # monkey patch
@@ -162,7 +162,7 @@ class PaintWidget(QWidget):
         self.avoidingPoints = [Point()] * self._ID_MAX
         self.sub_avoidingPoints = []
 
-        for i in xrange(self._ID_MAX):
+        for i in range(self._ID_MAX):
             strID = str(i)
             topicFriend = "robot_" + strID + "/odom"
             topicEnemy = "enemy_" + strID + "/odom"

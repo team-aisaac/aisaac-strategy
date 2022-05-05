@@ -3,7 +3,7 @@
 
 from abc import ABCMeta, abstractmethod
 
-from strategy import InitialStaticStrategy, StopStaticStrategy, DynamicStrategy
+from .strategy import InitialStaticStrategy, StopStaticStrategy, DynamicStrategy
 from world.objects import Objects
 from common import functions
 import config

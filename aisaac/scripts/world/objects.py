@@ -1,6 +1,7 @@
 #!/usr/bin/env  python
 # coding:utf-8
-import entity
+
+from . import entity
 import rospy
 from nav_msgs.msg import Odometry
 from std_msgs.msg import UInt16MultiArray

@@ -7,6 +7,9 @@ from datetime import *
 import time
 import math
 
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from proto import grSim_Packet_pb2
 from geometry_msgs.msg import Twist
 from consai_msgs.msg import robot_commands
@@ -38,7 +41,7 @@ class Sender:
 
         # make subscribers
         self.subscribers = []
-        for i in xrange(self._ID_MAX):
+        for i in range(self._ID_MAX):
             topic = "robot_" + str(i) + "/robot_commands"
             self.subscribers.append(
                     rospy.Subscriber(
