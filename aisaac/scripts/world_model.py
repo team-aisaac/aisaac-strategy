@@ -133,7 +133,7 @@ class WorldModel(object):
         return self._status_publisher
 
     def get_strategy_calcurator(self, key):
-        # type: () -> StrategyCalcuratorBase
+        # type: (str) -> StrategyCalcuratorBase
         return self._stcalcurator[key]
 
     def get_strategy_context(self):
