@@ -116,7 +116,7 @@ namespace aisaac
             out.push_back(tmp);
             // Index:2 x_vector + y_vector
             uint16_t uTargetY = std::abs(command.targetY);
-            tmp = ((uTargetX & 0b111) << 3) | (command.targetY >= 0 ? 0 : 0b10000) | ((uTargetY >> 9) & 0b1111);
+            tmp = ((uTargetX & 0b111) << 5) | (command.targetY >= 0 ? 0 : 0b10000) | ((uTargetY >> 9) & 0b1111);
             out.push_back(tmp);
             // Index:3 y_vector
             tmp = (uTargetY >> 1) & 0xFF;
