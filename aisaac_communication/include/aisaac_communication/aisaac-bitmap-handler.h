@@ -26,6 +26,7 @@ namespace aisaac
         int setNodePHYAddress(int, phyTechnology, std::vector<unsigned char>);
         void showInstanceStatus();
         void setShutdown(bool);
+        void convertToString(commandToRobot, std::vector<unsigned char>&);
         void generateFT4(commandToRobot, std::vector<unsigned char>&);
         int parseFT4(std::vector<unsigned char> in, commandToRobot &out);
         void sendCommand(int, unsigned char, std::vector<unsigned char>);

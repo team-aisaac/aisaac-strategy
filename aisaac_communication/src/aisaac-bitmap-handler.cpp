@@ -6,6 +6,7 @@
 #include <vector>
 #include <functional>
 #include <cstdlib>
+#include "aisaac_communication/aisaaccommand.pb.h"
 
 namespace aisaac
 {
@@ -72,6 +73,51 @@ namespace aisaac
         std::cout << "XBee IF: " << (xbeeActivated ? "Active" : "Inactive") << std::endl;
         std::cout << "WiFi IF: " << (wifiActivated ? "Active" : "Inactive") << std::endl;
         std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+    }
+    void AisaacBitmapHandler::convertToString(commandToRobot command, std::vector<unsigned char> &out) {
+        std::cout << "command";
+        std::cout << " robotCommandCoordinateSystemType: " << (int)command.robotCommandCoordinateSystemType;
+        std::cout << " targetX: " << command.targetX;
+        std::cout << " targetY: " << command.targetY;
+        std::cout << " targetAngle: " << command.targetAngle;
+        std::cout << " visionDataValid: " << (int)command.visionDataValid;
+        std::cout << " currentX: " << command.currentX;
+        std::cout << " currentY: " << command.currentY;
+        std::cout << " currentAngle: " << (int)command.currentAngle;
+        std::cout << " kickParameter.sensorUse: " << (int)command.kickParameter.sensorUse;
+        std::cout << " kickParameter.kickType: " << (int)command.kickParameter.kickType;
+        std::cout << " kickParameter.kickStrength: " << (int)command.kickParameter.kickStrength;
+        std::cout << " miscByte: " << (int)command.miscByte;
+        std::cout << std::endl;
+
+        out.clear();
+
+        // Index:0 DATAType5 0b101 + 0b00000
+        out.push_back(0b10100000);
+
+        // 
+        AIsaacCommand aisaac_command;
+        aisaac_command.set_robot_command_coordinate_system_type(command.robotCommandCoordinateSystemType);
+        aisaac_command.set_target_x(command.targetX);
+        aisaac_command.set_target_y(command.targetY);
+        aisaac_command.set_target_angle(command.targetAngle);
+        aisaac_command.set_vision_data_valid(command.visionDataValid);
+        aisaac_command.set_current_x(command.currentX);
+        aisaac_command.set_current_y(command.currentY);
+        aisaac_command.set_current_angle(command.currentAngle);
+        Kick aisaac_kick_command;
+        aisaac_kick_command.set_sensor_use_type(command.kickParameter.sensorUse);
+        aisaac_kick_command.set_kick_type(command.kickParameter.kickType);
+        aisaac_kick_command.set_kick_strength(command.kickParameter.kickStrength);
+        aisaac_command.set_allocated_kick(&aisaac_kick_command);
+        
+        std::string serialized_str;
+        // Encode
+        aisaac_command.SerializeToString(&serialized_str);
+
+        for (unsigned char c : serialized_str) {
+            out.push_back(c);
+        }
     }
     void AisaacBitmapHandler::generateFT4(commandToRobot command, std::vector<unsigned char> &out) {
 

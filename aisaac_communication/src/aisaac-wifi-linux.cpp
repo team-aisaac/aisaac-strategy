@@ -21,8 +21,8 @@ namespace aisaac {
         // Make UDP data structure
         unsigned char message[16];   // Header 4 Bytes + Max frame length: 12(Frame Type4)
         // Protocol version: 1.4
-        message[0] = 1;
-        message[1] = 6;
+        message[0] = 2;
+        message[1] = 0;
         message[2] = (unsigned char)robotID;  // Robot ID number
         message[3] = sequenceNumber;  // Sequence number
         // Pack command data
