@@ -38,7 +38,7 @@ class Sender:
 
         # make subscribers
         self.subscribers = []
-        for i in xrange(self._ID_MAX):
+        for i in range(self._ID_MAX):
             topic = "robot_" + str(i) + "/robot_commands"
             self.subscribers.append(
                     rospy.Subscriber(

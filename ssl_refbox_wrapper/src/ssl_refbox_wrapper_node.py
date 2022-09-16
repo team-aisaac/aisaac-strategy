@@ -51,6 +51,7 @@ if  __name__ == '__main__':
 
         protobuf.ParseFromString(buf)
 
+
         pub_stage.publish(Int8(protobuf.stage));
         # pub_stage_duration.publish(Duration());
         pub_command.publish(Int8(protobuf.command));
