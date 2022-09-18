@@ -97,21 +97,32 @@ namespace aisaac
 
         // Construct Protobuf message
         aisaacpb::SpcCommand cmd_to_robot;
+        aisaacpb::RobotCommandCoordinateSystemType coord_type;
+        if (command.robotCommandCoordinateSystemType == 0) {
+            coord_type = aisaacpb::RobotCommandCoordinateSystemType::Vector;
+        } else if (command.robotCommandCoordinateSystemType == 1) {
+            coord_type = aisaacpb::RobotCommandCoordinateSystemType::Coordinate;
+        } else if (command.robotCommandCoordinateSystemType == 2) {
+            coord_type = aisaacpb::RobotCommandCoordinateSystemType::Relax;
+        }
+        cmd_to_robot.set_robot_command_coordinate_system_type(coord_type);
+        cmd_to_robot.set_vision_data_valid(command.visionDataValid);
         aisaacpb::Position current_pos;
         current_pos.set_x(command.currentX);
         current_pos.set_y(command.currentY);
         current_pos.set_theta(command.currentAngle);
         cmd_to_robot.set_allocated_current_pos(&current_pos);
         aisaacpb::Velocity move_vec;
-        move_vec.set_vx(0);
-        move_vec.set_vy(0);
-        move_vec.set_omega(0);
+        move_vec.set_vx(command.currentX);
+        move_vec.set_vy(command.currentY);
+        move_vec.set_omega(command.currentAngle);
         cmd_to_robot.set_allocated_move_vec(&move_vec);
         aisaacpb::Position target_pos;
         target_pos.set_x(command.targetX);
         target_pos.set_y(command.targetY);
         target_pos.set_theta(command.targetAngle);
         // https://developers.google.com/protocol-buffers/docs/cpptutorial#writing-a-message
+        // ToDo
         aisaacpb::Obstacle *obstacle = cmd_to_robot.add_obstacles();
         obstacle->set_x(0);
         obstacle->set_y(0);

@@ -39,7 +39,7 @@ namespace protobuf_aisaaccommand_2eproto {
 struct TableStruct {
   static const ::google::protobuf::internal::ParseTableField entries[];
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[];
-  static const ::google::protobuf::internal::ParseTable schema[9];
+  static const ::google::protobuf::internal::ParseTable schema[10];
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
   static const ::google::protobuf::uint32 offsets[];
@@ -50,6 +50,9 @@ namespace aisaacpb {
 class AIsaacCommand;
 class AIsaacCommandDefaultTypeInternal;
 extern AIsaacCommandDefaultTypeInternal _AIsaacCommand_default_instance_;
+class Acceleration;
+class AccelerationDefaultTypeInternal;
+extern AccelerationDefaultTypeInternal _Acceleration_default_instance_;
 class DwaResult;
 class DwaResultDefaultTypeInternal;
 extern DwaResultDefaultTypeInternal _DwaResult_default_instance_;
@@ -65,9 +68,9 @@ extern PositionDefaultTypeInternal _Position_default_instance_;
 class RaspiCommand;
 class RaspiCommandDefaultTypeInternal;
 extern RaspiCommandDefaultTypeInternal _RaspiCommand_default_instance_;
-class RobotStatus;
-class RobotStatusDefaultTypeInternal;
-extern RobotStatusDefaultTypeInternal _RobotStatus_default_instance_;
+class RobotState;
+class RobotStateDefaultTypeInternal;
+extern RobotStateDefaultTypeInternal _RobotState_default_instance_;
 class SpcCommand;
 class SpcCommandDefaultTypeInternal;
 extern SpcCommandDefaultTypeInternal _SpcCommand_default_instance_;
@@ -78,12 +81,13 @@ extern VelocityDefaultTypeInternal _Velocity_default_instance_;
 namespace google {
 namespace protobuf {
 template<> ::aisaacpb::AIsaacCommand* Arena::CreateMaybeMessage<::aisaacpb::AIsaacCommand>(Arena*);
+template<> ::aisaacpb::Acceleration* Arena::CreateMaybeMessage<::aisaacpb::Acceleration>(Arena*);
 template<> ::aisaacpb::DwaResult* Arena::CreateMaybeMessage<::aisaacpb::DwaResult>(Arena*);
 template<> ::aisaacpb::Kick* Arena::CreateMaybeMessage<::aisaacpb::Kick>(Arena*);
 template<> ::aisaacpb::Obstacle* Arena::CreateMaybeMessage<::aisaacpb::Obstacle>(Arena*);
 template<> ::aisaacpb::Position* Arena::CreateMaybeMessage<::aisaacpb::Position>(Arena*);
 template<> ::aisaacpb::RaspiCommand* Arena::CreateMaybeMessage<::aisaacpb::RaspiCommand>(Arena*);
-template<> ::aisaacpb::RobotStatus* Arena::CreateMaybeMessage<::aisaacpb::RobotStatus>(Arena*);
+template<> ::aisaacpb::RobotState* Arena::CreateMaybeMessage<::aisaacpb::RobotState>(Arena*);
 template<> ::aisaacpb::SpcCommand* Arena::CreateMaybeMessage<::aisaacpb::SpcCommand>(Arena*);
 template<> ::aisaacpb::Velocity* Arena::CreateMaybeMessage<::aisaacpb::Velocity>(Arena*);
 }  // namespace protobuf
@@ -133,6 +137,28 @@ inline bool Kick_KickMethod_Parse(
     const ::std::string& name, Kick_KickMethod* value) {
   return ::google::protobuf::internal::ParseNamedEnum<Kick_KickMethod>(
     Kick_KickMethod_descriptor(), name, value);
+}
+enum RobotCommandCoordinateSystemType {
+  Vector = 0,
+  Coordinate = 1,
+  Relax = 2,
+  RobotCommandCoordinateSystemType_INT_MIN_SENTINEL_DO_NOT_USE_ = ::google::protobuf::kint32min,
+  RobotCommandCoordinateSystemType_INT_MAX_SENTINEL_DO_NOT_USE_ = ::google::protobuf::kint32max
+};
+bool RobotCommandCoordinateSystemType_IsValid(int value);
+const RobotCommandCoordinateSystemType RobotCommandCoordinateSystemType_MIN = Vector;
+const RobotCommandCoordinateSystemType RobotCommandCoordinateSystemType_MAX = Relax;
+const int RobotCommandCoordinateSystemType_ARRAYSIZE = RobotCommandCoordinateSystemType_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* RobotCommandCoordinateSystemType_descriptor();
+inline const ::std::string& RobotCommandCoordinateSystemType_Name(RobotCommandCoordinateSystemType value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    RobotCommandCoordinateSystemType_descriptor(), value);
+}
+inline bool RobotCommandCoordinateSystemType_Parse(
+    const ::std::string& name, RobotCommandCoordinateSystemType* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<RobotCommandCoordinateSystemType>(
+    RobotCommandCoordinateSystemType_descriptor(), name, value);
 }
 // ===================================================================
 
@@ -370,6 +396,116 @@ class Velocity : public ::google::protobuf::Message /* @@protoc_insertion_point(
 };
 // -------------------------------------------------------------------
 
+class Acceleration : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:aisaacpb.Acceleration) */ {
+ public:
+  Acceleration();
+  virtual ~Acceleration();
+
+  Acceleration(const Acceleration& from);
+
+  inline Acceleration& operator=(const Acceleration& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  Acceleration(Acceleration&& from) noexcept
+    : Acceleration() {
+    *this = ::std::move(from);
+  }
+
+  inline Acceleration& operator=(Acceleration&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const Acceleration& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const Acceleration* internal_default_instance() {
+    return reinterpret_cast<const Acceleration*>(
+               &_Acceleration_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    2;
+
+  void Swap(Acceleration* other);
+  friend void swap(Acceleration& a, Acceleration& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline Acceleration* New() const final {
+    return CreateMaybeMessage<Acceleration>(NULL);
+  }
+
+  Acceleration* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<Acceleration>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const Acceleration& from);
+  void MergeFrom(const Acceleration& from);
+  void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Acceleration* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return NULL;
+  }
+  inline void* MaybeArenaPtr() const {
+    return NULL;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // int32 ax = 1;
+  void clear_ax();
+  static const int kAxFieldNumber = 1;
+  ::google::protobuf::int32 ax() const;
+  void set_ax(::google::protobuf::int32 value);
+
+  // int32 ay = 2;
+  void clear_ay();
+  static const int kAyFieldNumber = 2;
+  ::google::protobuf::int32 ay() const;
+  void set_ay(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:aisaacpb.Acceleration)
+ private:
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::int32 ax_;
+  ::google::protobuf::int32 ay_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::protobuf_aisaaccommand_2eproto::TableStruct;
+};
+// -------------------------------------------------------------------
+
 class Obstacle : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:aisaacpb.Obstacle) */ {
  public:
   Obstacle();
@@ -405,7 +541,7 @@ class Obstacle : public ::google::protobuf::Message /* @@protoc_insertion_point(
                &_Obstacle_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    2;
+    3;
 
   void Swap(Obstacle* other);
   friend void swap(Obstacle& a, Obstacle& b) {
@@ -529,7 +665,7 @@ class Kick : public ::google::protobuf::Message /* @@protoc_insertion_point(clas
                &_Kick_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    3;
+    4;
 
   void Swap(Kick* other);
   friend void swap(Kick& a, Kick& b) {
@@ -741,7 +877,7 @@ class DwaResult : public ::google::protobuf::Message /* @@protoc_insertion_point
                &_DwaResult_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    4;
+    5;
 
   void Swap(DwaResult* other);
   friend void swap(DwaResult& a, DwaResult& b) {
@@ -872,7 +1008,7 @@ class SpcCommand : public ::google::protobuf::Message /* @@protoc_insertion_poin
                &_SpcCommand_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    5;
+    6;
 
   void Swap(SpcCommand* other);
   friend void swap(SpcCommand& a, SpcCommand& b) {
@@ -984,11 +1120,23 @@ class SpcCommand : public ::google::protobuf::Message /* @@protoc_insertion_poin
   ::aisaacpb::Kick* mutable_kick();
   void set_allocated_kick(::aisaacpb::Kick* kick);
 
+  // .aisaacpb.RobotCommandCoordinateSystemType robot_command_coordinate_system_type = 7;
+  void clear_robot_command_coordinate_system_type();
+  static const int kRobotCommandCoordinateSystemTypeFieldNumber = 7;
+  ::aisaacpb::RobotCommandCoordinateSystemType robot_command_coordinate_system_type() const;
+  void set_robot_command_coordinate_system_type(::aisaacpb::RobotCommandCoordinateSystemType value);
+
   // bool prohibited_zone_ignore = 6;
   void clear_prohibited_zone_ignore();
   static const int kProhibitedZoneIgnoreFieldNumber = 6;
   bool prohibited_zone_ignore() const;
   void set_prohibited_zone_ignore(bool value);
+
+  // bool vision_data_valid = 8;
+  void clear_vision_data_valid();
+  static const int kVisionDataValidFieldNumber = 8;
+  bool vision_data_valid() const;
+  void set_vision_data_valid(bool value);
 
   // @@protoc_insertion_point(class_scope:aisaacpb.SpcCommand)
  private:
@@ -999,7 +1147,9 @@ class SpcCommand : public ::google::protobuf::Message /* @@protoc_insertion_poin
   ::aisaacpb::Velocity* move_vec_;
   ::aisaacpb::Position* target_pos_;
   ::aisaacpb::Kick* kick_;
+  int robot_command_coordinate_system_type_;
   bool prohibited_zone_ignore_;
+  bool vision_data_valid_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::protobuf_aisaaccommand_2eproto::TableStruct;
 };
@@ -1040,7 +1190,7 @@ class RaspiCommand : public ::google::protobuf::Message /* @@protoc_insertion_po
                &_RaspiCommand_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    6;
+    7;
 
   void Swap(RaspiCommand* other);
   friend void swap(RaspiCommand& a, RaspiCommand& b) {
@@ -1092,34 +1242,10 @@ class RaspiCommand : public ::google::protobuf::Message /* @@protoc_insertion_po
 
   // accessors -------------------------------------------------------
 
-  // .aisaacpb.Position current_pos = 1;
-  bool has_current_pos() const;
-  void clear_current_pos();
-  static const int kCurrentPosFieldNumber = 1;
-  private:
-  const ::aisaacpb::Position& _internal_current_pos() const;
-  public:
-  const ::aisaacpb::Position& current_pos() const;
-  ::aisaacpb::Position* release_current_pos();
-  ::aisaacpb::Position* mutable_current_pos();
-  void set_allocated_current_pos(::aisaacpb::Position* current_pos);
-
-  // .aisaacpb.Velocity move_vec = 2;
-  bool has_move_vec() const;
-  void clear_move_vec();
-  static const int kMoveVecFieldNumber = 2;
-  private:
-  const ::aisaacpb::Velocity& _internal_move_vec() const;
-  public:
-  const ::aisaacpb::Velocity& move_vec() const;
-  ::aisaacpb::Velocity* release_move_vec();
-  ::aisaacpb::Velocity* mutable_move_vec();
-  void set_allocated_move_vec(::aisaacpb::Velocity* move_vec);
-
-  // .aisaacpb.Position target_pos = 3;
+  // .aisaacpb.Position target_pos = 1;
   bool has_target_pos() const;
   void clear_target_pos();
-  static const int kTargetPosFieldNumber = 3;
+  static const int kTargetPosFieldNumber = 1;
   private:
   const ::aisaacpb::Position& _internal_target_pos() const;
   public:
@@ -1128,10 +1254,10 @@ class RaspiCommand : public ::google::protobuf::Message /* @@protoc_insertion_po
   ::aisaacpb::Position* mutable_target_pos();
   void set_allocated_target_pos(::aisaacpb::Position* target_pos);
 
-  // .aisaacpb.DwaResult dwa_result = 6;
+  // .aisaacpb.DwaResult dwa_result = 4;
   bool has_dwa_result() const;
   void clear_dwa_result();
-  static const int kDwaResultFieldNumber = 6;
+  static const int kDwaResultFieldNumber = 4;
   private:
   const ::aisaacpb::DwaResult& _internal_dwa_result() const;
   public:
@@ -1140,27 +1266,15 @@ class RaspiCommand : public ::google::protobuf::Message /* @@protoc_insertion_po
   ::aisaacpb::DwaResult* mutable_dwa_result();
   void set_allocated_dwa_result(::aisaacpb::DwaResult* dwa_result);
 
-  // .aisaacpb.Kick kick = 7;
-  bool has_kick() const;
-  void clear_kick();
-  static const int kKickFieldNumber = 7;
-  private:
-  const ::aisaacpb::Kick& _internal_kick() const;
-  public:
-  const ::aisaacpb::Kick& kick() const;
-  ::aisaacpb::Kick* release_kick();
-  ::aisaacpb::Kick* mutable_kick();
-  void set_allocated_kick(::aisaacpb::Kick* kick);
-
-  // bool dwa_result_valid = 4;
+  // bool dwa_result_valid = 2;
   void clear_dwa_result_valid();
-  static const int kDwaResultValidFieldNumber = 4;
+  static const int kDwaResultValidFieldNumber = 2;
   bool dwa_result_valid() const;
   void set_dwa_result_valid(bool value);
 
-  // bool path_enable = 5;
+  // bool path_enable = 3;
   void clear_path_enable();
-  static const int kPathEnableFieldNumber = 5;
+  static const int kPathEnableFieldNumber = 3;
   bool path_enable() const;
   void set_path_enable(bool value);
 
@@ -1168,11 +1282,8 @@ class RaspiCommand : public ::google::protobuf::Message /* @@protoc_insertion_po
  private:
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::aisaacpb::Position* current_pos_;
-  ::aisaacpb::Velocity* move_vec_;
   ::aisaacpb::Position* target_pos_;
   ::aisaacpb::DwaResult* dwa_result_;
-  ::aisaacpb::Kick* kick_;
   bool dwa_result_valid_;
   bool path_enable_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
@@ -1180,24 +1291,24 @@ class RaspiCommand : public ::google::protobuf::Message /* @@protoc_insertion_po
 };
 // -------------------------------------------------------------------
 
-class RobotStatus : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:aisaacpb.RobotStatus) */ {
+class RobotState : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:aisaacpb.RobotState) */ {
  public:
-  RobotStatus();
-  virtual ~RobotStatus();
+  RobotState();
+  virtual ~RobotState();
 
-  RobotStatus(const RobotStatus& from);
+  RobotState(const RobotState& from);
 
-  inline RobotStatus& operator=(const RobotStatus& from) {
+  inline RobotState& operator=(const RobotState& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  RobotStatus(RobotStatus&& from) noexcept
-    : RobotStatus() {
+  RobotState(RobotState&& from) noexcept
+    : RobotState() {
     *this = ::std::move(from);
   }
 
-  inline RobotStatus& operator=(RobotStatus&& from) noexcept {
+  inline RobotState& operator=(RobotState&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -1207,34 +1318,34 @@ class RobotStatus : public ::google::protobuf::Message /* @@protoc_insertion_poi
   }
   #endif
   static const ::google::protobuf::Descriptor* descriptor();
-  static const RobotStatus& default_instance();
+  static const RobotState& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const RobotStatus* internal_default_instance() {
-    return reinterpret_cast<const RobotStatus*>(
-               &_RobotStatus_default_instance_);
+  static inline const RobotState* internal_default_instance() {
+    return reinterpret_cast<const RobotState*>(
+               &_RobotState_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    7;
+    8;
 
-  void Swap(RobotStatus* other);
-  friend void swap(RobotStatus& a, RobotStatus& b) {
+  void Swap(RobotState* other);
+  friend void swap(RobotState& a, RobotState& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline RobotStatus* New() const final {
-    return CreateMaybeMessage<RobotStatus>(NULL);
+  inline RobotState* New() const final {
+    return CreateMaybeMessage<RobotState>(NULL);
   }
 
-  RobotStatus* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<RobotStatus>(arena);
+  RobotState* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<RobotState>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const RobotStatus& from);
-  void MergeFrom(const RobotStatus& from);
+  void CopyFrom(const RobotState& from);
+  void MergeFrom(const RobotState& from);
   void Clear() final;
   bool IsInitialized() const final;
 
@@ -1251,7 +1362,7 @@ class RobotStatus : public ::google::protobuf::Message /* @@protoc_insertion_poi
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(RobotStatus* other);
+  void InternalSwap(RobotState* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return NULL;
@@ -1291,12 +1402,25 @@ class RobotStatus : public ::google::protobuf::Message /* @@protoc_insertion_poi
   ::aisaacpb::Velocity* mutable_current_vel();
   void set_allocated_current_vel(::aisaacpb::Velocity* current_vel);
 
-  // @@protoc_insertion_point(class_scope:aisaacpb.RobotStatus)
+  // .aisaacpb.Acceleration current_accel = 3;
+  bool has_current_accel() const;
+  void clear_current_accel();
+  static const int kCurrentAccelFieldNumber = 3;
+  private:
+  const ::aisaacpb::Acceleration& _internal_current_accel() const;
+  public:
+  const ::aisaacpb::Acceleration& current_accel() const;
+  ::aisaacpb::Acceleration* release_current_accel();
+  ::aisaacpb::Acceleration* mutable_current_accel();
+  void set_allocated_current_accel(::aisaacpb::Acceleration* current_accel);
+
+  // @@protoc_insertion_point(class_scope:aisaacpb.RobotState)
  private:
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::aisaacpb::Position* current_pos_;
   ::aisaacpb::Velocity* current_vel_;
+  ::aisaacpb::Acceleration* current_accel_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::protobuf_aisaaccommand_2eproto::TableStruct;
 };
@@ -1337,7 +1461,7 @@ class AIsaacCommand : public ::google::protobuf::Message /* @@protoc_insertion_p
                &_AIsaacCommand_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    8;
+    9;
 
   void Swap(AIsaacCommand* other);
   friend void swap(AIsaacCommand& a, AIsaacCommand& b) {
@@ -1562,6 +1686,38 @@ inline void Velocity::set_omega(::google::protobuf::int32 value) {
   
   omega_ = value;
   // @@protoc_insertion_point(field_set:aisaacpb.Velocity.omega)
+}
+
+// -------------------------------------------------------------------
+
+// Acceleration
+
+// int32 ax = 1;
+inline void Acceleration::clear_ax() {
+  ax_ = 0;
+}
+inline ::google::protobuf::int32 Acceleration::ax() const {
+  // @@protoc_insertion_point(field_get:aisaacpb.Acceleration.ax)
+  return ax_;
+}
+inline void Acceleration::set_ax(::google::protobuf::int32 value) {
+  
+  ax_ = value;
+  // @@protoc_insertion_point(field_set:aisaacpb.Acceleration.ax)
+}
+
+// int32 ay = 2;
+inline void Acceleration::clear_ay() {
+  ay_ = 0;
+}
+inline ::google::protobuf::int32 Acceleration::ay() const {
+  // @@protoc_insertion_point(field_get:aisaacpb.Acceleration.ay)
+  return ay_;
+}
+inline void Acceleration::set_ay(::google::protobuf::int32 value) {
+  
+  ay_ = value;
+  // @@protoc_insertion_point(field_set:aisaacpb.Acceleration.ay)
 }
 
 // -------------------------------------------------------------------
@@ -2170,119 +2326,39 @@ inline void SpcCommand::set_prohibited_zone_ignore(bool value) {
   // @@protoc_insertion_point(field_set:aisaacpb.SpcCommand.prohibited_zone_ignore)
 }
 
+// .aisaacpb.RobotCommandCoordinateSystemType robot_command_coordinate_system_type = 7;
+inline void SpcCommand::clear_robot_command_coordinate_system_type() {
+  robot_command_coordinate_system_type_ = 0;
+}
+inline ::aisaacpb::RobotCommandCoordinateSystemType SpcCommand::robot_command_coordinate_system_type() const {
+  // @@protoc_insertion_point(field_get:aisaacpb.SpcCommand.robot_command_coordinate_system_type)
+  return static_cast< ::aisaacpb::RobotCommandCoordinateSystemType >(robot_command_coordinate_system_type_);
+}
+inline void SpcCommand::set_robot_command_coordinate_system_type(::aisaacpb::RobotCommandCoordinateSystemType value) {
+  
+  robot_command_coordinate_system_type_ = value;
+  // @@protoc_insertion_point(field_set:aisaacpb.SpcCommand.robot_command_coordinate_system_type)
+}
+
+// bool vision_data_valid = 8;
+inline void SpcCommand::clear_vision_data_valid() {
+  vision_data_valid_ = false;
+}
+inline bool SpcCommand::vision_data_valid() const {
+  // @@protoc_insertion_point(field_get:aisaacpb.SpcCommand.vision_data_valid)
+  return vision_data_valid_;
+}
+inline void SpcCommand::set_vision_data_valid(bool value) {
+  
+  vision_data_valid_ = value;
+  // @@protoc_insertion_point(field_set:aisaacpb.SpcCommand.vision_data_valid)
+}
+
 // -------------------------------------------------------------------
 
 // RaspiCommand
 
-// .aisaacpb.Position current_pos = 1;
-inline bool RaspiCommand::has_current_pos() const {
-  return this != internal_default_instance() && current_pos_ != NULL;
-}
-inline void RaspiCommand::clear_current_pos() {
-  if (GetArenaNoVirtual() == NULL && current_pos_ != NULL) {
-    delete current_pos_;
-  }
-  current_pos_ = NULL;
-}
-inline const ::aisaacpb::Position& RaspiCommand::_internal_current_pos() const {
-  return *current_pos_;
-}
-inline const ::aisaacpb::Position& RaspiCommand::current_pos() const {
-  const ::aisaacpb::Position* p = current_pos_;
-  // @@protoc_insertion_point(field_get:aisaacpb.RaspiCommand.current_pos)
-  return p != NULL ? *p : *reinterpret_cast<const ::aisaacpb::Position*>(
-      &::aisaacpb::_Position_default_instance_);
-}
-inline ::aisaacpb::Position* RaspiCommand::release_current_pos() {
-  // @@protoc_insertion_point(field_release:aisaacpb.RaspiCommand.current_pos)
-  
-  ::aisaacpb::Position* temp = current_pos_;
-  current_pos_ = NULL;
-  return temp;
-}
-inline ::aisaacpb::Position* RaspiCommand::mutable_current_pos() {
-  
-  if (current_pos_ == NULL) {
-    auto* p = CreateMaybeMessage<::aisaacpb::Position>(GetArenaNoVirtual());
-    current_pos_ = p;
-  }
-  // @@protoc_insertion_point(field_mutable:aisaacpb.RaspiCommand.current_pos)
-  return current_pos_;
-}
-inline void RaspiCommand::set_allocated_current_pos(::aisaacpb::Position* current_pos) {
-  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
-  if (message_arena == NULL) {
-    delete current_pos_;
-  }
-  if (current_pos) {
-    ::google::protobuf::Arena* submessage_arena = NULL;
-    if (message_arena != submessage_arena) {
-      current_pos = ::google::protobuf::internal::GetOwnedMessage(
-          message_arena, current_pos, submessage_arena);
-    }
-    
-  } else {
-    
-  }
-  current_pos_ = current_pos;
-  // @@protoc_insertion_point(field_set_allocated:aisaacpb.RaspiCommand.current_pos)
-}
-
-// .aisaacpb.Velocity move_vec = 2;
-inline bool RaspiCommand::has_move_vec() const {
-  return this != internal_default_instance() && move_vec_ != NULL;
-}
-inline void RaspiCommand::clear_move_vec() {
-  if (GetArenaNoVirtual() == NULL && move_vec_ != NULL) {
-    delete move_vec_;
-  }
-  move_vec_ = NULL;
-}
-inline const ::aisaacpb::Velocity& RaspiCommand::_internal_move_vec() const {
-  return *move_vec_;
-}
-inline const ::aisaacpb::Velocity& RaspiCommand::move_vec() const {
-  const ::aisaacpb::Velocity* p = move_vec_;
-  // @@protoc_insertion_point(field_get:aisaacpb.RaspiCommand.move_vec)
-  return p != NULL ? *p : *reinterpret_cast<const ::aisaacpb::Velocity*>(
-      &::aisaacpb::_Velocity_default_instance_);
-}
-inline ::aisaacpb::Velocity* RaspiCommand::release_move_vec() {
-  // @@protoc_insertion_point(field_release:aisaacpb.RaspiCommand.move_vec)
-  
-  ::aisaacpb::Velocity* temp = move_vec_;
-  move_vec_ = NULL;
-  return temp;
-}
-inline ::aisaacpb::Velocity* RaspiCommand::mutable_move_vec() {
-  
-  if (move_vec_ == NULL) {
-    auto* p = CreateMaybeMessage<::aisaacpb::Velocity>(GetArenaNoVirtual());
-    move_vec_ = p;
-  }
-  // @@protoc_insertion_point(field_mutable:aisaacpb.RaspiCommand.move_vec)
-  return move_vec_;
-}
-inline void RaspiCommand::set_allocated_move_vec(::aisaacpb::Velocity* move_vec) {
-  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
-  if (message_arena == NULL) {
-    delete move_vec_;
-  }
-  if (move_vec) {
-    ::google::protobuf::Arena* submessage_arena = NULL;
-    if (message_arena != submessage_arena) {
-      move_vec = ::google::protobuf::internal::GetOwnedMessage(
-          message_arena, move_vec, submessage_arena);
-    }
-    
-  } else {
-    
-  }
-  move_vec_ = move_vec;
-  // @@protoc_insertion_point(field_set_allocated:aisaacpb.RaspiCommand.move_vec)
-}
-
-// .aisaacpb.Position target_pos = 3;
+// .aisaacpb.Position target_pos = 1;
 inline bool RaspiCommand::has_target_pos() const {
   return this != internal_default_instance() && target_pos_ != NULL;
 }
@@ -2336,7 +2412,7 @@ inline void RaspiCommand::set_allocated_target_pos(::aisaacpb::Position* target_
   // @@protoc_insertion_point(field_set_allocated:aisaacpb.RaspiCommand.target_pos)
 }
 
-// bool dwa_result_valid = 4;
+// bool dwa_result_valid = 2;
 inline void RaspiCommand::clear_dwa_result_valid() {
   dwa_result_valid_ = false;
 }
@@ -2350,7 +2426,7 @@ inline void RaspiCommand::set_dwa_result_valid(bool value) {
   // @@protoc_insertion_point(field_set:aisaacpb.RaspiCommand.dwa_result_valid)
 }
 
-// bool path_enable = 5;
+// bool path_enable = 3;
 inline void RaspiCommand::clear_path_enable() {
   path_enable_ = false;
 }
@@ -2364,7 +2440,7 @@ inline void RaspiCommand::set_path_enable(bool value) {
   // @@protoc_insertion_point(field_set:aisaacpb.RaspiCommand.path_enable)
 }
 
-// .aisaacpb.DwaResult dwa_result = 6;
+// .aisaacpb.DwaResult dwa_result = 4;
 inline bool RaspiCommand::has_dwa_result() const {
   return this != internal_default_instance() && dwa_result_ != NULL;
 }
@@ -2418,100 +2494,46 @@ inline void RaspiCommand::set_allocated_dwa_result(::aisaacpb::DwaResult* dwa_re
   // @@protoc_insertion_point(field_set_allocated:aisaacpb.RaspiCommand.dwa_result)
 }
 
-// .aisaacpb.Kick kick = 7;
-inline bool RaspiCommand::has_kick() const {
-  return this != internal_default_instance() && kick_ != NULL;
-}
-inline void RaspiCommand::clear_kick() {
-  if (GetArenaNoVirtual() == NULL && kick_ != NULL) {
-    delete kick_;
-  }
-  kick_ = NULL;
-}
-inline const ::aisaacpb::Kick& RaspiCommand::_internal_kick() const {
-  return *kick_;
-}
-inline const ::aisaacpb::Kick& RaspiCommand::kick() const {
-  const ::aisaacpb::Kick* p = kick_;
-  // @@protoc_insertion_point(field_get:aisaacpb.RaspiCommand.kick)
-  return p != NULL ? *p : *reinterpret_cast<const ::aisaacpb::Kick*>(
-      &::aisaacpb::_Kick_default_instance_);
-}
-inline ::aisaacpb::Kick* RaspiCommand::release_kick() {
-  // @@protoc_insertion_point(field_release:aisaacpb.RaspiCommand.kick)
-  
-  ::aisaacpb::Kick* temp = kick_;
-  kick_ = NULL;
-  return temp;
-}
-inline ::aisaacpb::Kick* RaspiCommand::mutable_kick() {
-  
-  if (kick_ == NULL) {
-    auto* p = CreateMaybeMessage<::aisaacpb::Kick>(GetArenaNoVirtual());
-    kick_ = p;
-  }
-  // @@protoc_insertion_point(field_mutable:aisaacpb.RaspiCommand.kick)
-  return kick_;
-}
-inline void RaspiCommand::set_allocated_kick(::aisaacpb::Kick* kick) {
-  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
-  if (message_arena == NULL) {
-    delete kick_;
-  }
-  if (kick) {
-    ::google::protobuf::Arena* submessage_arena = NULL;
-    if (message_arena != submessage_arena) {
-      kick = ::google::protobuf::internal::GetOwnedMessage(
-          message_arena, kick, submessage_arena);
-    }
-    
-  } else {
-    
-  }
-  kick_ = kick;
-  // @@protoc_insertion_point(field_set_allocated:aisaacpb.RaspiCommand.kick)
-}
-
 // -------------------------------------------------------------------
 
-// RobotStatus
+// RobotState
 
 // .aisaacpb.Position current_pos = 1;
-inline bool RobotStatus::has_current_pos() const {
+inline bool RobotState::has_current_pos() const {
   return this != internal_default_instance() && current_pos_ != NULL;
 }
-inline void RobotStatus::clear_current_pos() {
+inline void RobotState::clear_current_pos() {
   if (GetArenaNoVirtual() == NULL && current_pos_ != NULL) {
     delete current_pos_;
   }
   current_pos_ = NULL;
 }
-inline const ::aisaacpb::Position& RobotStatus::_internal_current_pos() const {
+inline const ::aisaacpb::Position& RobotState::_internal_current_pos() const {
   return *current_pos_;
 }
-inline const ::aisaacpb::Position& RobotStatus::current_pos() const {
+inline const ::aisaacpb::Position& RobotState::current_pos() const {
   const ::aisaacpb::Position* p = current_pos_;
-  // @@protoc_insertion_point(field_get:aisaacpb.RobotStatus.current_pos)
+  // @@protoc_insertion_point(field_get:aisaacpb.RobotState.current_pos)
   return p != NULL ? *p : *reinterpret_cast<const ::aisaacpb::Position*>(
       &::aisaacpb::_Position_default_instance_);
 }
-inline ::aisaacpb::Position* RobotStatus::release_current_pos() {
-  // @@protoc_insertion_point(field_release:aisaacpb.RobotStatus.current_pos)
+inline ::aisaacpb::Position* RobotState::release_current_pos() {
+  // @@protoc_insertion_point(field_release:aisaacpb.RobotState.current_pos)
   
   ::aisaacpb::Position* temp = current_pos_;
   current_pos_ = NULL;
   return temp;
 }
-inline ::aisaacpb::Position* RobotStatus::mutable_current_pos() {
+inline ::aisaacpb::Position* RobotState::mutable_current_pos() {
   
   if (current_pos_ == NULL) {
     auto* p = CreateMaybeMessage<::aisaacpb::Position>(GetArenaNoVirtual());
     current_pos_ = p;
   }
-  // @@protoc_insertion_point(field_mutable:aisaacpb.RobotStatus.current_pos)
+  // @@protoc_insertion_point(field_mutable:aisaacpb.RobotState.current_pos)
   return current_pos_;
 }
-inline void RobotStatus::set_allocated_current_pos(::aisaacpb::Position* current_pos) {
+inline void RobotState::set_allocated_current_pos(::aisaacpb::Position* current_pos) {
   ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
   if (message_arena == NULL) {
     delete current_pos_;
@@ -2527,45 +2549,45 @@ inline void RobotStatus::set_allocated_current_pos(::aisaacpb::Position* current
     
   }
   current_pos_ = current_pos;
-  // @@protoc_insertion_point(field_set_allocated:aisaacpb.RobotStatus.current_pos)
+  // @@protoc_insertion_point(field_set_allocated:aisaacpb.RobotState.current_pos)
 }
 
 // .aisaacpb.Velocity current_vel = 2;
-inline bool RobotStatus::has_current_vel() const {
+inline bool RobotState::has_current_vel() const {
   return this != internal_default_instance() && current_vel_ != NULL;
 }
-inline void RobotStatus::clear_current_vel() {
+inline void RobotState::clear_current_vel() {
   if (GetArenaNoVirtual() == NULL && current_vel_ != NULL) {
     delete current_vel_;
   }
   current_vel_ = NULL;
 }
-inline const ::aisaacpb::Velocity& RobotStatus::_internal_current_vel() const {
+inline const ::aisaacpb::Velocity& RobotState::_internal_current_vel() const {
   return *current_vel_;
 }
-inline const ::aisaacpb::Velocity& RobotStatus::current_vel() const {
+inline const ::aisaacpb::Velocity& RobotState::current_vel() const {
   const ::aisaacpb::Velocity* p = current_vel_;
-  // @@protoc_insertion_point(field_get:aisaacpb.RobotStatus.current_vel)
+  // @@protoc_insertion_point(field_get:aisaacpb.RobotState.current_vel)
   return p != NULL ? *p : *reinterpret_cast<const ::aisaacpb::Velocity*>(
       &::aisaacpb::_Velocity_default_instance_);
 }
-inline ::aisaacpb::Velocity* RobotStatus::release_current_vel() {
-  // @@protoc_insertion_point(field_release:aisaacpb.RobotStatus.current_vel)
+inline ::aisaacpb::Velocity* RobotState::release_current_vel() {
+  // @@protoc_insertion_point(field_release:aisaacpb.RobotState.current_vel)
   
   ::aisaacpb::Velocity* temp = current_vel_;
   current_vel_ = NULL;
   return temp;
 }
-inline ::aisaacpb::Velocity* RobotStatus::mutable_current_vel() {
+inline ::aisaacpb::Velocity* RobotState::mutable_current_vel() {
   
   if (current_vel_ == NULL) {
     auto* p = CreateMaybeMessage<::aisaacpb::Velocity>(GetArenaNoVirtual());
     current_vel_ = p;
   }
-  // @@protoc_insertion_point(field_mutable:aisaacpb.RobotStatus.current_vel)
+  // @@protoc_insertion_point(field_mutable:aisaacpb.RobotState.current_vel)
   return current_vel_;
 }
-inline void RobotStatus::set_allocated_current_vel(::aisaacpb::Velocity* current_vel) {
+inline void RobotState::set_allocated_current_vel(::aisaacpb::Velocity* current_vel) {
   ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
   if (message_arena == NULL) {
     delete current_vel_;
@@ -2581,7 +2603,61 @@ inline void RobotStatus::set_allocated_current_vel(::aisaacpb::Velocity* current
     
   }
   current_vel_ = current_vel;
-  // @@protoc_insertion_point(field_set_allocated:aisaacpb.RobotStatus.current_vel)
+  // @@protoc_insertion_point(field_set_allocated:aisaacpb.RobotState.current_vel)
+}
+
+// .aisaacpb.Acceleration current_accel = 3;
+inline bool RobotState::has_current_accel() const {
+  return this != internal_default_instance() && current_accel_ != NULL;
+}
+inline void RobotState::clear_current_accel() {
+  if (GetArenaNoVirtual() == NULL && current_accel_ != NULL) {
+    delete current_accel_;
+  }
+  current_accel_ = NULL;
+}
+inline const ::aisaacpb::Acceleration& RobotState::_internal_current_accel() const {
+  return *current_accel_;
+}
+inline const ::aisaacpb::Acceleration& RobotState::current_accel() const {
+  const ::aisaacpb::Acceleration* p = current_accel_;
+  // @@protoc_insertion_point(field_get:aisaacpb.RobotState.current_accel)
+  return p != NULL ? *p : *reinterpret_cast<const ::aisaacpb::Acceleration*>(
+      &::aisaacpb::_Acceleration_default_instance_);
+}
+inline ::aisaacpb::Acceleration* RobotState::release_current_accel() {
+  // @@protoc_insertion_point(field_release:aisaacpb.RobotState.current_accel)
+  
+  ::aisaacpb::Acceleration* temp = current_accel_;
+  current_accel_ = NULL;
+  return temp;
+}
+inline ::aisaacpb::Acceleration* RobotState::mutable_current_accel() {
+  
+  if (current_accel_ == NULL) {
+    auto* p = CreateMaybeMessage<::aisaacpb::Acceleration>(GetArenaNoVirtual());
+    current_accel_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:aisaacpb.RobotState.current_accel)
+  return current_accel_;
+}
+inline void RobotState::set_allocated_current_accel(::aisaacpb::Acceleration* current_accel) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == NULL) {
+    delete current_accel_;
+  }
+  if (current_accel) {
+    ::google::protobuf::Arena* submessage_arena = NULL;
+    if (message_arena != submessage_arena) {
+      current_accel = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, current_accel, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  current_accel_ = current_accel;
+  // @@protoc_insertion_point(field_set_allocated:aisaacpb.RobotState.current_accel)
 }
 
 // -------------------------------------------------------------------
@@ -2773,6 +2849,8 @@ inline void AIsaacCommand::set_allocated_kick(::aisaacpb::Kick* kick) {
 
 // -------------------------------------------------------------------
 
+// -------------------------------------------------------------------
+
 
 // @@protoc_insertion_point(namespace_scope)
 
@@ -2790,6 +2868,11 @@ template <> struct is_proto_enum< ::aisaacpb::Kick_KickMethod> : ::std::true_typ
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::aisaacpb::Kick_KickMethod>() {
   return ::aisaacpb::Kick_KickMethod_descriptor();
+}
+template <> struct is_proto_enum< ::aisaacpb::RobotCommandCoordinateSystemType> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::aisaacpb::RobotCommandCoordinateSystemType>() {
+  return ::aisaacpb::RobotCommandCoordinateSystemType_descriptor();
 }
 
 }  // namespace protobuf

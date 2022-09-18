@@ -20,6 +20,7 @@
 // @@protoc_insertion_point(includes)
 
 namespace protobuf_aisaaccommand_2eproto {
+extern PROTOBUF_INTERNAL_EXPORT_protobuf_aisaaccommand_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_Acceleration;
 extern PROTOBUF_INTERNAL_EXPORT_protobuf_aisaaccommand_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_DwaResult;
 extern PROTOBUF_INTERNAL_EXPORT_protobuf_aisaaccommand_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_Obstacle;
 extern PROTOBUF_INTERNAL_EXPORT_protobuf_aisaaccommand_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_Position;
@@ -37,6 +38,11 @@ class VelocityDefaultTypeInternal {
   ::google::protobuf::internal::ExplicitlyConstructed<Velocity>
       _instance;
 } _Velocity_default_instance_;
+class AccelerationDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<Acceleration>
+      _instance;
+} _Acceleration_default_instance_;
 class ObstacleDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<Obstacle>
@@ -62,11 +68,11 @@ class RaspiCommandDefaultTypeInternal {
   ::google::protobuf::internal::ExplicitlyConstructed<RaspiCommand>
       _instance;
 } _RaspiCommand_default_instance_;
-class RobotStatusDefaultTypeInternal {
+class RobotStateDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<RobotStatus>
+  ::google::protobuf::internal::ExplicitlyConstructed<RobotState>
       _instance;
-} _RobotStatus_default_instance_;
+} _RobotState_default_instance_;
 class AIsaacCommandDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<AIsaacCommand>
@@ -101,6 +107,20 @@ static void InitDefaultsVelocity() {
 
 ::google::protobuf::internal::SCCInfo<0> scc_info_Velocity =
     {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsVelocity}, {}};
+
+static void InitDefaultsAcceleration() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::aisaacpb::_Acceleration_default_instance_;
+    new (ptr) ::aisaacpb::Acceleration();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::aisaacpb::Acceleration::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<0> scc_info_Acceleration =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsAcceleration}, {}};
 
 static void InitDefaultsObstacle() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -175,28 +195,27 @@ static void InitDefaultsRaspiCommand() {
   ::aisaacpb::RaspiCommand::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<4> scc_info_RaspiCommand =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 4, InitDefaultsRaspiCommand}, {
+::google::protobuf::internal::SCCInfo<2> scc_info_RaspiCommand =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 2, InitDefaultsRaspiCommand}, {
       &protobuf_aisaaccommand_2eproto::scc_info_Position.base,
-      &protobuf_aisaaccommand_2eproto::scc_info_Velocity.base,
-      &protobuf_aisaaccommand_2eproto::scc_info_DwaResult.base,
-      &protobuf_aisaaccommand_2eproto::scc_info_Kick.base,}};
+      &protobuf_aisaaccommand_2eproto::scc_info_DwaResult.base,}};
 
-static void InitDefaultsRobotStatus() {
+static void InitDefaultsRobotState() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   {
-    void* ptr = &::aisaacpb::_RobotStatus_default_instance_;
-    new (ptr) ::aisaacpb::RobotStatus();
+    void* ptr = &::aisaacpb::_RobotState_default_instance_;
+    new (ptr) ::aisaacpb::RobotState();
     ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
   }
-  ::aisaacpb::RobotStatus::InitAsDefaultInstance();
+  ::aisaacpb::RobotState::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<2> scc_info_RobotStatus =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 2, InitDefaultsRobotStatus}, {
+::google::protobuf::internal::SCCInfo<3> scc_info_RobotState =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 3, InitDefaultsRobotState}, {
       &protobuf_aisaaccommand_2eproto::scc_info_Position.base,
-      &protobuf_aisaaccommand_2eproto::scc_info_Velocity.base,}};
+      &protobuf_aisaaccommand_2eproto::scc_info_Velocity.base,
+      &protobuf_aisaaccommand_2eproto::scc_info_Acceleration.base,}};
 
 static void InitDefaultsAIsaacCommand() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -216,17 +235,18 @@ static void InitDefaultsAIsaacCommand() {
 void InitDefaults() {
   ::google::protobuf::internal::InitSCC(&scc_info_Position.base);
   ::google::protobuf::internal::InitSCC(&scc_info_Velocity.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_Acceleration.base);
   ::google::protobuf::internal::InitSCC(&scc_info_Obstacle.base);
   ::google::protobuf::internal::InitSCC(&scc_info_Kick.base);
   ::google::protobuf::internal::InitSCC(&scc_info_DwaResult.base);
   ::google::protobuf::internal::InitSCC(&scc_info_SpcCommand.base);
   ::google::protobuf::internal::InitSCC(&scc_info_RaspiCommand.base);
-  ::google::protobuf::internal::InitSCC(&scc_info_RobotStatus.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_RobotState.base);
   ::google::protobuf::internal::InitSCC(&scc_info_AIsaacCommand.base);
 }
 
-::google::protobuf::Metadata file_level_metadata[9];
-const ::google::protobuf::EnumDescriptor* file_level_enum_descriptors[2];
+::google::protobuf::Metadata file_level_metadata[10];
+const ::google::protobuf::EnumDescriptor* file_level_enum_descriptors[3];
 
 const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
   ~0u,  // no _has_bits_
@@ -245,6 +265,13 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::Velocity, vx_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::Velocity, vy_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::Velocity, omega_),
+  ~0u,  // no _has_bits_
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::Acceleration, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::Acceleration, ax_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::Acceleration, ay_),
   ~0u,  // no _has_bits_
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::Obstacle, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -286,25 +313,25 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::SpcCommand, obstacles_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::SpcCommand, kick_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::SpcCommand, prohibited_zone_ignore_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::SpcCommand, robot_command_coordinate_system_type_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::SpcCommand, vision_data_valid_),
   ~0u,  // no _has_bits_
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::RaspiCommand, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::RaspiCommand, current_pos_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::RaspiCommand, move_vec_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::RaspiCommand, target_pos_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::RaspiCommand, dwa_result_valid_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::RaspiCommand, path_enable_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::RaspiCommand, dwa_result_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::RaspiCommand, kick_),
   ~0u,  // no _has_bits_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::RobotStatus, _internal_metadata_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::RobotState, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::RobotStatus, current_pos_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::RobotStatus, current_vel_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::RobotState, current_pos_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::RobotState, current_vel_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::RobotState, current_accel_),
   ~0u,  // no _has_bits_
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::AIsaacCommand, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -323,24 +350,26 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
 static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::aisaacpb::Position)},
   { 8, -1, sizeof(::aisaacpb::Velocity)},
-  { 16, -1, sizeof(::aisaacpb::Obstacle)},
-  { 25, -1, sizeof(::aisaacpb::Kick)},
-  { 36, -1, sizeof(::aisaacpb::DwaResult)},
-  { 46, -1, sizeof(::aisaacpb::SpcCommand)},
-  { 57, -1, sizeof(::aisaacpb::RaspiCommand)},
-  { 69, -1, sizeof(::aisaacpb::RobotStatus)},
-  { 76, -1, sizeof(::aisaacpb::AIsaacCommand)},
+  { 16, -1, sizeof(::aisaacpb::Acceleration)},
+  { 23, -1, sizeof(::aisaacpb::Obstacle)},
+  { 32, -1, sizeof(::aisaacpb::Kick)},
+  { 43, -1, sizeof(::aisaacpb::DwaResult)},
+  { 53, -1, sizeof(::aisaacpb::SpcCommand)},
+  { 66, -1, sizeof(::aisaacpb::RaspiCommand)},
+  { 75, -1, sizeof(::aisaacpb::RobotState)},
+  { 83, -1, sizeof(::aisaacpb::AIsaacCommand)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::aisaacpb::_Position_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::aisaacpb::_Velocity_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::aisaacpb::_Acceleration_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::aisaacpb::_Obstacle_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::aisaacpb::_Kick_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::aisaacpb::_DwaResult_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::aisaacpb::_SpcCommand_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::aisaacpb::_RaspiCommand_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::aisaacpb::_RobotStatus_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::aisaacpb::_RobotState_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::aisaacpb::_AIsaacCommand_default_instance_),
 };
 
@@ -359,7 +388,7 @@ void protobuf_AssignDescriptorsOnce() {
 void protobuf_RegisterTypes(const ::std::string&) GOOGLE_PROTOBUF_ATTRIBUTE_COLD;
 void protobuf_RegisterTypes(const ::std::string&) {
   protobuf_AssignDescriptorsOnce();
-  ::google::protobuf::internal::RegisterAllTypes(file_level_metadata, 9);
+  ::google::protobuf::internal::RegisterAllTypes(file_level_metadata, 10);
 }
 
 void AddDescriptorsImpl() {
@@ -368,7 +397,8 @@ void AddDescriptorsImpl() {
       "\n\023aisaaccommand.proto\022\010aisaacpb\"/\n\010Posit"
       "ion\022\t\n\001x\030\001 \001(\005\022\t\n\001y\030\002 \001(\005\022\r\n\005theta\030\003 \001(\005"
       "\"1\n\010Velocity\022\n\n\002vx\030\001 \001(\005\022\n\n\002vy\030\002 \001(\005\022\r\n\005"
-      "omega\030\003 \001(\005\"8\n\010Obstacle\022\t\n\001x\030\001 \001(\005\022\t\n\001y\030"
+      "omega\030\003 \001(\005\"&\n\014Acceleration\022\n\n\002ax\030\001 \001(\005\022"
+      "\n\n\002ay\030\002 \001(\005\"8\n\010Obstacle\022\t\n\001x\030\001 \001(\005\022\t\n\001y\030"
       "\002 \001(\005\022\n\n\002vx\030\003 \001(\005\022\n\n\002vy\030\004 \001(\005\"\315\002\n\004Kick\022,"
       "\n\013sensor_type\030\001 \001(\0162\027.aisaacpb.Kick.Kick"
       "Type\022.\n\013kick_method\030\002 \001(\0162\031.aisaacpb.Kic"
@@ -380,30 +410,34 @@ void AddDescriptorsImpl() {
       "\006\n\002XY\020\003\"$\n\nKickMethod\022\010\n\004Chip\020\000\022\014\n\010Strai"
       "ght\020\001\"J\n\tDwaResult\022\n\n\002vx\030\001 \001(\005\022\n\n\002vy\030\002 \001"
       "(\005\022\r\n\005omega\030\003 \001(\005\022\n\n\002ax\030\004 \001(\005\022\n\n\002ay\030\005 \001("
-      "\005\"\350\001\n\nSpcCommand\022\'\n\013current_pos\030\001 \001(\0132\022."
+      "\005\"\335\002\n\nSpcCommand\022\'\n\013current_pos\030\001 \001(\0132\022."
       "aisaacpb.Position\022$\n\010move_vec\030\002 \001(\0132\022.ai"
       "saacpb.Velocity\022&\n\ntarget_pos\030\003 \001(\0132\022.ai"
       "saacpb.Position\022%\n\tobstacles\030\004 \003(\0132\022.ais"
       "aacpb.Obstacle\022\034\n\004kick\030\005 \001(\0132\016.aisaacpb."
-      "Kick\022\036\n\026prohibited_zone_ignore\030\006 \001(\010\"\373\001\n"
-      "\014RaspiCommand\022\'\n\013current_pos\030\001 \001(\0132\022.ais"
-      "aacpb.Position\022$\n\010move_vec\030\002 \001(\0132\022.aisaa"
-      "cpb.Velocity\022&\n\ntarget_pos\030\003 \001(\0132\022.aisaa"
-      "cpb.Position\022\030\n\020dwa_result_valid\030\004 \001(\010\022\023"
-      "\n\013path_enable\030\005 \001(\010\022\'\n\ndwa_result\030\006 \001(\0132"
-      "\023.aisaacpb.DwaResult\022\034\n\004kick\030\007 \001(\0132\016.ais"
-      "aacpb.Kick\"_\n\013RobotStatus\022\'\n\013current_pos"
-      "\030\001 \001(\0132\022.aisaacpb.Position\022\'\n\013current_ve"
-      "l\030\002 \001(\0132\022.aisaacpb.Velocity\"\355\001\n\rAIsaacCo"
-      "mmand\022,\n$robot_command_coordinate_system"
-      "_type\030\001 \001(\005\022\020\n\010target_x\030\002 \001(\005\022\020\n\010target_"
-      "y\030\003 \001(\005\022\024\n\014target_angle\030\004 \001(\005\022\031\n\021vision_"
-      "data_valid\030\005 \001(\010\022\021\n\tcurrent_x\030\006 \001(\005\022\021\n\tc"
-      "urrent_y\030\007 \001(\005\022\025\n\rcurrent_angle\030\010 \001(\005\022\034\n"
-      "\004kick\030\t \001(\0132\016.aisaacpb.Kickb\006proto3"
+      "Kick\022\036\n\026prohibited_zone_ignore\030\006 \001(\010\022X\n$"
+      "robot_command_coordinate_system_type\030\007 \001"
+      "(\0162*.aisaacpb.RobotCommandCoordinateSyst"
+      "emType\022\031\n\021vision_data_valid\030\010 \001(\010\"\216\001\n\014Ra"
+      "spiCommand\022&\n\ntarget_pos\030\001 \001(\0132\022.aisaacp"
+      "b.Position\022\030\n\020dwa_result_valid\030\002 \001(\010\022\023\n\013"
+      "path_enable\030\003 \001(\010\022\'\n\ndwa_result\030\004 \001(\0132\023."
+      "aisaacpb.DwaResult\"\215\001\n\nRobotState\022\'\n\013cur"
+      "rent_pos\030\001 \001(\0132\022.aisaacpb.Position\022\'\n\013cu"
+      "rrent_vel\030\002 \001(\0132\022.aisaacpb.Velocity\022-\n\rc"
+      "urrent_accel\030\003 \001(\0132\026.aisaacpb.Accelerati"
+      "on\"\355\001\n\rAIsaacCommand\022,\n$robot_command_co"
+      "ordinate_system_type\030\001 \001(\005\022\020\n\010target_x\030\002"
+      " \001(\005\022\020\n\010target_y\030\003 \001(\005\022\024\n\014target_angle\030\004"
+      " \001(\005\022\031\n\021vision_data_valid\030\005 \001(\010\022\021\n\tcurre"
+      "nt_x\030\006 \001(\005\022\021\n\tcurrent_y\030\007 \001(\005\022\025\n\rcurrent"
+      "_angle\030\010 \001(\005\022\034\n\004kick\030\t \001(\0132\016.aisaacpb.Ki"
+      "ck*I\n RobotCommandCoordinateSystemType\022\n"
+      "\n\006Vector\020\000\022\016\n\nCoordinate\020\001\022\t\n\005Relax\020\002b\006p"
+      "roto3"
   };
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 1435);
+      descriptor, 1605);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "aisaaccommand.proto", &protobuf_RegisterTypes);
 }
@@ -466,6 +500,21 @@ const Kick_KickMethod Kick::KickMethod_MIN;
 const Kick_KickMethod Kick::KickMethod_MAX;
 const int Kick::KickMethod_ARRAYSIZE;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+const ::google::protobuf::EnumDescriptor* RobotCommandCoordinateSystemType_descriptor() {
+  protobuf_aisaaccommand_2eproto::protobuf_AssignDescriptorsOnce();
+  return protobuf_aisaaccommand_2eproto::file_level_enum_descriptors[2];
+}
+bool RobotCommandCoordinateSystemType_IsValid(int value) {
+  switch (value) {
+    case 0:
+    case 1:
+    case 2:
+      return true;
+    default:
+      return false;
+  }
+}
+
 
 // ===================================================================
 
@@ -1064,6 +1113,271 @@ void Velocity::InternalSwap(Velocity* other) {
 }
 
 ::google::protobuf::Metadata Velocity::GetMetadata() const {
+  protobuf_aisaaccommand_2eproto::protobuf_AssignDescriptorsOnce();
+  return ::protobuf_aisaaccommand_2eproto::file_level_metadata[kIndexInFileMessages];
+}
+
+
+// ===================================================================
+
+void Acceleration::InitAsDefaultInstance() {
+}
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int Acceleration::kAxFieldNumber;
+const int Acceleration::kAyFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+Acceleration::Acceleration()
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  ::google::protobuf::internal::InitSCC(
+      &protobuf_aisaaccommand_2eproto::scc_info_Acceleration.base);
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:aisaacpb.Acceleration)
+}
+Acceleration::Acceleration(const Acceleration& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(NULL) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::memcpy(&ax_, &from.ax_,
+    static_cast<size_t>(reinterpret_cast<char*>(&ay_) -
+    reinterpret_cast<char*>(&ax_)) + sizeof(ay_));
+  // @@protoc_insertion_point(copy_constructor:aisaacpb.Acceleration)
+}
+
+void Acceleration::SharedCtor() {
+  ::memset(&ax_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&ay_) -
+      reinterpret_cast<char*>(&ax_)) + sizeof(ay_));
+}
+
+Acceleration::~Acceleration() {
+  // @@protoc_insertion_point(destructor:aisaacpb.Acceleration)
+  SharedDtor();
+}
+
+void Acceleration::SharedDtor() {
+}
+
+void Acceleration::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const ::google::protobuf::Descriptor* Acceleration::descriptor() {
+  ::protobuf_aisaaccommand_2eproto::protobuf_AssignDescriptorsOnce();
+  return ::protobuf_aisaaccommand_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
+}
+
+const Acceleration& Acceleration::default_instance() {
+  ::google::protobuf::internal::InitSCC(&protobuf_aisaaccommand_2eproto::scc_info_Acceleration.base);
+  return *internal_default_instance();
+}
+
+
+void Acceleration::Clear() {
+// @@protoc_insertion_point(message_clear_start:aisaacpb.Acceleration)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  ::memset(&ax_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&ay_) -
+      reinterpret_cast<char*>(&ax_)) + sizeof(ay_));
+  _internal_metadata_.Clear();
+}
+
+bool Acceleration::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:aisaacpb.Acceleration)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // int32 ax = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(8u /* 8 & 0xFF */)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &ax_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // int32 ay = 2;
+      case 2: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(16u /* 16 & 0xFF */)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &ay_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:aisaacpb.Acceleration)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:aisaacpb.Acceleration)
+  return false;
+#undef DO_
+}
+
+void Acceleration::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:aisaacpb.Acceleration)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // int32 ax = 1;
+  if (this->ax() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->ax(), output);
+  }
+
+  // int32 ay = 2;
+  if (this->ay() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->ay(), output);
+  }
+
+  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), output);
+  }
+  // @@protoc_insertion_point(serialize_end:aisaacpb.Acceleration)
+}
+
+::google::protobuf::uint8* Acceleration::InternalSerializeWithCachedSizesToArray(
+    bool deterministic, ::google::protobuf::uint8* target) const {
+  (void)deterministic; // Unused
+  // @@protoc_insertion_point(serialize_to_array_start:aisaacpb.Acceleration)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // int32 ax = 1;
+  if (this->ax() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(1, this->ax(), target);
+  }
+
+  // int32 ay = 2;
+  if (this->ay() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->ay(), target);
+  }
+
+  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:aisaacpb.Acceleration)
+  return target;
+}
+
+size_t Acceleration::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:aisaacpb.Acceleration)
+  size_t total_size = 0;
+
+  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
+  }
+  // int32 ax = 1;
+  if (this->ax() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::Int32Size(
+        this->ax());
+  }
+
+  // int32 ay = 2;
+  if (this->ay() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::Int32Size(
+        this->ay());
+  }
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void Acceleration::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:aisaacpb.Acceleration)
+  GOOGLE_DCHECK_NE(&from, this);
+  const Acceleration* source =
+      ::google::protobuf::internal::DynamicCastToGenerated<const Acceleration>(
+          &from);
+  if (source == NULL) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:aisaacpb.Acceleration)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:aisaacpb.Acceleration)
+    MergeFrom(*source);
+  }
+}
+
+void Acceleration::MergeFrom(const Acceleration& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:aisaacpb.Acceleration)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.ax() != 0) {
+    set_ax(from.ax());
+  }
+  if (from.ay() != 0) {
+    set_ay(from.ay());
+  }
+}
+
+void Acceleration::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:aisaacpb.Acceleration)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void Acceleration::CopyFrom(const Acceleration& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:aisaacpb.Acceleration)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool Acceleration::IsInitialized() const {
+  return true;
+}
+
+void Acceleration::Swap(Acceleration* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void Acceleration::InternalSwap(Acceleration* other) {
+  using std::swap;
+  swap(ax_, other->ax_);
+  swap(ay_, other->ay_);
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+}
+
+::google::protobuf::Metadata Acceleration::GetMetadata() const {
   protobuf_aisaaccommand_2eproto::protobuf_AssignDescriptorsOnce();
   return ::protobuf_aisaaccommand_2eproto::file_level_metadata[kIndexInFileMessages];
 }
@@ -2250,6 +2564,8 @@ const int SpcCommand::kTargetPosFieldNumber;
 const int SpcCommand::kObstaclesFieldNumber;
 const int SpcCommand::kKickFieldNumber;
 const int SpcCommand::kProhibitedZoneIgnoreFieldNumber;
+const int SpcCommand::kRobotCommandCoordinateSystemTypeFieldNumber;
+const int SpcCommand::kVisionDataValidFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 SpcCommand::SpcCommand()
@@ -2284,14 +2600,16 @@ SpcCommand::SpcCommand(const SpcCommand& from)
   } else {
     kick_ = NULL;
   }
-  prohibited_zone_ignore_ = from.prohibited_zone_ignore_;
+  ::memcpy(&robot_command_coordinate_system_type_, &from.robot_command_coordinate_system_type_,
+    static_cast<size_t>(reinterpret_cast<char*>(&vision_data_valid_) -
+    reinterpret_cast<char*>(&robot_command_coordinate_system_type_)) + sizeof(vision_data_valid_));
   // @@protoc_insertion_point(copy_constructor:aisaacpb.SpcCommand)
 }
 
 void SpcCommand::SharedCtor() {
   ::memset(&current_pos_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&prohibited_zone_ignore_) -
-      reinterpret_cast<char*>(&current_pos_)) + sizeof(prohibited_zone_ignore_));
+      reinterpret_cast<char*>(&vision_data_valid_) -
+      reinterpret_cast<char*>(&current_pos_)) + sizeof(vision_data_valid_));
 }
 
 SpcCommand::~SpcCommand() {
@@ -2343,7 +2661,9 @@ void SpcCommand::Clear() {
     delete kick_;
   }
   kick_ = NULL;
-  prohibited_zone_ignore_ = false;
+  ::memset(&robot_command_coordinate_system_type_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&vision_data_valid_) -
+      reinterpret_cast<char*>(&robot_command_coordinate_system_type_)) + sizeof(vision_data_valid_));
   _internal_metadata_.Clear();
 }
 
@@ -2431,6 +2751,35 @@ bool SpcCommand::MergePartialFromCodedStream(
         break;
       }
 
+      // .aisaacpb.RobotCommandCoordinateSystemType robot_command_coordinate_system_type = 7;
+      case 7: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(56u /* 56 & 0xFF */)) {
+          int value;
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
+                 input, &value)));
+          set_robot_command_coordinate_system_type(static_cast< ::aisaacpb::RobotCommandCoordinateSystemType >(value));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // bool vision_data_valid = 8;
+      case 8: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(64u /* 64 & 0xFF */)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
+                 input, &vision_data_valid_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -2495,6 +2844,17 @@ void SpcCommand::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteBool(6, this->prohibited_zone_ignore(), output);
   }
 
+  // .aisaacpb.RobotCommandCoordinateSystemType robot_command_coordinate_system_type = 7;
+  if (this->robot_command_coordinate_system_type() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteEnum(
+      7, this->robot_command_coordinate_system_type(), output);
+  }
+
+  // bool vision_data_valid = 8;
+  if (this->vision_data_valid() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(8, this->vision_data_valid(), output);
+  }
+
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), output);
@@ -2548,6 +2908,17 @@ void SpcCommand::SerializeWithCachedSizes(
   // bool prohibited_zone_ignore = 6;
   if (this->prohibited_zone_ignore() != 0) {
     target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(6, this->prohibited_zone_ignore(), target);
+  }
+
+  // .aisaacpb.RobotCommandCoordinateSystemType robot_command_coordinate_system_type = 7;
+  if (this->robot_command_coordinate_system_type() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
+      7, this->robot_command_coordinate_system_type(), target);
+  }
+
+  // bool vision_data_valid = 8;
+  if (this->vision_data_valid() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(8, this->vision_data_valid(), target);
   }
 
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
@@ -2606,8 +2977,19 @@ size_t SpcCommand::ByteSizeLong() const {
         *kick_);
   }
 
+  // .aisaacpb.RobotCommandCoordinateSystemType robot_command_coordinate_system_type = 7;
+  if (this->robot_command_coordinate_system_type() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::EnumSize(this->robot_command_coordinate_system_type());
+  }
+
   // bool prohibited_zone_ignore = 6;
   if (this->prohibited_zone_ignore() != 0) {
+    total_size += 1 + 1;
+  }
+
+  // bool vision_data_valid = 8;
+  if (this->vision_data_valid() != 0) {
     total_size += 1 + 1;
   }
 
@@ -2651,8 +3033,14 @@ void SpcCommand::MergeFrom(const SpcCommand& from) {
   if (from.has_kick()) {
     mutable_kick()->::aisaacpb::Kick::MergeFrom(from.kick());
   }
+  if (from.robot_command_coordinate_system_type() != 0) {
+    set_robot_command_coordinate_system_type(from.robot_command_coordinate_system_type());
+  }
   if (from.prohibited_zone_ignore() != 0) {
     set_prohibited_zone_ignore(from.prohibited_zone_ignore());
+  }
+  if (from.vision_data_valid() != 0) {
+    set_vision_data_valid(from.vision_data_valid());
   }
 }
 
@@ -2685,7 +3073,9 @@ void SpcCommand::InternalSwap(SpcCommand* other) {
   swap(move_vec_, other->move_vec_);
   swap(target_pos_, other->target_pos_);
   swap(kick_, other->kick_);
+  swap(robot_command_coordinate_system_type_, other->robot_command_coordinate_system_type_);
   swap(prohibited_zone_ignore_, other->prohibited_zone_ignore_);
+  swap(vision_data_valid_, other->vision_data_valid_);
   _internal_metadata_.Swap(&other->_internal_metadata_);
 }
 
@@ -2698,25 +3088,16 @@ void SpcCommand::InternalSwap(SpcCommand* other) {
 // ===================================================================
 
 void RaspiCommand::InitAsDefaultInstance() {
-  ::aisaacpb::_RaspiCommand_default_instance_._instance.get_mutable()->current_pos_ = const_cast< ::aisaacpb::Position*>(
-      ::aisaacpb::Position::internal_default_instance());
-  ::aisaacpb::_RaspiCommand_default_instance_._instance.get_mutable()->move_vec_ = const_cast< ::aisaacpb::Velocity*>(
-      ::aisaacpb::Velocity::internal_default_instance());
   ::aisaacpb::_RaspiCommand_default_instance_._instance.get_mutable()->target_pos_ = const_cast< ::aisaacpb::Position*>(
       ::aisaacpb::Position::internal_default_instance());
   ::aisaacpb::_RaspiCommand_default_instance_._instance.get_mutable()->dwa_result_ = const_cast< ::aisaacpb::DwaResult*>(
       ::aisaacpb::DwaResult::internal_default_instance());
-  ::aisaacpb::_RaspiCommand_default_instance_._instance.get_mutable()->kick_ = const_cast< ::aisaacpb::Kick*>(
-      ::aisaacpb::Kick::internal_default_instance());
 }
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int RaspiCommand::kCurrentPosFieldNumber;
-const int RaspiCommand::kMoveVecFieldNumber;
 const int RaspiCommand::kTargetPosFieldNumber;
 const int RaspiCommand::kDwaResultValidFieldNumber;
 const int RaspiCommand::kPathEnableFieldNumber;
 const int RaspiCommand::kDwaResultFieldNumber;
-const int RaspiCommand::kKickFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 RaspiCommand::RaspiCommand()
@@ -2730,16 +3111,6 @@ RaspiCommand::RaspiCommand(const RaspiCommand& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(NULL) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  if (from.has_current_pos()) {
-    current_pos_ = new ::aisaacpb::Position(*from.current_pos_);
-  } else {
-    current_pos_ = NULL;
-  }
-  if (from.has_move_vec()) {
-    move_vec_ = new ::aisaacpb::Velocity(*from.move_vec_);
-  } else {
-    move_vec_ = NULL;
-  }
   if (from.has_target_pos()) {
     target_pos_ = new ::aisaacpb::Position(*from.target_pos_);
   } else {
@@ -2750,11 +3121,6 @@ RaspiCommand::RaspiCommand(const RaspiCommand& from)
   } else {
     dwa_result_ = NULL;
   }
-  if (from.has_kick()) {
-    kick_ = new ::aisaacpb::Kick(*from.kick_);
-  } else {
-    kick_ = NULL;
-  }
   ::memcpy(&dwa_result_valid_, &from.dwa_result_valid_,
     static_cast<size_t>(reinterpret_cast<char*>(&path_enable_) -
     reinterpret_cast<char*>(&dwa_result_valid_)) + sizeof(path_enable_));
@@ -2762,9 +3128,9 @@ RaspiCommand::RaspiCommand(const RaspiCommand& from)
 }
 
 void RaspiCommand::SharedCtor() {
-  ::memset(&current_pos_, 0, static_cast<size_t>(
+  ::memset(&target_pos_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&path_enable_) -
-      reinterpret_cast<char*>(&current_pos_)) + sizeof(path_enable_));
+      reinterpret_cast<char*>(&target_pos_)) + sizeof(path_enable_));
 }
 
 RaspiCommand::~RaspiCommand() {
@@ -2773,11 +3139,8 @@ RaspiCommand::~RaspiCommand() {
 }
 
 void RaspiCommand::SharedDtor() {
-  if (this != internal_default_instance()) delete current_pos_;
-  if (this != internal_default_instance()) delete move_vec_;
   if (this != internal_default_instance()) delete target_pos_;
   if (this != internal_default_instance()) delete dwa_result_;
-  if (this != internal_default_instance()) delete kick_;
 }
 
 void RaspiCommand::SetCachedSize(int size) const {
@@ -2800,14 +3163,6 @@ void RaspiCommand::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  if (GetArenaNoVirtual() == NULL && current_pos_ != NULL) {
-    delete current_pos_;
-  }
-  current_pos_ = NULL;
-  if (GetArenaNoVirtual() == NULL && move_vec_ != NULL) {
-    delete move_vec_;
-  }
-  move_vec_ = NULL;
   if (GetArenaNoVirtual() == NULL && target_pos_ != NULL) {
     delete target_pos_;
   }
@@ -2816,10 +3171,6 @@ void RaspiCommand::Clear() {
     delete dwa_result_;
   }
   dwa_result_ = NULL;
-  if (GetArenaNoVirtual() == NULL && kick_ != NULL) {
-    delete kick_;
-  }
-  kick_ = NULL;
   ::memset(&dwa_result_valid_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&path_enable_) -
       reinterpret_cast<char*>(&dwa_result_valid_)) + sizeof(path_enable_));
@@ -2836,34 +3187,10 @@ bool RaspiCommand::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // .aisaacpb.Position current_pos = 1;
+      // .aisaacpb.Position target_pos = 1;
       case 1: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(10u /* 10 & 0xFF */)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
-               input, mutable_current_pos()));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // .aisaacpb.Velocity move_vec = 2;
-      case 2: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(18u /* 18 & 0xFF */)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
-               input, mutable_move_vec()));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // .aisaacpb.Position target_pos = 3;
-      case 3: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(26u /* 26 & 0xFF */)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
                input, mutable_target_pos()));
         } else {
@@ -2872,10 +3199,10 @@ bool RaspiCommand::MergePartialFromCodedStream(
         break;
       }
 
-      // bool dwa_result_valid = 4;
-      case 4: {
+      // bool dwa_result_valid = 2;
+      case 2: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(32u /* 32 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(16u /* 16 & 0xFF */)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
@@ -2886,10 +3213,10 @@ bool RaspiCommand::MergePartialFromCodedStream(
         break;
       }
 
-      // bool path_enable = 5;
-      case 5: {
+      // bool path_enable = 3;
+      case 3: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(40u /* 40 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(24u /* 24 & 0xFF */)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
@@ -2900,24 +3227,12 @@ bool RaspiCommand::MergePartialFromCodedStream(
         break;
       }
 
-      // .aisaacpb.DwaResult dwa_result = 6;
-      case 6: {
+      // .aisaacpb.DwaResult dwa_result = 4;
+      case 4: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(50u /* 50 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(34u /* 34 & 0xFF */)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
                input, mutable_dwa_result()));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // .aisaacpb.Kick kick = 7;
-      case 7: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(58u /* 58 & 0xFF */)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
-               input, mutable_kick()));
         } else {
           goto handle_unusual;
         }
@@ -2950,44 +3265,26 @@ void RaspiCommand::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // .aisaacpb.Position current_pos = 1;
-  if (this->has_current_pos()) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      1, this->_internal_current_pos(), output);
-  }
-
-  // .aisaacpb.Velocity move_vec = 2;
-  if (this->has_move_vec()) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      2, this->_internal_move_vec(), output);
-  }
-
-  // .aisaacpb.Position target_pos = 3;
+  // .aisaacpb.Position target_pos = 1;
   if (this->has_target_pos()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      3, this->_internal_target_pos(), output);
+      1, this->_internal_target_pos(), output);
   }
 
-  // bool dwa_result_valid = 4;
+  // bool dwa_result_valid = 2;
   if (this->dwa_result_valid() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteBool(4, this->dwa_result_valid(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteBool(2, this->dwa_result_valid(), output);
   }
 
-  // bool path_enable = 5;
+  // bool path_enable = 3;
   if (this->path_enable() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteBool(5, this->path_enable(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteBool(3, this->path_enable(), output);
   }
 
-  // .aisaacpb.DwaResult dwa_result = 6;
+  // .aisaacpb.DwaResult dwa_result = 4;
   if (this->has_dwa_result()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      6, this->_internal_dwa_result(), output);
-  }
-
-  // .aisaacpb.Kick kick = 7;
-  if (this->has_kick()) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      7, this->_internal_kick(), output);
+      4, this->_internal_dwa_result(), output);
   }
 
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
@@ -3004,49 +3301,28 @@ void RaspiCommand::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // .aisaacpb.Position current_pos = 1;
-  if (this->has_current_pos()) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      InternalWriteMessageToArray(
-        1, this->_internal_current_pos(), deterministic, target);
-  }
-
-  // .aisaacpb.Velocity move_vec = 2;
-  if (this->has_move_vec()) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      InternalWriteMessageToArray(
-        2, this->_internal_move_vec(), deterministic, target);
-  }
-
-  // .aisaacpb.Position target_pos = 3;
+  // .aisaacpb.Position target_pos = 1;
   if (this->has_target_pos()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        3, this->_internal_target_pos(), deterministic, target);
+        1, this->_internal_target_pos(), deterministic, target);
   }
 
-  // bool dwa_result_valid = 4;
+  // bool dwa_result_valid = 2;
   if (this->dwa_result_valid() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(4, this->dwa_result_valid(), target);
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(2, this->dwa_result_valid(), target);
   }
 
-  // bool path_enable = 5;
+  // bool path_enable = 3;
   if (this->path_enable() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(5, this->path_enable(), target);
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(3, this->path_enable(), target);
   }
 
-  // .aisaacpb.DwaResult dwa_result = 6;
+  // .aisaacpb.DwaResult dwa_result = 4;
   if (this->has_dwa_result()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        6, this->_internal_dwa_result(), deterministic, target);
-  }
-
-  // .aisaacpb.Kick kick = 7;
-  if (this->has_kick()) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      InternalWriteMessageToArray(
-        7, this->_internal_kick(), deterministic, target);
+        4, this->_internal_dwa_result(), deterministic, target);
   }
 
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
@@ -3066,47 +3342,26 @@ size_t RaspiCommand::ByteSizeLong() const {
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
         (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
   }
-  // .aisaacpb.Position current_pos = 1;
-  if (this->has_current_pos()) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::MessageSize(
-        *current_pos_);
-  }
-
-  // .aisaacpb.Velocity move_vec = 2;
-  if (this->has_move_vec()) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::MessageSize(
-        *move_vec_);
-  }
-
-  // .aisaacpb.Position target_pos = 3;
+  // .aisaacpb.Position target_pos = 1;
   if (this->has_target_pos()) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSize(
         *target_pos_);
   }
 
-  // .aisaacpb.DwaResult dwa_result = 6;
+  // .aisaacpb.DwaResult dwa_result = 4;
   if (this->has_dwa_result()) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSize(
         *dwa_result_);
   }
 
-  // .aisaacpb.Kick kick = 7;
-  if (this->has_kick()) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::MessageSize(
-        *kick_);
-  }
-
-  // bool dwa_result_valid = 4;
+  // bool dwa_result_valid = 2;
   if (this->dwa_result_valid() != 0) {
     total_size += 1 + 1;
   }
 
-  // bool path_enable = 5;
+  // bool path_enable = 3;
   if (this->path_enable() != 0) {
     total_size += 1 + 1;
   }
@@ -3138,20 +3393,11 @@ void RaspiCommand::MergeFrom(const RaspiCommand& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from.has_current_pos()) {
-    mutable_current_pos()->::aisaacpb::Position::MergeFrom(from.current_pos());
-  }
-  if (from.has_move_vec()) {
-    mutable_move_vec()->::aisaacpb::Velocity::MergeFrom(from.move_vec());
-  }
   if (from.has_target_pos()) {
     mutable_target_pos()->::aisaacpb::Position::MergeFrom(from.target_pos());
   }
   if (from.has_dwa_result()) {
     mutable_dwa_result()->::aisaacpb::DwaResult::MergeFrom(from.dwa_result());
-  }
-  if (from.has_kick()) {
-    mutable_kick()->::aisaacpb::Kick::MergeFrom(from.kick());
   }
   if (from.dwa_result_valid() != 0) {
     set_dwa_result_valid(from.dwa_result_valid());
@@ -3185,11 +3431,8 @@ void RaspiCommand::Swap(RaspiCommand* other) {
 }
 void RaspiCommand::InternalSwap(RaspiCommand* other) {
   using std::swap;
-  swap(current_pos_, other->current_pos_);
-  swap(move_vec_, other->move_vec_);
   swap(target_pos_, other->target_pos_);
   swap(dwa_result_, other->dwa_result_);
-  swap(kick_, other->kick_);
   swap(dwa_result_valid_, other->dwa_result_valid_);
   swap(path_enable_, other->path_enable_);
   _internal_metadata_.Swap(&other->_internal_metadata_);
@@ -3203,25 +3446,28 @@ void RaspiCommand::InternalSwap(RaspiCommand* other) {
 
 // ===================================================================
 
-void RobotStatus::InitAsDefaultInstance() {
-  ::aisaacpb::_RobotStatus_default_instance_._instance.get_mutable()->current_pos_ = const_cast< ::aisaacpb::Position*>(
+void RobotState::InitAsDefaultInstance() {
+  ::aisaacpb::_RobotState_default_instance_._instance.get_mutable()->current_pos_ = const_cast< ::aisaacpb::Position*>(
       ::aisaacpb::Position::internal_default_instance());
-  ::aisaacpb::_RobotStatus_default_instance_._instance.get_mutable()->current_vel_ = const_cast< ::aisaacpb::Velocity*>(
+  ::aisaacpb::_RobotState_default_instance_._instance.get_mutable()->current_vel_ = const_cast< ::aisaacpb::Velocity*>(
       ::aisaacpb::Velocity::internal_default_instance());
+  ::aisaacpb::_RobotState_default_instance_._instance.get_mutable()->current_accel_ = const_cast< ::aisaacpb::Acceleration*>(
+      ::aisaacpb::Acceleration::internal_default_instance());
 }
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int RobotStatus::kCurrentPosFieldNumber;
-const int RobotStatus::kCurrentVelFieldNumber;
+const int RobotState::kCurrentPosFieldNumber;
+const int RobotState::kCurrentVelFieldNumber;
+const int RobotState::kCurrentAccelFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
-RobotStatus::RobotStatus()
+RobotState::RobotState()
   : ::google::protobuf::Message(), _internal_metadata_(NULL) {
   ::google::protobuf::internal::InitSCC(
-      &protobuf_aisaaccommand_2eproto::scc_info_RobotStatus.base);
+      &protobuf_aisaaccommand_2eproto::scc_info_RobotState.base);
   SharedCtor();
-  // @@protoc_insertion_point(constructor:aisaacpb.RobotStatus)
+  // @@protoc_insertion_point(constructor:aisaacpb.RobotState)
 }
-RobotStatus::RobotStatus(const RobotStatus& from)
+RobotState::RobotState(const RobotState& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(NULL) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
@@ -3235,41 +3481,47 @@ RobotStatus::RobotStatus(const RobotStatus& from)
   } else {
     current_vel_ = NULL;
   }
-  // @@protoc_insertion_point(copy_constructor:aisaacpb.RobotStatus)
+  if (from.has_current_accel()) {
+    current_accel_ = new ::aisaacpb::Acceleration(*from.current_accel_);
+  } else {
+    current_accel_ = NULL;
+  }
+  // @@protoc_insertion_point(copy_constructor:aisaacpb.RobotState)
 }
 
-void RobotStatus::SharedCtor() {
+void RobotState::SharedCtor() {
   ::memset(&current_pos_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&current_vel_) -
-      reinterpret_cast<char*>(&current_pos_)) + sizeof(current_vel_));
+      reinterpret_cast<char*>(&current_accel_) -
+      reinterpret_cast<char*>(&current_pos_)) + sizeof(current_accel_));
 }
 
-RobotStatus::~RobotStatus() {
-  // @@protoc_insertion_point(destructor:aisaacpb.RobotStatus)
+RobotState::~RobotState() {
+  // @@protoc_insertion_point(destructor:aisaacpb.RobotState)
   SharedDtor();
 }
 
-void RobotStatus::SharedDtor() {
+void RobotState::SharedDtor() {
   if (this != internal_default_instance()) delete current_pos_;
   if (this != internal_default_instance()) delete current_vel_;
+  if (this != internal_default_instance()) delete current_accel_;
 }
 
-void RobotStatus::SetCachedSize(int size) const {
+void RobotState::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
-const ::google::protobuf::Descriptor* RobotStatus::descriptor() {
+const ::google::protobuf::Descriptor* RobotState::descriptor() {
   ::protobuf_aisaaccommand_2eproto::protobuf_AssignDescriptorsOnce();
   return ::protobuf_aisaaccommand_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
 }
 
-const RobotStatus& RobotStatus::default_instance() {
-  ::google::protobuf::internal::InitSCC(&protobuf_aisaaccommand_2eproto::scc_info_RobotStatus.base);
+const RobotState& RobotState::default_instance() {
+  ::google::protobuf::internal::InitSCC(&protobuf_aisaaccommand_2eproto::scc_info_RobotState.base);
   return *internal_default_instance();
 }
 
 
-void RobotStatus::Clear() {
-// @@protoc_insertion_point(message_clear_start:aisaacpb.RobotStatus)
+void RobotState::Clear() {
+// @@protoc_insertion_point(message_clear_start:aisaacpb.RobotState)
   ::google::protobuf::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
@@ -3282,14 +3534,18 @@ void RobotStatus::Clear() {
     delete current_vel_;
   }
   current_vel_ = NULL;
+  if (GetArenaNoVirtual() == NULL && current_accel_ != NULL) {
+    delete current_accel_;
+  }
+  current_accel_ = NULL;
   _internal_metadata_.Clear();
 }
 
-bool RobotStatus::MergePartialFromCodedStream(
+bool RobotState::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:aisaacpb.RobotStatus)
+  // @@protoc_insertion_point(parse_start:aisaacpb.RobotState)
   for (;;) {
     ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
@@ -3319,6 +3575,18 @@ bool RobotStatus::MergePartialFromCodedStream(
         break;
       }
 
+      // .aisaacpb.Acceleration current_accel = 3;
+      case 3: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(26u /* 26 & 0xFF */)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+               input, mutable_current_accel()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -3331,17 +3599,17 @@ bool RobotStatus::MergePartialFromCodedStream(
     }
   }
 success:
-  // @@protoc_insertion_point(parse_success:aisaacpb.RobotStatus)
+  // @@protoc_insertion_point(parse_success:aisaacpb.RobotState)
   return true;
 failure:
-  // @@protoc_insertion_point(parse_failure:aisaacpb.RobotStatus)
+  // @@protoc_insertion_point(parse_failure:aisaacpb.RobotState)
   return false;
 #undef DO_
 }
 
-void RobotStatus::SerializeWithCachedSizes(
+void RobotState::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:aisaacpb.RobotStatus)
+  // @@protoc_insertion_point(serialize_start:aisaacpb.RobotState)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -3357,17 +3625,23 @@ void RobotStatus::SerializeWithCachedSizes(
       2, this->_internal_current_vel(), output);
   }
 
+  // .aisaacpb.Acceleration current_accel = 3;
+  if (this->has_current_accel()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      3, this->_internal_current_accel(), output);
+  }
+
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), output);
   }
-  // @@protoc_insertion_point(serialize_end:aisaacpb.RobotStatus)
+  // @@protoc_insertion_point(serialize_end:aisaacpb.RobotState)
 }
 
-::google::protobuf::uint8* RobotStatus::InternalSerializeWithCachedSizesToArray(
+::google::protobuf::uint8* RobotState::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
   (void)deterministic; // Unused
-  // @@protoc_insertion_point(serialize_to_array_start:aisaacpb.RobotStatus)
+  // @@protoc_insertion_point(serialize_to_array_start:aisaacpb.RobotState)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -3385,16 +3659,23 @@ void RobotStatus::SerializeWithCachedSizes(
         2, this->_internal_current_vel(), deterministic, target);
   }
 
+  // .aisaacpb.Acceleration current_accel = 3;
+  if (this->has_current_accel()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageToArray(
+        3, this->_internal_current_accel(), deterministic, target);
+  }
+
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), target);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:aisaacpb.RobotStatus)
+  // @@protoc_insertion_point(serialize_to_array_end:aisaacpb.RobotState)
   return target;
 }
 
-size_t RobotStatus::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:aisaacpb.RobotStatus)
+size_t RobotState::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:aisaacpb.RobotState)
   size_t total_size = 0;
 
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
@@ -3416,28 +3697,35 @@ size_t RobotStatus::ByteSizeLong() const {
         *current_vel_);
   }
 
+  // .aisaacpb.Acceleration current_accel = 3;
+  if (this->has_current_accel()) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::MessageSize(
+        *current_accel_);
+  }
+
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
   SetCachedSize(cached_size);
   return total_size;
 }
 
-void RobotStatus::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:aisaacpb.RobotStatus)
+void RobotState::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:aisaacpb.RobotState)
   GOOGLE_DCHECK_NE(&from, this);
-  const RobotStatus* source =
-      ::google::protobuf::internal::DynamicCastToGenerated<const RobotStatus>(
+  const RobotState* source =
+      ::google::protobuf::internal::DynamicCastToGenerated<const RobotState>(
           &from);
   if (source == NULL) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:aisaacpb.RobotStatus)
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:aisaacpb.RobotState)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:aisaacpb.RobotStatus)
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:aisaacpb.RobotState)
     MergeFrom(*source);
   }
 }
 
-void RobotStatus::MergeFrom(const RobotStatus& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:aisaacpb.RobotStatus)
+void RobotState::MergeFrom(const RobotState& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:aisaacpb.RobotState)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   ::google::protobuf::uint32 cached_has_bits = 0;
@@ -3449,38 +3737,42 @@ void RobotStatus::MergeFrom(const RobotStatus& from) {
   if (from.has_current_vel()) {
     mutable_current_vel()->::aisaacpb::Velocity::MergeFrom(from.current_vel());
   }
+  if (from.has_current_accel()) {
+    mutable_current_accel()->::aisaacpb::Acceleration::MergeFrom(from.current_accel());
+  }
 }
 
-void RobotStatus::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:aisaacpb.RobotStatus)
+void RobotState::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:aisaacpb.RobotState)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void RobotStatus::CopyFrom(const RobotStatus& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:aisaacpb.RobotStatus)
+void RobotState::CopyFrom(const RobotState& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:aisaacpb.RobotState)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool RobotStatus::IsInitialized() const {
+bool RobotState::IsInitialized() const {
   return true;
 }
 
-void RobotStatus::Swap(RobotStatus* other) {
+void RobotState::Swap(RobotState* other) {
   if (other == this) return;
   InternalSwap(other);
 }
-void RobotStatus::InternalSwap(RobotStatus* other) {
+void RobotState::InternalSwap(RobotState* other) {
   using std::swap;
   swap(current_pos_, other->current_pos_);
   swap(current_vel_, other->current_vel_);
+  swap(current_accel_, other->current_accel_);
   _internal_metadata_.Swap(&other->_internal_metadata_);
 }
 
-::google::protobuf::Metadata RobotStatus::GetMetadata() const {
+::google::protobuf::Metadata RobotState::GetMetadata() const {
   protobuf_aisaaccommand_2eproto::protobuf_AssignDescriptorsOnce();
   return ::protobuf_aisaaccommand_2eproto::file_level_metadata[kIndexInFileMessages];
 }
@@ -4024,6 +4316,9 @@ template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::aisaacpb::Position* Arena::Creat
 template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::aisaacpb::Velocity* Arena::CreateMaybeMessage< ::aisaacpb::Velocity >(Arena* arena) {
   return Arena::CreateInternal< ::aisaacpb::Velocity >(arena);
 }
+template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::aisaacpb::Acceleration* Arena::CreateMaybeMessage< ::aisaacpb::Acceleration >(Arena* arena) {
+  return Arena::CreateInternal< ::aisaacpb::Acceleration >(arena);
+}
 template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::aisaacpb::Obstacle* Arena::CreateMaybeMessage< ::aisaacpb::Obstacle >(Arena* arena) {
   return Arena::CreateInternal< ::aisaacpb::Obstacle >(arena);
 }
@@ -4039,8 +4334,8 @@ template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::aisaacpb::SpcCommand* Arena::Cre
 template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::aisaacpb::RaspiCommand* Arena::CreateMaybeMessage< ::aisaacpb::RaspiCommand >(Arena* arena) {
   return Arena::CreateInternal< ::aisaacpb::RaspiCommand >(arena);
 }
-template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::aisaacpb::RobotStatus* Arena::CreateMaybeMessage< ::aisaacpb::RobotStatus >(Arena* arena) {
-  return Arena::CreateInternal< ::aisaacpb::RobotStatus >(arena);
+template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::aisaacpb::RobotState* Arena::CreateMaybeMessage< ::aisaacpb::RobotState >(Arena* arena) {
+  return Arena::CreateInternal< ::aisaacpb::RobotState >(arena);
 }
 template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::aisaacpb::AIsaacCommand* Arena::CreateMaybeMessage< ::aisaacpb::AIsaacCommand >(Arena* arena) {
   return Arena::CreateInternal< ::aisaacpb::AIsaacCommand >(arena);
