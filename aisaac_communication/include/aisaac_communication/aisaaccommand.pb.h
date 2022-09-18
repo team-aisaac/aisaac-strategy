@@ -29,6 +29,7 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
+#include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
 // @@protoc_insertion_point(includes)
 #define PROTOBUF_INTERNAL_EXPORT_protobuf_aisaaccommand_2eproto 
@@ -38,29 +39,462 @@ namespace protobuf_aisaaccommand_2eproto {
 struct TableStruct {
   static const ::google::protobuf::internal::ParseTableField entries[];
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[];
-  static const ::google::protobuf::internal::ParseTable schema[2];
+  static const ::google::protobuf::internal::ParseTable schema[9];
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
   static const ::google::protobuf::uint32 offsets[];
 };
 void AddDescriptors();
 }  // namespace protobuf_aisaaccommand_2eproto
+namespace aisaacpb {
 class AIsaacCommand;
 class AIsaacCommandDefaultTypeInternal;
 extern AIsaacCommandDefaultTypeInternal _AIsaacCommand_default_instance_;
+class DwaResult;
+class DwaResultDefaultTypeInternal;
+extern DwaResultDefaultTypeInternal _DwaResult_default_instance_;
 class Kick;
 class KickDefaultTypeInternal;
 extern KickDefaultTypeInternal _Kick_default_instance_;
+class Obstacle;
+class ObstacleDefaultTypeInternal;
+extern ObstacleDefaultTypeInternal _Obstacle_default_instance_;
+class Position;
+class PositionDefaultTypeInternal;
+extern PositionDefaultTypeInternal _Position_default_instance_;
+class RaspiCommand;
+class RaspiCommandDefaultTypeInternal;
+extern RaspiCommandDefaultTypeInternal _RaspiCommand_default_instance_;
+class RobotStatus;
+class RobotStatusDefaultTypeInternal;
+extern RobotStatusDefaultTypeInternal _RobotStatus_default_instance_;
+class SpcCommand;
+class SpcCommandDefaultTypeInternal;
+extern SpcCommandDefaultTypeInternal _SpcCommand_default_instance_;
+class Velocity;
+class VelocityDefaultTypeInternal;
+extern VelocityDefaultTypeInternal _Velocity_default_instance_;
+}  // namespace aisaacpb
 namespace google {
 namespace protobuf {
-template<> ::AIsaacCommand* Arena::CreateMaybeMessage<::AIsaacCommand>(Arena*);
-template<> ::Kick* Arena::CreateMaybeMessage<::Kick>(Arena*);
+template<> ::aisaacpb::AIsaacCommand* Arena::CreateMaybeMessage<::aisaacpb::AIsaacCommand>(Arena*);
+template<> ::aisaacpb::DwaResult* Arena::CreateMaybeMessage<::aisaacpb::DwaResult>(Arena*);
+template<> ::aisaacpb::Kick* Arena::CreateMaybeMessage<::aisaacpb::Kick>(Arena*);
+template<> ::aisaacpb::Obstacle* Arena::CreateMaybeMessage<::aisaacpb::Obstacle>(Arena*);
+template<> ::aisaacpb::Position* Arena::CreateMaybeMessage<::aisaacpb::Position>(Arena*);
+template<> ::aisaacpb::RaspiCommand* Arena::CreateMaybeMessage<::aisaacpb::RaspiCommand>(Arena*);
+template<> ::aisaacpb::RobotStatus* Arena::CreateMaybeMessage<::aisaacpb::RobotStatus>(Arena*);
+template<> ::aisaacpb::SpcCommand* Arena::CreateMaybeMessage<::aisaacpb::SpcCommand>(Arena*);
+template<> ::aisaacpb::Velocity* Arena::CreateMaybeMessage<::aisaacpb::Velocity>(Arena*);
 }  // namespace protobuf
 }  // namespace google
+namespace aisaacpb {
 
+enum Kick_KickType {
+  Kick_KickType_None = 0,
+  Kick_KickType_Force = 1,
+  Kick_KickType_Sensor = 2,
+  Kick_KickType_XY = 3,
+  Kick_KickType_Kick_KickType_INT_MIN_SENTINEL_DO_NOT_USE_ = ::google::protobuf::kint32min,
+  Kick_KickType_Kick_KickType_INT_MAX_SENTINEL_DO_NOT_USE_ = ::google::protobuf::kint32max
+};
+bool Kick_KickType_IsValid(int value);
+const Kick_KickType Kick_KickType_KickType_MIN = Kick_KickType_None;
+const Kick_KickType Kick_KickType_KickType_MAX = Kick_KickType_XY;
+const int Kick_KickType_KickType_ARRAYSIZE = Kick_KickType_KickType_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* Kick_KickType_descriptor();
+inline const ::std::string& Kick_KickType_Name(Kick_KickType value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    Kick_KickType_descriptor(), value);
+}
+inline bool Kick_KickType_Parse(
+    const ::std::string& name, Kick_KickType* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<Kick_KickType>(
+    Kick_KickType_descriptor(), name, value);
+}
+enum Kick_KickMethod {
+  Kick_KickMethod_Chip = 0,
+  Kick_KickMethod_Straight = 1,
+  Kick_KickMethod_Kick_KickMethod_INT_MIN_SENTINEL_DO_NOT_USE_ = ::google::protobuf::kint32min,
+  Kick_KickMethod_Kick_KickMethod_INT_MAX_SENTINEL_DO_NOT_USE_ = ::google::protobuf::kint32max
+};
+bool Kick_KickMethod_IsValid(int value);
+const Kick_KickMethod Kick_KickMethod_KickMethod_MIN = Kick_KickMethod_Chip;
+const Kick_KickMethod Kick_KickMethod_KickMethod_MAX = Kick_KickMethod_Straight;
+const int Kick_KickMethod_KickMethod_ARRAYSIZE = Kick_KickMethod_KickMethod_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* Kick_KickMethod_descriptor();
+inline const ::std::string& Kick_KickMethod_Name(Kick_KickMethod value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    Kick_KickMethod_descriptor(), value);
+}
+inline bool Kick_KickMethod_Parse(
+    const ::std::string& name, Kick_KickMethod* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<Kick_KickMethod>(
+    Kick_KickMethod_descriptor(), name, value);
+}
 // ===================================================================
 
-class Kick : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:Kick) */ {
+class Position : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:aisaacpb.Position) */ {
+ public:
+  Position();
+  virtual ~Position();
+
+  Position(const Position& from);
+
+  inline Position& operator=(const Position& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  Position(Position&& from) noexcept
+    : Position() {
+    *this = ::std::move(from);
+  }
+
+  inline Position& operator=(Position&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const Position& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const Position* internal_default_instance() {
+    return reinterpret_cast<const Position*>(
+               &_Position_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    0;
+
+  void Swap(Position* other);
+  friend void swap(Position& a, Position& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline Position* New() const final {
+    return CreateMaybeMessage<Position>(NULL);
+  }
+
+  Position* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<Position>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const Position& from);
+  void MergeFrom(const Position& from);
+  void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Position* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return NULL;
+  }
+  inline void* MaybeArenaPtr() const {
+    return NULL;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // int32 x = 1;
+  void clear_x();
+  static const int kXFieldNumber = 1;
+  ::google::protobuf::int32 x() const;
+  void set_x(::google::protobuf::int32 value);
+
+  // int32 y = 2;
+  void clear_y();
+  static const int kYFieldNumber = 2;
+  ::google::protobuf::int32 y() const;
+  void set_y(::google::protobuf::int32 value);
+
+  // int32 theta = 3;
+  void clear_theta();
+  static const int kThetaFieldNumber = 3;
+  ::google::protobuf::int32 theta() const;
+  void set_theta(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:aisaacpb.Position)
+ private:
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::int32 x_;
+  ::google::protobuf::int32 y_;
+  ::google::protobuf::int32 theta_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::protobuf_aisaaccommand_2eproto::TableStruct;
+};
+// -------------------------------------------------------------------
+
+class Velocity : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:aisaacpb.Velocity) */ {
+ public:
+  Velocity();
+  virtual ~Velocity();
+
+  Velocity(const Velocity& from);
+
+  inline Velocity& operator=(const Velocity& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  Velocity(Velocity&& from) noexcept
+    : Velocity() {
+    *this = ::std::move(from);
+  }
+
+  inline Velocity& operator=(Velocity&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const Velocity& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const Velocity* internal_default_instance() {
+    return reinterpret_cast<const Velocity*>(
+               &_Velocity_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    1;
+
+  void Swap(Velocity* other);
+  friend void swap(Velocity& a, Velocity& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline Velocity* New() const final {
+    return CreateMaybeMessage<Velocity>(NULL);
+  }
+
+  Velocity* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<Velocity>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const Velocity& from);
+  void MergeFrom(const Velocity& from);
+  void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Velocity* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return NULL;
+  }
+  inline void* MaybeArenaPtr() const {
+    return NULL;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // int32 vx = 1;
+  void clear_vx();
+  static const int kVxFieldNumber = 1;
+  ::google::protobuf::int32 vx() const;
+  void set_vx(::google::protobuf::int32 value);
+
+  // int32 vy = 2;
+  void clear_vy();
+  static const int kVyFieldNumber = 2;
+  ::google::protobuf::int32 vy() const;
+  void set_vy(::google::protobuf::int32 value);
+
+  // int32 omega = 3;
+  void clear_omega();
+  static const int kOmegaFieldNumber = 3;
+  ::google::protobuf::int32 omega() const;
+  void set_omega(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:aisaacpb.Velocity)
+ private:
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::int32 vx_;
+  ::google::protobuf::int32 vy_;
+  ::google::protobuf::int32 omega_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::protobuf_aisaaccommand_2eproto::TableStruct;
+};
+// -------------------------------------------------------------------
+
+class Obstacle : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:aisaacpb.Obstacle) */ {
+ public:
+  Obstacle();
+  virtual ~Obstacle();
+
+  Obstacle(const Obstacle& from);
+
+  inline Obstacle& operator=(const Obstacle& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  Obstacle(Obstacle&& from) noexcept
+    : Obstacle() {
+    *this = ::std::move(from);
+  }
+
+  inline Obstacle& operator=(Obstacle&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const Obstacle& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const Obstacle* internal_default_instance() {
+    return reinterpret_cast<const Obstacle*>(
+               &_Obstacle_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    2;
+
+  void Swap(Obstacle* other);
+  friend void swap(Obstacle& a, Obstacle& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline Obstacle* New() const final {
+    return CreateMaybeMessage<Obstacle>(NULL);
+  }
+
+  Obstacle* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<Obstacle>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const Obstacle& from);
+  void MergeFrom(const Obstacle& from);
+  void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Obstacle* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return NULL;
+  }
+  inline void* MaybeArenaPtr() const {
+    return NULL;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // int32 x = 1;
+  void clear_x();
+  static const int kXFieldNumber = 1;
+  ::google::protobuf::int32 x() const;
+  void set_x(::google::protobuf::int32 value);
+
+  // int32 y = 2;
+  void clear_y();
+  static const int kYFieldNumber = 2;
+  ::google::protobuf::int32 y() const;
+  void set_y(::google::protobuf::int32 value);
+
+  // int32 vx = 3;
+  void clear_vx();
+  static const int kVxFieldNumber = 3;
+  ::google::protobuf::int32 vx() const;
+  void set_vx(::google::protobuf::int32 value);
+
+  // int32 vy = 4;
+  void clear_vy();
+  static const int kVyFieldNumber = 4;
+  ::google::protobuf::int32 vy() const;
+  void set_vy(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:aisaacpb.Obstacle)
+ private:
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::int32 x_;
+  ::google::protobuf::int32 y_;
+  ::google::protobuf::int32 vx_;
+  ::google::protobuf::int32 vy_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::protobuf_aisaaccommand_2eproto::TableStruct;
+};
+// -------------------------------------------------------------------
+
+class Kick : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:aisaacpb.Kick) */ {
  public:
   Kick();
   virtual ~Kick();
@@ -95,7 +529,7 @@ class Kick : public ::google::protobuf::Message /* @@protoc_insertion_point(clas
                &_Kick_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    0;
+    3;
 
   void Swap(Kick* other);
   friend void swap(Kick& a, Kick& b) {
@@ -145,19 +579,111 @@ class Kick : public ::google::protobuf::Message /* @@protoc_insertion_point(clas
 
   // nested types ----------------------------------------------------
 
+  typedef Kick_KickType KickType;
+  static const KickType None =
+    Kick_KickType_None;
+  static const KickType Force =
+    Kick_KickType_Force;
+  static const KickType Sensor =
+    Kick_KickType_Sensor;
+  static const KickType XY =
+    Kick_KickType_XY;
+  static inline bool KickType_IsValid(int value) {
+    return Kick_KickType_IsValid(value);
+  }
+  static const KickType KickType_MIN =
+    Kick_KickType_KickType_MIN;
+  static const KickType KickType_MAX =
+    Kick_KickType_KickType_MAX;
+  static const int KickType_ARRAYSIZE =
+    Kick_KickType_KickType_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor*
+  KickType_descriptor() {
+    return Kick_KickType_descriptor();
+  }
+  static inline const ::std::string& KickType_Name(KickType value) {
+    return Kick_KickType_Name(value);
+  }
+  static inline bool KickType_Parse(const ::std::string& name,
+      KickType* value) {
+    return Kick_KickType_Parse(name, value);
+  }
+
+  typedef Kick_KickMethod KickMethod;
+  static const KickMethod Chip =
+    Kick_KickMethod_Chip;
+  static const KickMethod Straight =
+    Kick_KickMethod_Straight;
+  static inline bool KickMethod_IsValid(int value) {
+    return Kick_KickMethod_IsValid(value);
+  }
+  static const KickMethod KickMethod_MIN =
+    Kick_KickMethod_KickMethod_MIN;
+  static const KickMethod KickMethod_MAX =
+    Kick_KickMethod_KickMethod_MAX;
+  static const int KickMethod_ARRAYSIZE =
+    Kick_KickMethod_KickMethod_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor*
+  KickMethod_descriptor() {
+    return Kick_KickMethod_descriptor();
+  }
+  static inline const ::std::string& KickMethod_Name(KickMethod value) {
+    return Kick_KickMethod_Name(value);
+  }
+  static inline bool KickMethod_Parse(const ::std::string& name,
+      KickMethod* value) {
+    return Kick_KickMethod_Parse(name, value);
+  }
+
   // accessors -------------------------------------------------------
 
-  // int32 sensor_use_type = 1;
-  void clear_sensor_use_type();
-  static const int kSensorUseTypeFieldNumber = 1;
-  ::google::protobuf::int32 sensor_use_type() const;
-  void set_sensor_use_type(::google::protobuf::int32 value);
+  // .aisaacpb.Position ball_waypoint = 4;
+  bool has_ball_waypoint() const;
+  void clear_ball_waypoint();
+  static const int kBallWaypointFieldNumber = 4;
+  private:
+  const ::aisaacpb::Position& _internal_ball_waypoint() const;
+  public:
+  const ::aisaacpb::Position& ball_waypoint() const;
+  ::aisaacpb::Position* release_ball_waypoint();
+  ::aisaacpb::Position* mutable_ball_waypoint();
+  void set_allocated_ball_waypoint(::aisaacpb::Position* ball_waypoint);
 
-  // bool kick_type = 2;
-  void clear_kick_type();
-  static const int kKickTypeFieldNumber = 2;
-  bool kick_type() const;
-  void set_kick_type(bool value);
+  // .aisaacpb.Position ball_pos = 5;
+  bool has_ball_pos() const;
+  void clear_ball_pos();
+  static const int kBallPosFieldNumber = 5;
+  private:
+  const ::aisaacpb::Position& _internal_ball_pos() const;
+  public:
+  const ::aisaacpb::Position& ball_pos() const;
+  ::aisaacpb::Position* release_ball_pos();
+  ::aisaacpb::Position* mutable_ball_pos();
+  void set_allocated_ball_pos(::aisaacpb::Position* ball_pos);
+
+  // .aisaacpb.Velocity ball_vel = 6;
+  bool has_ball_vel() const;
+  void clear_ball_vel();
+  static const int kBallVelFieldNumber = 6;
+  private:
+  const ::aisaacpb::Velocity& _internal_ball_vel() const;
+  public:
+  const ::aisaacpb::Velocity& ball_vel() const;
+  ::aisaacpb::Velocity* release_ball_vel();
+  ::aisaacpb::Velocity* mutable_ball_vel();
+  void set_allocated_ball_vel(::aisaacpb::Velocity* ball_vel);
+
+  // .aisaacpb.Kick.KickType sensor_type = 1;
+  void clear_sensor_type();
+  static const int kSensorTypeFieldNumber = 1;
+  ::aisaacpb::Kick_KickType sensor_type() const;
+  void set_sensor_type(::aisaacpb::Kick_KickType value);
+
+  // .aisaacpb.Kick.KickMethod kick_method = 2;
+  void clear_kick_method();
+  static const int kKickMethodFieldNumber = 2;
+  ::aisaacpb::Kick_KickMethod kick_method() const;
+  void set_kick_method(::aisaacpb::Kick_KickMethod value);
 
   // int32 kick_strength = 3;
   void clear_kick_strength();
@@ -165,19 +691,618 @@ class Kick : public ::google::protobuf::Message /* @@protoc_insertion_point(clas
   ::google::protobuf::int32 kick_strength() const;
   void set_kick_strength(::google::protobuf::int32 value);
 
-  // @@protoc_insertion_point(class_scope:Kick)
+  // @@protoc_insertion_point(class_scope:aisaacpb.Kick)
  private:
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::int32 sensor_use_type_;
-  bool kick_type_;
+  ::aisaacpb::Position* ball_waypoint_;
+  ::aisaacpb::Position* ball_pos_;
+  ::aisaacpb::Velocity* ball_vel_;
+  int sensor_type_;
+  int kick_method_;
   ::google::protobuf::int32 kick_strength_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::protobuf_aisaaccommand_2eproto::TableStruct;
 };
 // -------------------------------------------------------------------
 
-class AIsaacCommand : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:AIsaacCommand) */ {
+class DwaResult : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:aisaacpb.DwaResult) */ {
+ public:
+  DwaResult();
+  virtual ~DwaResult();
+
+  DwaResult(const DwaResult& from);
+
+  inline DwaResult& operator=(const DwaResult& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  DwaResult(DwaResult&& from) noexcept
+    : DwaResult() {
+    *this = ::std::move(from);
+  }
+
+  inline DwaResult& operator=(DwaResult&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const DwaResult& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const DwaResult* internal_default_instance() {
+    return reinterpret_cast<const DwaResult*>(
+               &_DwaResult_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    4;
+
+  void Swap(DwaResult* other);
+  friend void swap(DwaResult& a, DwaResult& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline DwaResult* New() const final {
+    return CreateMaybeMessage<DwaResult>(NULL);
+  }
+
+  DwaResult* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<DwaResult>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const DwaResult& from);
+  void MergeFrom(const DwaResult& from);
+  void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(DwaResult* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return NULL;
+  }
+  inline void* MaybeArenaPtr() const {
+    return NULL;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // int32 vx = 1;
+  void clear_vx();
+  static const int kVxFieldNumber = 1;
+  ::google::protobuf::int32 vx() const;
+  void set_vx(::google::protobuf::int32 value);
+
+  // int32 vy = 2;
+  void clear_vy();
+  static const int kVyFieldNumber = 2;
+  ::google::protobuf::int32 vy() const;
+  void set_vy(::google::protobuf::int32 value);
+
+  // int32 omega = 3;
+  void clear_omega();
+  static const int kOmegaFieldNumber = 3;
+  ::google::protobuf::int32 omega() const;
+  void set_omega(::google::protobuf::int32 value);
+
+  // int32 ax = 4;
+  void clear_ax();
+  static const int kAxFieldNumber = 4;
+  ::google::protobuf::int32 ax() const;
+  void set_ax(::google::protobuf::int32 value);
+
+  // int32 ay = 5;
+  void clear_ay();
+  static const int kAyFieldNumber = 5;
+  ::google::protobuf::int32 ay() const;
+  void set_ay(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:aisaacpb.DwaResult)
+ private:
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::int32 vx_;
+  ::google::protobuf::int32 vy_;
+  ::google::protobuf::int32 omega_;
+  ::google::protobuf::int32 ax_;
+  ::google::protobuf::int32 ay_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::protobuf_aisaaccommand_2eproto::TableStruct;
+};
+// -------------------------------------------------------------------
+
+class SpcCommand : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:aisaacpb.SpcCommand) */ {
+ public:
+  SpcCommand();
+  virtual ~SpcCommand();
+
+  SpcCommand(const SpcCommand& from);
+
+  inline SpcCommand& operator=(const SpcCommand& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  SpcCommand(SpcCommand&& from) noexcept
+    : SpcCommand() {
+    *this = ::std::move(from);
+  }
+
+  inline SpcCommand& operator=(SpcCommand&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const SpcCommand& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const SpcCommand* internal_default_instance() {
+    return reinterpret_cast<const SpcCommand*>(
+               &_SpcCommand_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    5;
+
+  void Swap(SpcCommand* other);
+  friend void swap(SpcCommand& a, SpcCommand& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline SpcCommand* New() const final {
+    return CreateMaybeMessage<SpcCommand>(NULL);
+  }
+
+  SpcCommand* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<SpcCommand>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const SpcCommand& from);
+  void MergeFrom(const SpcCommand& from);
+  void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(SpcCommand* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return NULL;
+  }
+  inline void* MaybeArenaPtr() const {
+    return NULL;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // repeated .aisaacpb.Obstacle obstacles = 4;
+  int obstacles_size() const;
+  void clear_obstacles();
+  static const int kObstaclesFieldNumber = 4;
+  ::aisaacpb::Obstacle* mutable_obstacles(int index);
+  ::google::protobuf::RepeatedPtrField< ::aisaacpb::Obstacle >*
+      mutable_obstacles();
+  const ::aisaacpb::Obstacle& obstacles(int index) const;
+  ::aisaacpb::Obstacle* add_obstacles();
+  const ::google::protobuf::RepeatedPtrField< ::aisaacpb::Obstacle >&
+      obstacles() const;
+
+  // .aisaacpb.Position current_pos = 1;
+  bool has_current_pos() const;
+  void clear_current_pos();
+  static const int kCurrentPosFieldNumber = 1;
+  private:
+  const ::aisaacpb::Position& _internal_current_pos() const;
+  public:
+  const ::aisaacpb::Position& current_pos() const;
+  ::aisaacpb::Position* release_current_pos();
+  ::aisaacpb::Position* mutable_current_pos();
+  void set_allocated_current_pos(::aisaacpb::Position* current_pos);
+
+  // .aisaacpb.Velocity move_vec = 2;
+  bool has_move_vec() const;
+  void clear_move_vec();
+  static const int kMoveVecFieldNumber = 2;
+  private:
+  const ::aisaacpb::Velocity& _internal_move_vec() const;
+  public:
+  const ::aisaacpb::Velocity& move_vec() const;
+  ::aisaacpb::Velocity* release_move_vec();
+  ::aisaacpb::Velocity* mutable_move_vec();
+  void set_allocated_move_vec(::aisaacpb::Velocity* move_vec);
+
+  // .aisaacpb.Position target_pos = 3;
+  bool has_target_pos() const;
+  void clear_target_pos();
+  static const int kTargetPosFieldNumber = 3;
+  private:
+  const ::aisaacpb::Position& _internal_target_pos() const;
+  public:
+  const ::aisaacpb::Position& target_pos() const;
+  ::aisaacpb::Position* release_target_pos();
+  ::aisaacpb::Position* mutable_target_pos();
+  void set_allocated_target_pos(::aisaacpb::Position* target_pos);
+
+  // .aisaacpb.Kick kick = 5;
+  bool has_kick() const;
+  void clear_kick();
+  static const int kKickFieldNumber = 5;
+  private:
+  const ::aisaacpb::Kick& _internal_kick() const;
+  public:
+  const ::aisaacpb::Kick& kick() const;
+  ::aisaacpb::Kick* release_kick();
+  ::aisaacpb::Kick* mutable_kick();
+  void set_allocated_kick(::aisaacpb::Kick* kick);
+
+  // bool prohibited_zone_ignore = 6;
+  void clear_prohibited_zone_ignore();
+  static const int kProhibitedZoneIgnoreFieldNumber = 6;
+  bool prohibited_zone_ignore() const;
+  void set_prohibited_zone_ignore(bool value);
+
+  // @@protoc_insertion_point(class_scope:aisaacpb.SpcCommand)
+ private:
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::RepeatedPtrField< ::aisaacpb::Obstacle > obstacles_;
+  ::aisaacpb::Position* current_pos_;
+  ::aisaacpb::Velocity* move_vec_;
+  ::aisaacpb::Position* target_pos_;
+  ::aisaacpb::Kick* kick_;
+  bool prohibited_zone_ignore_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::protobuf_aisaaccommand_2eproto::TableStruct;
+};
+// -------------------------------------------------------------------
+
+class RaspiCommand : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:aisaacpb.RaspiCommand) */ {
+ public:
+  RaspiCommand();
+  virtual ~RaspiCommand();
+
+  RaspiCommand(const RaspiCommand& from);
+
+  inline RaspiCommand& operator=(const RaspiCommand& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  RaspiCommand(RaspiCommand&& from) noexcept
+    : RaspiCommand() {
+    *this = ::std::move(from);
+  }
+
+  inline RaspiCommand& operator=(RaspiCommand&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const RaspiCommand& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const RaspiCommand* internal_default_instance() {
+    return reinterpret_cast<const RaspiCommand*>(
+               &_RaspiCommand_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    6;
+
+  void Swap(RaspiCommand* other);
+  friend void swap(RaspiCommand& a, RaspiCommand& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline RaspiCommand* New() const final {
+    return CreateMaybeMessage<RaspiCommand>(NULL);
+  }
+
+  RaspiCommand* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<RaspiCommand>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const RaspiCommand& from);
+  void MergeFrom(const RaspiCommand& from);
+  void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(RaspiCommand* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return NULL;
+  }
+  inline void* MaybeArenaPtr() const {
+    return NULL;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // .aisaacpb.Position current_pos = 1;
+  bool has_current_pos() const;
+  void clear_current_pos();
+  static const int kCurrentPosFieldNumber = 1;
+  private:
+  const ::aisaacpb::Position& _internal_current_pos() const;
+  public:
+  const ::aisaacpb::Position& current_pos() const;
+  ::aisaacpb::Position* release_current_pos();
+  ::aisaacpb::Position* mutable_current_pos();
+  void set_allocated_current_pos(::aisaacpb::Position* current_pos);
+
+  // .aisaacpb.Velocity move_vec = 2;
+  bool has_move_vec() const;
+  void clear_move_vec();
+  static const int kMoveVecFieldNumber = 2;
+  private:
+  const ::aisaacpb::Velocity& _internal_move_vec() const;
+  public:
+  const ::aisaacpb::Velocity& move_vec() const;
+  ::aisaacpb::Velocity* release_move_vec();
+  ::aisaacpb::Velocity* mutable_move_vec();
+  void set_allocated_move_vec(::aisaacpb::Velocity* move_vec);
+
+  // .aisaacpb.Position target_pos = 3;
+  bool has_target_pos() const;
+  void clear_target_pos();
+  static const int kTargetPosFieldNumber = 3;
+  private:
+  const ::aisaacpb::Position& _internal_target_pos() const;
+  public:
+  const ::aisaacpb::Position& target_pos() const;
+  ::aisaacpb::Position* release_target_pos();
+  ::aisaacpb::Position* mutable_target_pos();
+  void set_allocated_target_pos(::aisaacpb::Position* target_pos);
+
+  // .aisaacpb.DwaResult dwa_result = 6;
+  bool has_dwa_result() const;
+  void clear_dwa_result();
+  static const int kDwaResultFieldNumber = 6;
+  private:
+  const ::aisaacpb::DwaResult& _internal_dwa_result() const;
+  public:
+  const ::aisaacpb::DwaResult& dwa_result() const;
+  ::aisaacpb::DwaResult* release_dwa_result();
+  ::aisaacpb::DwaResult* mutable_dwa_result();
+  void set_allocated_dwa_result(::aisaacpb::DwaResult* dwa_result);
+
+  // .aisaacpb.Kick kick = 7;
+  bool has_kick() const;
+  void clear_kick();
+  static const int kKickFieldNumber = 7;
+  private:
+  const ::aisaacpb::Kick& _internal_kick() const;
+  public:
+  const ::aisaacpb::Kick& kick() const;
+  ::aisaacpb::Kick* release_kick();
+  ::aisaacpb::Kick* mutable_kick();
+  void set_allocated_kick(::aisaacpb::Kick* kick);
+
+  // bool dwa_result_valid = 4;
+  void clear_dwa_result_valid();
+  static const int kDwaResultValidFieldNumber = 4;
+  bool dwa_result_valid() const;
+  void set_dwa_result_valid(bool value);
+
+  // bool path_enable = 5;
+  void clear_path_enable();
+  static const int kPathEnableFieldNumber = 5;
+  bool path_enable() const;
+  void set_path_enable(bool value);
+
+  // @@protoc_insertion_point(class_scope:aisaacpb.RaspiCommand)
+ private:
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::aisaacpb::Position* current_pos_;
+  ::aisaacpb::Velocity* move_vec_;
+  ::aisaacpb::Position* target_pos_;
+  ::aisaacpb::DwaResult* dwa_result_;
+  ::aisaacpb::Kick* kick_;
+  bool dwa_result_valid_;
+  bool path_enable_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::protobuf_aisaaccommand_2eproto::TableStruct;
+};
+// -------------------------------------------------------------------
+
+class RobotStatus : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:aisaacpb.RobotStatus) */ {
+ public:
+  RobotStatus();
+  virtual ~RobotStatus();
+
+  RobotStatus(const RobotStatus& from);
+
+  inline RobotStatus& operator=(const RobotStatus& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  RobotStatus(RobotStatus&& from) noexcept
+    : RobotStatus() {
+    *this = ::std::move(from);
+  }
+
+  inline RobotStatus& operator=(RobotStatus&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const RobotStatus& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const RobotStatus* internal_default_instance() {
+    return reinterpret_cast<const RobotStatus*>(
+               &_RobotStatus_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    7;
+
+  void Swap(RobotStatus* other);
+  friend void swap(RobotStatus& a, RobotStatus& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline RobotStatus* New() const final {
+    return CreateMaybeMessage<RobotStatus>(NULL);
+  }
+
+  RobotStatus* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<RobotStatus>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const RobotStatus& from);
+  void MergeFrom(const RobotStatus& from);
+  void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(RobotStatus* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return NULL;
+  }
+  inline void* MaybeArenaPtr() const {
+    return NULL;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // .aisaacpb.Position current_pos = 1;
+  bool has_current_pos() const;
+  void clear_current_pos();
+  static const int kCurrentPosFieldNumber = 1;
+  private:
+  const ::aisaacpb::Position& _internal_current_pos() const;
+  public:
+  const ::aisaacpb::Position& current_pos() const;
+  ::aisaacpb::Position* release_current_pos();
+  ::aisaacpb::Position* mutable_current_pos();
+  void set_allocated_current_pos(::aisaacpb::Position* current_pos);
+
+  // .aisaacpb.Velocity current_vel = 2;
+  bool has_current_vel() const;
+  void clear_current_vel();
+  static const int kCurrentVelFieldNumber = 2;
+  private:
+  const ::aisaacpb::Velocity& _internal_current_vel() const;
+  public:
+  const ::aisaacpb::Velocity& current_vel() const;
+  ::aisaacpb::Velocity* release_current_vel();
+  ::aisaacpb::Velocity* mutable_current_vel();
+  void set_allocated_current_vel(::aisaacpb::Velocity* current_vel);
+
+  // @@protoc_insertion_point(class_scope:aisaacpb.RobotStatus)
+ private:
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::aisaacpb::Position* current_pos_;
+  ::aisaacpb::Velocity* current_vel_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::protobuf_aisaaccommand_2eproto::TableStruct;
+};
+// -------------------------------------------------------------------
+
+class AIsaacCommand : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:aisaacpb.AIsaacCommand) */ {
  public:
   AIsaacCommand();
   virtual ~AIsaacCommand();
@@ -212,7 +1337,7 @@ class AIsaacCommand : public ::google::protobuf::Message /* @@protoc_insertion_p
                &_AIsaacCommand_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    1;
+    8;
 
   void Swap(AIsaacCommand* other);
   friend void swap(AIsaacCommand& a, AIsaacCommand& b) {
@@ -264,17 +1389,17 @@ class AIsaacCommand : public ::google::protobuf::Message /* @@protoc_insertion_p
 
   // accessors -------------------------------------------------------
 
-  // .Kick kick = 9;
+  // .aisaacpb.Kick kick = 9;
   bool has_kick() const;
   void clear_kick();
   static const int kKickFieldNumber = 9;
   private:
-  const ::Kick& _internal_kick() const;
+  const ::aisaacpb::Kick& _internal_kick() const;
   public:
-  const ::Kick& kick() const;
-  ::Kick* release_kick();
-  ::Kick* mutable_kick();
-  void set_allocated_kick(::Kick* kick);
+  const ::aisaacpb::Kick& kick() const;
+  ::aisaacpb::Kick* release_kick();
+  ::aisaacpb::Kick* mutable_kick();
+  void set_allocated_kick(::aisaacpb::Kick* kick);
 
   // int32 robot_command_coordinate_system_type = 1;
   void clear_robot_command_coordinate_system_type();
@@ -324,11 +1449,11 @@ class AIsaacCommand : public ::google::protobuf::Message /* @@protoc_insertion_p
   ::google::protobuf::int32 current_angle() const;
   void set_current_angle(::google::protobuf::int32 value);
 
-  // @@protoc_insertion_point(class_scope:AIsaacCommand)
+  // @@protoc_insertion_point(class_scope:aisaacpb.AIsaacCommand)
  private:
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::Kick* kick_;
+  ::aisaacpb::Kick* kick_;
   ::google::protobuf::int32 robot_command_coordinate_system_type_;
   ::google::protobuf::int32 target_x_;
   ::google::protobuf::int32 target_y_;
@@ -349,34 +1474,186 @@ class AIsaacCommand : public ::google::protobuf::Message /* @@protoc_insertion_p
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif  // __GNUC__
+// Position
+
+// int32 x = 1;
+inline void Position::clear_x() {
+  x_ = 0;
+}
+inline ::google::protobuf::int32 Position::x() const {
+  // @@protoc_insertion_point(field_get:aisaacpb.Position.x)
+  return x_;
+}
+inline void Position::set_x(::google::protobuf::int32 value) {
+  
+  x_ = value;
+  // @@protoc_insertion_point(field_set:aisaacpb.Position.x)
+}
+
+// int32 y = 2;
+inline void Position::clear_y() {
+  y_ = 0;
+}
+inline ::google::protobuf::int32 Position::y() const {
+  // @@protoc_insertion_point(field_get:aisaacpb.Position.y)
+  return y_;
+}
+inline void Position::set_y(::google::protobuf::int32 value) {
+  
+  y_ = value;
+  // @@protoc_insertion_point(field_set:aisaacpb.Position.y)
+}
+
+// int32 theta = 3;
+inline void Position::clear_theta() {
+  theta_ = 0;
+}
+inline ::google::protobuf::int32 Position::theta() const {
+  // @@protoc_insertion_point(field_get:aisaacpb.Position.theta)
+  return theta_;
+}
+inline void Position::set_theta(::google::protobuf::int32 value) {
+  
+  theta_ = value;
+  // @@protoc_insertion_point(field_set:aisaacpb.Position.theta)
+}
+
+// -------------------------------------------------------------------
+
+// Velocity
+
+// int32 vx = 1;
+inline void Velocity::clear_vx() {
+  vx_ = 0;
+}
+inline ::google::protobuf::int32 Velocity::vx() const {
+  // @@protoc_insertion_point(field_get:aisaacpb.Velocity.vx)
+  return vx_;
+}
+inline void Velocity::set_vx(::google::protobuf::int32 value) {
+  
+  vx_ = value;
+  // @@protoc_insertion_point(field_set:aisaacpb.Velocity.vx)
+}
+
+// int32 vy = 2;
+inline void Velocity::clear_vy() {
+  vy_ = 0;
+}
+inline ::google::protobuf::int32 Velocity::vy() const {
+  // @@protoc_insertion_point(field_get:aisaacpb.Velocity.vy)
+  return vy_;
+}
+inline void Velocity::set_vy(::google::protobuf::int32 value) {
+  
+  vy_ = value;
+  // @@protoc_insertion_point(field_set:aisaacpb.Velocity.vy)
+}
+
+// int32 omega = 3;
+inline void Velocity::clear_omega() {
+  omega_ = 0;
+}
+inline ::google::protobuf::int32 Velocity::omega() const {
+  // @@protoc_insertion_point(field_get:aisaacpb.Velocity.omega)
+  return omega_;
+}
+inline void Velocity::set_omega(::google::protobuf::int32 value) {
+  
+  omega_ = value;
+  // @@protoc_insertion_point(field_set:aisaacpb.Velocity.omega)
+}
+
+// -------------------------------------------------------------------
+
+// Obstacle
+
+// int32 x = 1;
+inline void Obstacle::clear_x() {
+  x_ = 0;
+}
+inline ::google::protobuf::int32 Obstacle::x() const {
+  // @@protoc_insertion_point(field_get:aisaacpb.Obstacle.x)
+  return x_;
+}
+inline void Obstacle::set_x(::google::protobuf::int32 value) {
+  
+  x_ = value;
+  // @@protoc_insertion_point(field_set:aisaacpb.Obstacle.x)
+}
+
+// int32 y = 2;
+inline void Obstacle::clear_y() {
+  y_ = 0;
+}
+inline ::google::protobuf::int32 Obstacle::y() const {
+  // @@protoc_insertion_point(field_get:aisaacpb.Obstacle.y)
+  return y_;
+}
+inline void Obstacle::set_y(::google::protobuf::int32 value) {
+  
+  y_ = value;
+  // @@protoc_insertion_point(field_set:aisaacpb.Obstacle.y)
+}
+
+// int32 vx = 3;
+inline void Obstacle::clear_vx() {
+  vx_ = 0;
+}
+inline ::google::protobuf::int32 Obstacle::vx() const {
+  // @@protoc_insertion_point(field_get:aisaacpb.Obstacle.vx)
+  return vx_;
+}
+inline void Obstacle::set_vx(::google::protobuf::int32 value) {
+  
+  vx_ = value;
+  // @@protoc_insertion_point(field_set:aisaacpb.Obstacle.vx)
+}
+
+// int32 vy = 4;
+inline void Obstacle::clear_vy() {
+  vy_ = 0;
+}
+inline ::google::protobuf::int32 Obstacle::vy() const {
+  // @@protoc_insertion_point(field_get:aisaacpb.Obstacle.vy)
+  return vy_;
+}
+inline void Obstacle::set_vy(::google::protobuf::int32 value) {
+  
+  vy_ = value;
+  // @@protoc_insertion_point(field_set:aisaacpb.Obstacle.vy)
+}
+
+// -------------------------------------------------------------------
+
 // Kick
 
-// int32 sensor_use_type = 1;
-inline void Kick::clear_sensor_use_type() {
-  sensor_use_type_ = 0;
+// .aisaacpb.Kick.KickType sensor_type = 1;
+inline void Kick::clear_sensor_type() {
+  sensor_type_ = 0;
 }
-inline ::google::protobuf::int32 Kick::sensor_use_type() const {
-  // @@protoc_insertion_point(field_get:Kick.sensor_use_type)
-  return sensor_use_type_;
+inline ::aisaacpb::Kick_KickType Kick::sensor_type() const {
+  // @@protoc_insertion_point(field_get:aisaacpb.Kick.sensor_type)
+  return static_cast< ::aisaacpb::Kick_KickType >(sensor_type_);
 }
-inline void Kick::set_sensor_use_type(::google::protobuf::int32 value) {
+inline void Kick::set_sensor_type(::aisaacpb::Kick_KickType value) {
   
-  sensor_use_type_ = value;
-  // @@protoc_insertion_point(field_set:Kick.sensor_use_type)
+  sensor_type_ = value;
+  // @@protoc_insertion_point(field_set:aisaacpb.Kick.sensor_type)
 }
 
-// bool kick_type = 2;
-inline void Kick::clear_kick_type() {
-  kick_type_ = false;
+// .aisaacpb.Kick.KickMethod kick_method = 2;
+inline void Kick::clear_kick_method() {
+  kick_method_ = 0;
 }
-inline bool Kick::kick_type() const {
-  // @@protoc_insertion_point(field_get:Kick.kick_type)
-  return kick_type_;
+inline ::aisaacpb::Kick_KickMethod Kick::kick_method() const {
+  // @@protoc_insertion_point(field_get:aisaacpb.Kick.kick_method)
+  return static_cast< ::aisaacpb::Kick_KickMethod >(kick_method_);
 }
-inline void Kick::set_kick_type(bool value) {
+inline void Kick::set_kick_method(::aisaacpb::Kick_KickMethod value) {
   
-  kick_type_ = value;
-  // @@protoc_insertion_point(field_set:Kick.kick_type)
+  kick_method_ = value;
+  // @@protoc_insertion_point(field_set:aisaacpb.Kick.kick_method)
 }
 
 // int32 kick_strength = 3;
@@ -384,167 +1661,483 @@ inline void Kick::clear_kick_strength() {
   kick_strength_ = 0;
 }
 inline ::google::protobuf::int32 Kick::kick_strength() const {
-  // @@protoc_insertion_point(field_get:Kick.kick_strength)
+  // @@protoc_insertion_point(field_get:aisaacpb.Kick.kick_strength)
   return kick_strength_;
 }
 inline void Kick::set_kick_strength(::google::protobuf::int32 value) {
   
   kick_strength_ = value;
-  // @@protoc_insertion_point(field_set:Kick.kick_strength)
+  // @@protoc_insertion_point(field_set:aisaacpb.Kick.kick_strength)
+}
+
+// .aisaacpb.Position ball_waypoint = 4;
+inline bool Kick::has_ball_waypoint() const {
+  return this != internal_default_instance() && ball_waypoint_ != NULL;
+}
+inline void Kick::clear_ball_waypoint() {
+  if (GetArenaNoVirtual() == NULL && ball_waypoint_ != NULL) {
+    delete ball_waypoint_;
+  }
+  ball_waypoint_ = NULL;
+}
+inline const ::aisaacpb::Position& Kick::_internal_ball_waypoint() const {
+  return *ball_waypoint_;
+}
+inline const ::aisaacpb::Position& Kick::ball_waypoint() const {
+  const ::aisaacpb::Position* p = ball_waypoint_;
+  // @@protoc_insertion_point(field_get:aisaacpb.Kick.ball_waypoint)
+  return p != NULL ? *p : *reinterpret_cast<const ::aisaacpb::Position*>(
+      &::aisaacpb::_Position_default_instance_);
+}
+inline ::aisaacpb::Position* Kick::release_ball_waypoint() {
+  // @@protoc_insertion_point(field_release:aisaacpb.Kick.ball_waypoint)
+  
+  ::aisaacpb::Position* temp = ball_waypoint_;
+  ball_waypoint_ = NULL;
+  return temp;
+}
+inline ::aisaacpb::Position* Kick::mutable_ball_waypoint() {
+  
+  if (ball_waypoint_ == NULL) {
+    auto* p = CreateMaybeMessage<::aisaacpb::Position>(GetArenaNoVirtual());
+    ball_waypoint_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:aisaacpb.Kick.ball_waypoint)
+  return ball_waypoint_;
+}
+inline void Kick::set_allocated_ball_waypoint(::aisaacpb::Position* ball_waypoint) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == NULL) {
+    delete ball_waypoint_;
+  }
+  if (ball_waypoint) {
+    ::google::protobuf::Arena* submessage_arena = NULL;
+    if (message_arena != submessage_arena) {
+      ball_waypoint = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, ball_waypoint, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  ball_waypoint_ = ball_waypoint;
+  // @@protoc_insertion_point(field_set_allocated:aisaacpb.Kick.ball_waypoint)
+}
+
+// .aisaacpb.Position ball_pos = 5;
+inline bool Kick::has_ball_pos() const {
+  return this != internal_default_instance() && ball_pos_ != NULL;
+}
+inline void Kick::clear_ball_pos() {
+  if (GetArenaNoVirtual() == NULL && ball_pos_ != NULL) {
+    delete ball_pos_;
+  }
+  ball_pos_ = NULL;
+}
+inline const ::aisaacpb::Position& Kick::_internal_ball_pos() const {
+  return *ball_pos_;
+}
+inline const ::aisaacpb::Position& Kick::ball_pos() const {
+  const ::aisaacpb::Position* p = ball_pos_;
+  // @@protoc_insertion_point(field_get:aisaacpb.Kick.ball_pos)
+  return p != NULL ? *p : *reinterpret_cast<const ::aisaacpb::Position*>(
+      &::aisaacpb::_Position_default_instance_);
+}
+inline ::aisaacpb::Position* Kick::release_ball_pos() {
+  // @@protoc_insertion_point(field_release:aisaacpb.Kick.ball_pos)
+  
+  ::aisaacpb::Position* temp = ball_pos_;
+  ball_pos_ = NULL;
+  return temp;
+}
+inline ::aisaacpb::Position* Kick::mutable_ball_pos() {
+  
+  if (ball_pos_ == NULL) {
+    auto* p = CreateMaybeMessage<::aisaacpb::Position>(GetArenaNoVirtual());
+    ball_pos_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:aisaacpb.Kick.ball_pos)
+  return ball_pos_;
+}
+inline void Kick::set_allocated_ball_pos(::aisaacpb::Position* ball_pos) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == NULL) {
+    delete ball_pos_;
+  }
+  if (ball_pos) {
+    ::google::protobuf::Arena* submessage_arena = NULL;
+    if (message_arena != submessage_arena) {
+      ball_pos = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, ball_pos, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  ball_pos_ = ball_pos;
+  // @@protoc_insertion_point(field_set_allocated:aisaacpb.Kick.ball_pos)
+}
+
+// .aisaacpb.Velocity ball_vel = 6;
+inline bool Kick::has_ball_vel() const {
+  return this != internal_default_instance() && ball_vel_ != NULL;
+}
+inline void Kick::clear_ball_vel() {
+  if (GetArenaNoVirtual() == NULL && ball_vel_ != NULL) {
+    delete ball_vel_;
+  }
+  ball_vel_ = NULL;
+}
+inline const ::aisaacpb::Velocity& Kick::_internal_ball_vel() const {
+  return *ball_vel_;
+}
+inline const ::aisaacpb::Velocity& Kick::ball_vel() const {
+  const ::aisaacpb::Velocity* p = ball_vel_;
+  // @@protoc_insertion_point(field_get:aisaacpb.Kick.ball_vel)
+  return p != NULL ? *p : *reinterpret_cast<const ::aisaacpb::Velocity*>(
+      &::aisaacpb::_Velocity_default_instance_);
+}
+inline ::aisaacpb::Velocity* Kick::release_ball_vel() {
+  // @@protoc_insertion_point(field_release:aisaacpb.Kick.ball_vel)
+  
+  ::aisaacpb::Velocity* temp = ball_vel_;
+  ball_vel_ = NULL;
+  return temp;
+}
+inline ::aisaacpb::Velocity* Kick::mutable_ball_vel() {
+  
+  if (ball_vel_ == NULL) {
+    auto* p = CreateMaybeMessage<::aisaacpb::Velocity>(GetArenaNoVirtual());
+    ball_vel_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:aisaacpb.Kick.ball_vel)
+  return ball_vel_;
+}
+inline void Kick::set_allocated_ball_vel(::aisaacpb::Velocity* ball_vel) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == NULL) {
+    delete ball_vel_;
+  }
+  if (ball_vel) {
+    ::google::protobuf::Arena* submessage_arena = NULL;
+    if (message_arena != submessage_arena) {
+      ball_vel = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, ball_vel, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  ball_vel_ = ball_vel;
+  // @@protoc_insertion_point(field_set_allocated:aisaacpb.Kick.ball_vel)
 }
 
 // -------------------------------------------------------------------
 
-// AIsaacCommand
+// DwaResult
 
-// int32 robot_command_coordinate_system_type = 1;
-inline void AIsaacCommand::clear_robot_command_coordinate_system_type() {
-  robot_command_coordinate_system_type_ = 0;
+// int32 vx = 1;
+inline void DwaResult::clear_vx() {
+  vx_ = 0;
 }
-inline ::google::protobuf::int32 AIsaacCommand::robot_command_coordinate_system_type() const {
-  // @@protoc_insertion_point(field_get:AIsaacCommand.robot_command_coordinate_system_type)
-  return robot_command_coordinate_system_type_;
+inline ::google::protobuf::int32 DwaResult::vx() const {
+  // @@protoc_insertion_point(field_get:aisaacpb.DwaResult.vx)
+  return vx_;
 }
-inline void AIsaacCommand::set_robot_command_coordinate_system_type(::google::protobuf::int32 value) {
+inline void DwaResult::set_vx(::google::protobuf::int32 value) {
   
-  robot_command_coordinate_system_type_ = value;
-  // @@protoc_insertion_point(field_set:AIsaacCommand.robot_command_coordinate_system_type)
+  vx_ = value;
+  // @@protoc_insertion_point(field_set:aisaacpb.DwaResult.vx)
 }
 
-// int32 target_x = 2;
-inline void AIsaacCommand::clear_target_x() {
-  target_x_ = 0;
+// int32 vy = 2;
+inline void DwaResult::clear_vy() {
+  vy_ = 0;
 }
-inline ::google::protobuf::int32 AIsaacCommand::target_x() const {
-  // @@protoc_insertion_point(field_get:AIsaacCommand.target_x)
-  return target_x_;
+inline ::google::protobuf::int32 DwaResult::vy() const {
+  // @@protoc_insertion_point(field_get:aisaacpb.DwaResult.vy)
+  return vy_;
 }
-inline void AIsaacCommand::set_target_x(::google::protobuf::int32 value) {
+inline void DwaResult::set_vy(::google::protobuf::int32 value) {
   
-  target_x_ = value;
-  // @@protoc_insertion_point(field_set:AIsaacCommand.target_x)
+  vy_ = value;
+  // @@protoc_insertion_point(field_set:aisaacpb.DwaResult.vy)
 }
 
-// int32 target_y = 3;
-inline void AIsaacCommand::clear_target_y() {
-  target_y_ = 0;
+// int32 omega = 3;
+inline void DwaResult::clear_omega() {
+  omega_ = 0;
 }
-inline ::google::protobuf::int32 AIsaacCommand::target_y() const {
-  // @@protoc_insertion_point(field_get:AIsaacCommand.target_y)
-  return target_y_;
+inline ::google::protobuf::int32 DwaResult::omega() const {
+  // @@protoc_insertion_point(field_get:aisaacpb.DwaResult.omega)
+  return omega_;
 }
-inline void AIsaacCommand::set_target_y(::google::protobuf::int32 value) {
+inline void DwaResult::set_omega(::google::protobuf::int32 value) {
   
-  target_y_ = value;
-  // @@protoc_insertion_point(field_set:AIsaacCommand.target_y)
+  omega_ = value;
+  // @@protoc_insertion_point(field_set:aisaacpb.DwaResult.omega)
 }
 
-// int32 target_angle = 4;
-inline void AIsaacCommand::clear_target_angle() {
-  target_angle_ = 0;
+// int32 ax = 4;
+inline void DwaResult::clear_ax() {
+  ax_ = 0;
 }
-inline ::google::protobuf::int32 AIsaacCommand::target_angle() const {
-  // @@protoc_insertion_point(field_get:AIsaacCommand.target_angle)
-  return target_angle_;
+inline ::google::protobuf::int32 DwaResult::ax() const {
+  // @@protoc_insertion_point(field_get:aisaacpb.DwaResult.ax)
+  return ax_;
 }
-inline void AIsaacCommand::set_target_angle(::google::protobuf::int32 value) {
+inline void DwaResult::set_ax(::google::protobuf::int32 value) {
   
-  target_angle_ = value;
-  // @@protoc_insertion_point(field_set:AIsaacCommand.target_angle)
+  ax_ = value;
+  // @@protoc_insertion_point(field_set:aisaacpb.DwaResult.ax)
 }
 
-// bool vision_data_valid = 5;
-inline void AIsaacCommand::clear_vision_data_valid() {
-  vision_data_valid_ = false;
+// int32 ay = 5;
+inline void DwaResult::clear_ay() {
+  ay_ = 0;
 }
-inline bool AIsaacCommand::vision_data_valid() const {
-  // @@protoc_insertion_point(field_get:AIsaacCommand.vision_data_valid)
-  return vision_data_valid_;
+inline ::google::protobuf::int32 DwaResult::ay() const {
+  // @@protoc_insertion_point(field_get:aisaacpb.DwaResult.ay)
+  return ay_;
 }
-inline void AIsaacCommand::set_vision_data_valid(bool value) {
+inline void DwaResult::set_ay(::google::protobuf::int32 value) {
   
-  vision_data_valid_ = value;
-  // @@protoc_insertion_point(field_set:AIsaacCommand.vision_data_valid)
+  ay_ = value;
+  // @@protoc_insertion_point(field_set:aisaacpb.DwaResult.ay)
 }
 
-// int32 current_x = 6;
-inline void AIsaacCommand::clear_current_x() {
-  current_x_ = 0;
+// -------------------------------------------------------------------
+
+// SpcCommand
+
+// .aisaacpb.Position current_pos = 1;
+inline bool SpcCommand::has_current_pos() const {
+  return this != internal_default_instance() && current_pos_ != NULL;
 }
-inline ::google::protobuf::int32 AIsaacCommand::current_x() const {
-  // @@protoc_insertion_point(field_get:AIsaacCommand.current_x)
-  return current_x_;
+inline void SpcCommand::clear_current_pos() {
+  if (GetArenaNoVirtual() == NULL && current_pos_ != NULL) {
+    delete current_pos_;
+  }
+  current_pos_ = NULL;
 }
-inline void AIsaacCommand::set_current_x(::google::protobuf::int32 value) {
+inline const ::aisaacpb::Position& SpcCommand::_internal_current_pos() const {
+  return *current_pos_;
+}
+inline const ::aisaacpb::Position& SpcCommand::current_pos() const {
+  const ::aisaacpb::Position* p = current_pos_;
+  // @@protoc_insertion_point(field_get:aisaacpb.SpcCommand.current_pos)
+  return p != NULL ? *p : *reinterpret_cast<const ::aisaacpb::Position*>(
+      &::aisaacpb::_Position_default_instance_);
+}
+inline ::aisaacpb::Position* SpcCommand::release_current_pos() {
+  // @@protoc_insertion_point(field_release:aisaacpb.SpcCommand.current_pos)
   
-  current_x_ = value;
-  // @@protoc_insertion_point(field_set:AIsaacCommand.current_x)
+  ::aisaacpb::Position* temp = current_pos_;
+  current_pos_ = NULL;
+  return temp;
 }
-
-// int32 current_y = 7;
-inline void AIsaacCommand::clear_current_y() {
-  current_y_ = 0;
-}
-inline ::google::protobuf::int32 AIsaacCommand::current_y() const {
-  // @@protoc_insertion_point(field_get:AIsaacCommand.current_y)
-  return current_y_;
-}
-inline void AIsaacCommand::set_current_y(::google::protobuf::int32 value) {
+inline ::aisaacpb::Position* SpcCommand::mutable_current_pos() {
   
-  current_y_ = value;
-  // @@protoc_insertion_point(field_set:AIsaacCommand.current_y)
+  if (current_pos_ == NULL) {
+    auto* p = CreateMaybeMessage<::aisaacpb::Position>(GetArenaNoVirtual());
+    current_pos_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:aisaacpb.SpcCommand.current_pos)
+  return current_pos_;
+}
+inline void SpcCommand::set_allocated_current_pos(::aisaacpb::Position* current_pos) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == NULL) {
+    delete current_pos_;
+  }
+  if (current_pos) {
+    ::google::protobuf::Arena* submessage_arena = NULL;
+    if (message_arena != submessage_arena) {
+      current_pos = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, current_pos, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  current_pos_ = current_pos;
+  // @@protoc_insertion_point(field_set_allocated:aisaacpb.SpcCommand.current_pos)
 }
 
-// int32 current_angle = 8;
-inline void AIsaacCommand::clear_current_angle() {
-  current_angle_ = 0;
+// .aisaacpb.Velocity move_vec = 2;
+inline bool SpcCommand::has_move_vec() const {
+  return this != internal_default_instance() && move_vec_ != NULL;
 }
-inline ::google::protobuf::int32 AIsaacCommand::current_angle() const {
-  // @@protoc_insertion_point(field_get:AIsaacCommand.current_angle)
-  return current_angle_;
+inline void SpcCommand::clear_move_vec() {
+  if (GetArenaNoVirtual() == NULL && move_vec_ != NULL) {
+    delete move_vec_;
+  }
+  move_vec_ = NULL;
 }
-inline void AIsaacCommand::set_current_angle(::google::protobuf::int32 value) {
+inline const ::aisaacpb::Velocity& SpcCommand::_internal_move_vec() const {
+  return *move_vec_;
+}
+inline const ::aisaacpb::Velocity& SpcCommand::move_vec() const {
+  const ::aisaacpb::Velocity* p = move_vec_;
+  // @@protoc_insertion_point(field_get:aisaacpb.SpcCommand.move_vec)
+  return p != NULL ? *p : *reinterpret_cast<const ::aisaacpb::Velocity*>(
+      &::aisaacpb::_Velocity_default_instance_);
+}
+inline ::aisaacpb::Velocity* SpcCommand::release_move_vec() {
+  // @@protoc_insertion_point(field_release:aisaacpb.SpcCommand.move_vec)
   
-  current_angle_ = value;
-  // @@protoc_insertion_point(field_set:AIsaacCommand.current_angle)
+  ::aisaacpb::Velocity* temp = move_vec_;
+  move_vec_ = NULL;
+  return temp;
+}
+inline ::aisaacpb::Velocity* SpcCommand::mutable_move_vec() {
+  
+  if (move_vec_ == NULL) {
+    auto* p = CreateMaybeMessage<::aisaacpb::Velocity>(GetArenaNoVirtual());
+    move_vec_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:aisaacpb.SpcCommand.move_vec)
+  return move_vec_;
+}
+inline void SpcCommand::set_allocated_move_vec(::aisaacpb::Velocity* move_vec) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == NULL) {
+    delete move_vec_;
+  }
+  if (move_vec) {
+    ::google::protobuf::Arena* submessage_arena = NULL;
+    if (message_arena != submessage_arena) {
+      move_vec = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, move_vec, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  move_vec_ = move_vec;
+  // @@protoc_insertion_point(field_set_allocated:aisaacpb.SpcCommand.move_vec)
 }
 
-// .Kick kick = 9;
-inline bool AIsaacCommand::has_kick() const {
+// .aisaacpb.Position target_pos = 3;
+inline bool SpcCommand::has_target_pos() const {
+  return this != internal_default_instance() && target_pos_ != NULL;
+}
+inline void SpcCommand::clear_target_pos() {
+  if (GetArenaNoVirtual() == NULL && target_pos_ != NULL) {
+    delete target_pos_;
+  }
+  target_pos_ = NULL;
+}
+inline const ::aisaacpb::Position& SpcCommand::_internal_target_pos() const {
+  return *target_pos_;
+}
+inline const ::aisaacpb::Position& SpcCommand::target_pos() const {
+  const ::aisaacpb::Position* p = target_pos_;
+  // @@protoc_insertion_point(field_get:aisaacpb.SpcCommand.target_pos)
+  return p != NULL ? *p : *reinterpret_cast<const ::aisaacpb::Position*>(
+      &::aisaacpb::_Position_default_instance_);
+}
+inline ::aisaacpb::Position* SpcCommand::release_target_pos() {
+  // @@protoc_insertion_point(field_release:aisaacpb.SpcCommand.target_pos)
+  
+  ::aisaacpb::Position* temp = target_pos_;
+  target_pos_ = NULL;
+  return temp;
+}
+inline ::aisaacpb::Position* SpcCommand::mutable_target_pos() {
+  
+  if (target_pos_ == NULL) {
+    auto* p = CreateMaybeMessage<::aisaacpb::Position>(GetArenaNoVirtual());
+    target_pos_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:aisaacpb.SpcCommand.target_pos)
+  return target_pos_;
+}
+inline void SpcCommand::set_allocated_target_pos(::aisaacpb::Position* target_pos) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == NULL) {
+    delete target_pos_;
+  }
+  if (target_pos) {
+    ::google::protobuf::Arena* submessage_arena = NULL;
+    if (message_arena != submessage_arena) {
+      target_pos = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, target_pos, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  target_pos_ = target_pos;
+  // @@protoc_insertion_point(field_set_allocated:aisaacpb.SpcCommand.target_pos)
+}
+
+// repeated .aisaacpb.Obstacle obstacles = 4;
+inline int SpcCommand::obstacles_size() const {
+  return obstacles_.size();
+}
+inline void SpcCommand::clear_obstacles() {
+  obstacles_.Clear();
+}
+inline ::aisaacpb::Obstacle* SpcCommand::mutable_obstacles(int index) {
+  // @@protoc_insertion_point(field_mutable:aisaacpb.SpcCommand.obstacles)
+  return obstacles_.Mutable(index);
+}
+inline ::google::protobuf::RepeatedPtrField< ::aisaacpb::Obstacle >*
+SpcCommand::mutable_obstacles() {
+  // @@protoc_insertion_point(field_mutable_list:aisaacpb.SpcCommand.obstacles)
+  return &obstacles_;
+}
+inline const ::aisaacpb::Obstacle& SpcCommand::obstacles(int index) const {
+  // @@protoc_insertion_point(field_get:aisaacpb.SpcCommand.obstacles)
+  return obstacles_.Get(index);
+}
+inline ::aisaacpb::Obstacle* SpcCommand::add_obstacles() {
+  // @@protoc_insertion_point(field_add:aisaacpb.SpcCommand.obstacles)
+  return obstacles_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::aisaacpb::Obstacle >&
+SpcCommand::obstacles() const {
+  // @@protoc_insertion_point(field_list:aisaacpb.SpcCommand.obstacles)
+  return obstacles_;
+}
+
+// .aisaacpb.Kick kick = 5;
+inline bool SpcCommand::has_kick() const {
   return this != internal_default_instance() && kick_ != NULL;
 }
-inline void AIsaacCommand::clear_kick() {
+inline void SpcCommand::clear_kick() {
   if (GetArenaNoVirtual() == NULL && kick_ != NULL) {
     delete kick_;
   }
   kick_ = NULL;
 }
-inline const ::Kick& AIsaacCommand::_internal_kick() const {
+inline const ::aisaacpb::Kick& SpcCommand::_internal_kick() const {
   return *kick_;
 }
-inline const ::Kick& AIsaacCommand::kick() const {
-  const ::Kick* p = kick_;
-  // @@protoc_insertion_point(field_get:AIsaacCommand.kick)
-  return p != NULL ? *p : *reinterpret_cast<const ::Kick*>(
-      &::_Kick_default_instance_);
+inline const ::aisaacpb::Kick& SpcCommand::kick() const {
+  const ::aisaacpb::Kick* p = kick_;
+  // @@protoc_insertion_point(field_get:aisaacpb.SpcCommand.kick)
+  return p != NULL ? *p : *reinterpret_cast<const ::aisaacpb::Kick*>(
+      &::aisaacpb::_Kick_default_instance_);
 }
-inline ::Kick* AIsaacCommand::release_kick() {
-  // @@protoc_insertion_point(field_release:AIsaacCommand.kick)
+inline ::aisaacpb::Kick* SpcCommand::release_kick() {
+  // @@protoc_insertion_point(field_release:aisaacpb.SpcCommand.kick)
   
-  ::Kick* temp = kick_;
+  ::aisaacpb::Kick* temp = kick_;
   kick_ = NULL;
   return temp;
 }
-inline ::Kick* AIsaacCommand::mutable_kick() {
+inline ::aisaacpb::Kick* SpcCommand::mutable_kick() {
   
   if (kick_ == NULL) {
-    auto* p = CreateMaybeMessage<::Kick>(GetArenaNoVirtual());
+    auto* p = CreateMaybeMessage<::aisaacpb::Kick>(GetArenaNoVirtual());
     kick_ = p;
   }
-  // @@protoc_insertion_point(field_mutable:AIsaacCommand.kick)
+  // @@protoc_insertion_point(field_mutable:aisaacpb.SpcCommand.kick)
   return kick_;
 }
-inline void AIsaacCommand::set_allocated_kick(::Kick* kick) {
+inline void SpcCommand::set_allocated_kick(::aisaacpb::Kick* kick) {
   ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
   if (message_arena == NULL) {
     delete kick_;
@@ -560,7 +2153,605 @@ inline void AIsaacCommand::set_allocated_kick(::Kick* kick) {
     
   }
   kick_ = kick;
-  // @@protoc_insertion_point(field_set_allocated:AIsaacCommand.kick)
+  // @@protoc_insertion_point(field_set_allocated:aisaacpb.SpcCommand.kick)
+}
+
+// bool prohibited_zone_ignore = 6;
+inline void SpcCommand::clear_prohibited_zone_ignore() {
+  prohibited_zone_ignore_ = false;
+}
+inline bool SpcCommand::prohibited_zone_ignore() const {
+  // @@protoc_insertion_point(field_get:aisaacpb.SpcCommand.prohibited_zone_ignore)
+  return prohibited_zone_ignore_;
+}
+inline void SpcCommand::set_prohibited_zone_ignore(bool value) {
+  
+  prohibited_zone_ignore_ = value;
+  // @@protoc_insertion_point(field_set:aisaacpb.SpcCommand.prohibited_zone_ignore)
+}
+
+// -------------------------------------------------------------------
+
+// RaspiCommand
+
+// .aisaacpb.Position current_pos = 1;
+inline bool RaspiCommand::has_current_pos() const {
+  return this != internal_default_instance() && current_pos_ != NULL;
+}
+inline void RaspiCommand::clear_current_pos() {
+  if (GetArenaNoVirtual() == NULL && current_pos_ != NULL) {
+    delete current_pos_;
+  }
+  current_pos_ = NULL;
+}
+inline const ::aisaacpb::Position& RaspiCommand::_internal_current_pos() const {
+  return *current_pos_;
+}
+inline const ::aisaacpb::Position& RaspiCommand::current_pos() const {
+  const ::aisaacpb::Position* p = current_pos_;
+  // @@protoc_insertion_point(field_get:aisaacpb.RaspiCommand.current_pos)
+  return p != NULL ? *p : *reinterpret_cast<const ::aisaacpb::Position*>(
+      &::aisaacpb::_Position_default_instance_);
+}
+inline ::aisaacpb::Position* RaspiCommand::release_current_pos() {
+  // @@protoc_insertion_point(field_release:aisaacpb.RaspiCommand.current_pos)
+  
+  ::aisaacpb::Position* temp = current_pos_;
+  current_pos_ = NULL;
+  return temp;
+}
+inline ::aisaacpb::Position* RaspiCommand::mutable_current_pos() {
+  
+  if (current_pos_ == NULL) {
+    auto* p = CreateMaybeMessage<::aisaacpb::Position>(GetArenaNoVirtual());
+    current_pos_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:aisaacpb.RaspiCommand.current_pos)
+  return current_pos_;
+}
+inline void RaspiCommand::set_allocated_current_pos(::aisaacpb::Position* current_pos) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == NULL) {
+    delete current_pos_;
+  }
+  if (current_pos) {
+    ::google::protobuf::Arena* submessage_arena = NULL;
+    if (message_arena != submessage_arena) {
+      current_pos = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, current_pos, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  current_pos_ = current_pos;
+  // @@protoc_insertion_point(field_set_allocated:aisaacpb.RaspiCommand.current_pos)
+}
+
+// .aisaacpb.Velocity move_vec = 2;
+inline bool RaspiCommand::has_move_vec() const {
+  return this != internal_default_instance() && move_vec_ != NULL;
+}
+inline void RaspiCommand::clear_move_vec() {
+  if (GetArenaNoVirtual() == NULL && move_vec_ != NULL) {
+    delete move_vec_;
+  }
+  move_vec_ = NULL;
+}
+inline const ::aisaacpb::Velocity& RaspiCommand::_internal_move_vec() const {
+  return *move_vec_;
+}
+inline const ::aisaacpb::Velocity& RaspiCommand::move_vec() const {
+  const ::aisaacpb::Velocity* p = move_vec_;
+  // @@protoc_insertion_point(field_get:aisaacpb.RaspiCommand.move_vec)
+  return p != NULL ? *p : *reinterpret_cast<const ::aisaacpb::Velocity*>(
+      &::aisaacpb::_Velocity_default_instance_);
+}
+inline ::aisaacpb::Velocity* RaspiCommand::release_move_vec() {
+  // @@protoc_insertion_point(field_release:aisaacpb.RaspiCommand.move_vec)
+  
+  ::aisaacpb::Velocity* temp = move_vec_;
+  move_vec_ = NULL;
+  return temp;
+}
+inline ::aisaacpb::Velocity* RaspiCommand::mutable_move_vec() {
+  
+  if (move_vec_ == NULL) {
+    auto* p = CreateMaybeMessage<::aisaacpb::Velocity>(GetArenaNoVirtual());
+    move_vec_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:aisaacpb.RaspiCommand.move_vec)
+  return move_vec_;
+}
+inline void RaspiCommand::set_allocated_move_vec(::aisaacpb::Velocity* move_vec) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == NULL) {
+    delete move_vec_;
+  }
+  if (move_vec) {
+    ::google::protobuf::Arena* submessage_arena = NULL;
+    if (message_arena != submessage_arena) {
+      move_vec = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, move_vec, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  move_vec_ = move_vec;
+  // @@protoc_insertion_point(field_set_allocated:aisaacpb.RaspiCommand.move_vec)
+}
+
+// .aisaacpb.Position target_pos = 3;
+inline bool RaspiCommand::has_target_pos() const {
+  return this != internal_default_instance() && target_pos_ != NULL;
+}
+inline void RaspiCommand::clear_target_pos() {
+  if (GetArenaNoVirtual() == NULL && target_pos_ != NULL) {
+    delete target_pos_;
+  }
+  target_pos_ = NULL;
+}
+inline const ::aisaacpb::Position& RaspiCommand::_internal_target_pos() const {
+  return *target_pos_;
+}
+inline const ::aisaacpb::Position& RaspiCommand::target_pos() const {
+  const ::aisaacpb::Position* p = target_pos_;
+  // @@protoc_insertion_point(field_get:aisaacpb.RaspiCommand.target_pos)
+  return p != NULL ? *p : *reinterpret_cast<const ::aisaacpb::Position*>(
+      &::aisaacpb::_Position_default_instance_);
+}
+inline ::aisaacpb::Position* RaspiCommand::release_target_pos() {
+  // @@protoc_insertion_point(field_release:aisaacpb.RaspiCommand.target_pos)
+  
+  ::aisaacpb::Position* temp = target_pos_;
+  target_pos_ = NULL;
+  return temp;
+}
+inline ::aisaacpb::Position* RaspiCommand::mutable_target_pos() {
+  
+  if (target_pos_ == NULL) {
+    auto* p = CreateMaybeMessage<::aisaacpb::Position>(GetArenaNoVirtual());
+    target_pos_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:aisaacpb.RaspiCommand.target_pos)
+  return target_pos_;
+}
+inline void RaspiCommand::set_allocated_target_pos(::aisaacpb::Position* target_pos) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == NULL) {
+    delete target_pos_;
+  }
+  if (target_pos) {
+    ::google::protobuf::Arena* submessage_arena = NULL;
+    if (message_arena != submessage_arena) {
+      target_pos = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, target_pos, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  target_pos_ = target_pos;
+  // @@protoc_insertion_point(field_set_allocated:aisaacpb.RaspiCommand.target_pos)
+}
+
+// bool dwa_result_valid = 4;
+inline void RaspiCommand::clear_dwa_result_valid() {
+  dwa_result_valid_ = false;
+}
+inline bool RaspiCommand::dwa_result_valid() const {
+  // @@protoc_insertion_point(field_get:aisaacpb.RaspiCommand.dwa_result_valid)
+  return dwa_result_valid_;
+}
+inline void RaspiCommand::set_dwa_result_valid(bool value) {
+  
+  dwa_result_valid_ = value;
+  // @@protoc_insertion_point(field_set:aisaacpb.RaspiCommand.dwa_result_valid)
+}
+
+// bool path_enable = 5;
+inline void RaspiCommand::clear_path_enable() {
+  path_enable_ = false;
+}
+inline bool RaspiCommand::path_enable() const {
+  // @@protoc_insertion_point(field_get:aisaacpb.RaspiCommand.path_enable)
+  return path_enable_;
+}
+inline void RaspiCommand::set_path_enable(bool value) {
+  
+  path_enable_ = value;
+  // @@protoc_insertion_point(field_set:aisaacpb.RaspiCommand.path_enable)
+}
+
+// .aisaacpb.DwaResult dwa_result = 6;
+inline bool RaspiCommand::has_dwa_result() const {
+  return this != internal_default_instance() && dwa_result_ != NULL;
+}
+inline void RaspiCommand::clear_dwa_result() {
+  if (GetArenaNoVirtual() == NULL && dwa_result_ != NULL) {
+    delete dwa_result_;
+  }
+  dwa_result_ = NULL;
+}
+inline const ::aisaacpb::DwaResult& RaspiCommand::_internal_dwa_result() const {
+  return *dwa_result_;
+}
+inline const ::aisaacpb::DwaResult& RaspiCommand::dwa_result() const {
+  const ::aisaacpb::DwaResult* p = dwa_result_;
+  // @@protoc_insertion_point(field_get:aisaacpb.RaspiCommand.dwa_result)
+  return p != NULL ? *p : *reinterpret_cast<const ::aisaacpb::DwaResult*>(
+      &::aisaacpb::_DwaResult_default_instance_);
+}
+inline ::aisaacpb::DwaResult* RaspiCommand::release_dwa_result() {
+  // @@protoc_insertion_point(field_release:aisaacpb.RaspiCommand.dwa_result)
+  
+  ::aisaacpb::DwaResult* temp = dwa_result_;
+  dwa_result_ = NULL;
+  return temp;
+}
+inline ::aisaacpb::DwaResult* RaspiCommand::mutable_dwa_result() {
+  
+  if (dwa_result_ == NULL) {
+    auto* p = CreateMaybeMessage<::aisaacpb::DwaResult>(GetArenaNoVirtual());
+    dwa_result_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:aisaacpb.RaspiCommand.dwa_result)
+  return dwa_result_;
+}
+inline void RaspiCommand::set_allocated_dwa_result(::aisaacpb::DwaResult* dwa_result) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == NULL) {
+    delete dwa_result_;
+  }
+  if (dwa_result) {
+    ::google::protobuf::Arena* submessage_arena = NULL;
+    if (message_arena != submessage_arena) {
+      dwa_result = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, dwa_result, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  dwa_result_ = dwa_result;
+  // @@protoc_insertion_point(field_set_allocated:aisaacpb.RaspiCommand.dwa_result)
+}
+
+// .aisaacpb.Kick kick = 7;
+inline bool RaspiCommand::has_kick() const {
+  return this != internal_default_instance() && kick_ != NULL;
+}
+inline void RaspiCommand::clear_kick() {
+  if (GetArenaNoVirtual() == NULL && kick_ != NULL) {
+    delete kick_;
+  }
+  kick_ = NULL;
+}
+inline const ::aisaacpb::Kick& RaspiCommand::_internal_kick() const {
+  return *kick_;
+}
+inline const ::aisaacpb::Kick& RaspiCommand::kick() const {
+  const ::aisaacpb::Kick* p = kick_;
+  // @@protoc_insertion_point(field_get:aisaacpb.RaspiCommand.kick)
+  return p != NULL ? *p : *reinterpret_cast<const ::aisaacpb::Kick*>(
+      &::aisaacpb::_Kick_default_instance_);
+}
+inline ::aisaacpb::Kick* RaspiCommand::release_kick() {
+  // @@protoc_insertion_point(field_release:aisaacpb.RaspiCommand.kick)
+  
+  ::aisaacpb::Kick* temp = kick_;
+  kick_ = NULL;
+  return temp;
+}
+inline ::aisaacpb::Kick* RaspiCommand::mutable_kick() {
+  
+  if (kick_ == NULL) {
+    auto* p = CreateMaybeMessage<::aisaacpb::Kick>(GetArenaNoVirtual());
+    kick_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:aisaacpb.RaspiCommand.kick)
+  return kick_;
+}
+inline void RaspiCommand::set_allocated_kick(::aisaacpb::Kick* kick) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == NULL) {
+    delete kick_;
+  }
+  if (kick) {
+    ::google::protobuf::Arena* submessage_arena = NULL;
+    if (message_arena != submessage_arena) {
+      kick = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, kick, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  kick_ = kick;
+  // @@protoc_insertion_point(field_set_allocated:aisaacpb.RaspiCommand.kick)
+}
+
+// -------------------------------------------------------------------
+
+// RobotStatus
+
+// .aisaacpb.Position current_pos = 1;
+inline bool RobotStatus::has_current_pos() const {
+  return this != internal_default_instance() && current_pos_ != NULL;
+}
+inline void RobotStatus::clear_current_pos() {
+  if (GetArenaNoVirtual() == NULL && current_pos_ != NULL) {
+    delete current_pos_;
+  }
+  current_pos_ = NULL;
+}
+inline const ::aisaacpb::Position& RobotStatus::_internal_current_pos() const {
+  return *current_pos_;
+}
+inline const ::aisaacpb::Position& RobotStatus::current_pos() const {
+  const ::aisaacpb::Position* p = current_pos_;
+  // @@protoc_insertion_point(field_get:aisaacpb.RobotStatus.current_pos)
+  return p != NULL ? *p : *reinterpret_cast<const ::aisaacpb::Position*>(
+      &::aisaacpb::_Position_default_instance_);
+}
+inline ::aisaacpb::Position* RobotStatus::release_current_pos() {
+  // @@protoc_insertion_point(field_release:aisaacpb.RobotStatus.current_pos)
+  
+  ::aisaacpb::Position* temp = current_pos_;
+  current_pos_ = NULL;
+  return temp;
+}
+inline ::aisaacpb::Position* RobotStatus::mutable_current_pos() {
+  
+  if (current_pos_ == NULL) {
+    auto* p = CreateMaybeMessage<::aisaacpb::Position>(GetArenaNoVirtual());
+    current_pos_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:aisaacpb.RobotStatus.current_pos)
+  return current_pos_;
+}
+inline void RobotStatus::set_allocated_current_pos(::aisaacpb::Position* current_pos) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == NULL) {
+    delete current_pos_;
+  }
+  if (current_pos) {
+    ::google::protobuf::Arena* submessage_arena = NULL;
+    if (message_arena != submessage_arena) {
+      current_pos = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, current_pos, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  current_pos_ = current_pos;
+  // @@protoc_insertion_point(field_set_allocated:aisaacpb.RobotStatus.current_pos)
+}
+
+// .aisaacpb.Velocity current_vel = 2;
+inline bool RobotStatus::has_current_vel() const {
+  return this != internal_default_instance() && current_vel_ != NULL;
+}
+inline void RobotStatus::clear_current_vel() {
+  if (GetArenaNoVirtual() == NULL && current_vel_ != NULL) {
+    delete current_vel_;
+  }
+  current_vel_ = NULL;
+}
+inline const ::aisaacpb::Velocity& RobotStatus::_internal_current_vel() const {
+  return *current_vel_;
+}
+inline const ::aisaacpb::Velocity& RobotStatus::current_vel() const {
+  const ::aisaacpb::Velocity* p = current_vel_;
+  // @@protoc_insertion_point(field_get:aisaacpb.RobotStatus.current_vel)
+  return p != NULL ? *p : *reinterpret_cast<const ::aisaacpb::Velocity*>(
+      &::aisaacpb::_Velocity_default_instance_);
+}
+inline ::aisaacpb::Velocity* RobotStatus::release_current_vel() {
+  // @@protoc_insertion_point(field_release:aisaacpb.RobotStatus.current_vel)
+  
+  ::aisaacpb::Velocity* temp = current_vel_;
+  current_vel_ = NULL;
+  return temp;
+}
+inline ::aisaacpb::Velocity* RobotStatus::mutable_current_vel() {
+  
+  if (current_vel_ == NULL) {
+    auto* p = CreateMaybeMessage<::aisaacpb::Velocity>(GetArenaNoVirtual());
+    current_vel_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:aisaacpb.RobotStatus.current_vel)
+  return current_vel_;
+}
+inline void RobotStatus::set_allocated_current_vel(::aisaacpb::Velocity* current_vel) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == NULL) {
+    delete current_vel_;
+  }
+  if (current_vel) {
+    ::google::protobuf::Arena* submessage_arena = NULL;
+    if (message_arena != submessage_arena) {
+      current_vel = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, current_vel, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  current_vel_ = current_vel;
+  // @@protoc_insertion_point(field_set_allocated:aisaacpb.RobotStatus.current_vel)
+}
+
+// -------------------------------------------------------------------
+
+// AIsaacCommand
+
+// int32 robot_command_coordinate_system_type = 1;
+inline void AIsaacCommand::clear_robot_command_coordinate_system_type() {
+  robot_command_coordinate_system_type_ = 0;
+}
+inline ::google::protobuf::int32 AIsaacCommand::robot_command_coordinate_system_type() const {
+  // @@protoc_insertion_point(field_get:aisaacpb.AIsaacCommand.robot_command_coordinate_system_type)
+  return robot_command_coordinate_system_type_;
+}
+inline void AIsaacCommand::set_robot_command_coordinate_system_type(::google::protobuf::int32 value) {
+  
+  robot_command_coordinate_system_type_ = value;
+  // @@protoc_insertion_point(field_set:aisaacpb.AIsaacCommand.robot_command_coordinate_system_type)
+}
+
+// int32 target_x = 2;
+inline void AIsaacCommand::clear_target_x() {
+  target_x_ = 0;
+}
+inline ::google::protobuf::int32 AIsaacCommand::target_x() const {
+  // @@protoc_insertion_point(field_get:aisaacpb.AIsaacCommand.target_x)
+  return target_x_;
+}
+inline void AIsaacCommand::set_target_x(::google::protobuf::int32 value) {
+  
+  target_x_ = value;
+  // @@protoc_insertion_point(field_set:aisaacpb.AIsaacCommand.target_x)
+}
+
+// int32 target_y = 3;
+inline void AIsaacCommand::clear_target_y() {
+  target_y_ = 0;
+}
+inline ::google::protobuf::int32 AIsaacCommand::target_y() const {
+  // @@protoc_insertion_point(field_get:aisaacpb.AIsaacCommand.target_y)
+  return target_y_;
+}
+inline void AIsaacCommand::set_target_y(::google::protobuf::int32 value) {
+  
+  target_y_ = value;
+  // @@protoc_insertion_point(field_set:aisaacpb.AIsaacCommand.target_y)
+}
+
+// int32 target_angle = 4;
+inline void AIsaacCommand::clear_target_angle() {
+  target_angle_ = 0;
+}
+inline ::google::protobuf::int32 AIsaacCommand::target_angle() const {
+  // @@protoc_insertion_point(field_get:aisaacpb.AIsaacCommand.target_angle)
+  return target_angle_;
+}
+inline void AIsaacCommand::set_target_angle(::google::protobuf::int32 value) {
+  
+  target_angle_ = value;
+  // @@protoc_insertion_point(field_set:aisaacpb.AIsaacCommand.target_angle)
+}
+
+// bool vision_data_valid = 5;
+inline void AIsaacCommand::clear_vision_data_valid() {
+  vision_data_valid_ = false;
+}
+inline bool AIsaacCommand::vision_data_valid() const {
+  // @@protoc_insertion_point(field_get:aisaacpb.AIsaacCommand.vision_data_valid)
+  return vision_data_valid_;
+}
+inline void AIsaacCommand::set_vision_data_valid(bool value) {
+  
+  vision_data_valid_ = value;
+  // @@protoc_insertion_point(field_set:aisaacpb.AIsaacCommand.vision_data_valid)
+}
+
+// int32 current_x = 6;
+inline void AIsaacCommand::clear_current_x() {
+  current_x_ = 0;
+}
+inline ::google::protobuf::int32 AIsaacCommand::current_x() const {
+  // @@protoc_insertion_point(field_get:aisaacpb.AIsaacCommand.current_x)
+  return current_x_;
+}
+inline void AIsaacCommand::set_current_x(::google::protobuf::int32 value) {
+  
+  current_x_ = value;
+  // @@protoc_insertion_point(field_set:aisaacpb.AIsaacCommand.current_x)
+}
+
+// int32 current_y = 7;
+inline void AIsaacCommand::clear_current_y() {
+  current_y_ = 0;
+}
+inline ::google::protobuf::int32 AIsaacCommand::current_y() const {
+  // @@protoc_insertion_point(field_get:aisaacpb.AIsaacCommand.current_y)
+  return current_y_;
+}
+inline void AIsaacCommand::set_current_y(::google::protobuf::int32 value) {
+  
+  current_y_ = value;
+  // @@protoc_insertion_point(field_set:aisaacpb.AIsaacCommand.current_y)
+}
+
+// int32 current_angle = 8;
+inline void AIsaacCommand::clear_current_angle() {
+  current_angle_ = 0;
+}
+inline ::google::protobuf::int32 AIsaacCommand::current_angle() const {
+  // @@protoc_insertion_point(field_get:aisaacpb.AIsaacCommand.current_angle)
+  return current_angle_;
+}
+inline void AIsaacCommand::set_current_angle(::google::protobuf::int32 value) {
+  
+  current_angle_ = value;
+  // @@protoc_insertion_point(field_set:aisaacpb.AIsaacCommand.current_angle)
+}
+
+// .aisaacpb.Kick kick = 9;
+inline bool AIsaacCommand::has_kick() const {
+  return this != internal_default_instance() && kick_ != NULL;
+}
+inline void AIsaacCommand::clear_kick() {
+  if (GetArenaNoVirtual() == NULL && kick_ != NULL) {
+    delete kick_;
+  }
+  kick_ = NULL;
+}
+inline const ::aisaacpb::Kick& AIsaacCommand::_internal_kick() const {
+  return *kick_;
+}
+inline const ::aisaacpb::Kick& AIsaacCommand::kick() const {
+  const ::aisaacpb::Kick* p = kick_;
+  // @@protoc_insertion_point(field_get:aisaacpb.AIsaacCommand.kick)
+  return p != NULL ? *p : *reinterpret_cast<const ::aisaacpb::Kick*>(
+      &::aisaacpb::_Kick_default_instance_);
+}
+inline ::aisaacpb::Kick* AIsaacCommand::release_kick() {
+  // @@protoc_insertion_point(field_release:aisaacpb.AIsaacCommand.kick)
+  
+  ::aisaacpb::Kick* temp = kick_;
+  kick_ = NULL;
+  return temp;
+}
+inline ::aisaacpb::Kick* AIsaacCommand::mutable_kick() {
+  
+  if (kick_ == NULL) {
+    auto* p = CreateMaybeMessage<::aisaacpb::Kick>(GetArenaNoVirtual());
+    kick_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:aisaacpb.AIsaacCommand.kick)
+  return kick_;
+}
+inline void AIsaacCommand::set_allocated_kick(::aisaacpb::Kick* kick) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == NULL) {
+    delete kick_;
+  }
+  if (kick) {
+    ::google::protobuf::Arena* submessage_arena = NULL;
+    if (message_arena != submessage_arena) {
+      kick = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, kick, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  kick_ = kick;
+  // @@protoc_insertion_point(field_set_allocated:aisaacpb.AIsaacCommand.kick)
 }
 
 #ifdef __GNUC__
@@ -568,9 +2759,41 @@ inline void AIsaacCommand::set_allocated_kick(::Kick* kick) {
 #endif  // __GNUC__
 // -------------------------------------------------------------------
 
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 
 // @@protoc_insertion_point(namespace_scope)
 
+}  // namespace aisaacpb
+
+namespace google {
+namespace protobuf {
+
+template <> struct is_proto_enum< ::aisaacpb::Kick_KickType> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::aisaacpb::Kick_KickType>() {
+  return ::aisaacpb::Kick_KickType_descriptor();
+}
+template <> struct is_proto_enum< ::aisaacpb::Kick_KickMethod> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::aisaacpb::Kick_KickMethod>() {
+  return ::aisaacpb::Kick_KickMethod_descriptor();
+}
+
+}  // namespace protobuf
+}  // namespace google
 
 // @@protoc_insertion_point(global_scope)
 

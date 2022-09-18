@@ -95,25 +95,50 @@ namespace aisaac
         // Index:0 DATAType5 0b101 + 0b00000
         out.push_back(0b10100000);
 
-        // 
-        AIsaacCommand aisaac_command;
-        aisaac_command.set_robot_command_coordinate_system_type(command.robotCommandCoordinateSystemType);
-        aisaac_command.set_target_x(command.targetX);
-        aisaac_command.set_target_y(command.targetY);
-        aisaac_command.set_target_angle(command.targetAngle);
-        aisaac_command.set_vision_data_valid(command.visionDataValid);
-        aisaac_command.set_current_x(command.currentX);
-        aisaac_command.set_current_y(command.currentY);
-        aisaac_command.set_current_angle(command.currentAngle);
-        Kick aisaac_kick_command;
-        aisaac_kick_command.set_sensor_use_type(command.kickParameter.sensorUse);
-        aisaac_kick_command.set_kick_type(command.kickParameter.kickType);
-        aisaac_kick_command.set_kick_strength(command.kickParameter.kickStrength);
-        aisaac_command.set_allocated_kick(&aisaac_kick_command);
+        // Construct Protobuf message
+        aisaacpb::SpcCommand cmd_to_robot;
+        aisaacpb::Position current_pos;
+        current_pos.set_x(command.currentX);
+        current_pos.set_y(command.currentY);
+        current_pos.set_theta(command.currentAngle);
+        cmd_to_robot.set_allocated_current_pos(&current_pos);
+        aisaacpb::Velocity move_vec;
+        move_vec.set_vx(0);
+        move_vec.set_vy(0);
+        move_vec.set_omega(0);
+        cmd_to_robot.set_allocated_move_vec(&move_vec);
+        aisaacpb::Position target_pos;
+        target_pos.set_x(command.targetX);
+        target_pos.set_y(command.targetY);
+        target_pos.set_theta(command.targetAngle);
+        // https://developers.google.com/protocol-buffers/docs/cpptutorial#writing-a-message
+        aisaacpb::Obstacle *obstacle = cmd_to_robot.add_obstacles();
+        obstacle->set_x(0);
+        obstacle->set_y(0);
+        obstacle->set_vx(0);
+        obstacle->set_vy(0);
+        aisaacpb::Kick kick_cmd;
+        kick_cmd.set_sensor_type(aisaacpb::Kick::KickType(command.kickParameter.sensorUse));
+        kick_cmd.set_kick_method(aisaacpb::Kick::KickMethod(command.kickParameter.kickType));
+        kick_cmd.set_kick_strength((int32_t)command.kickParameter.kickStrength);
+        aisaacpb::Position ball_waypoint;
+        ball_waypoint.set_x(0);
+        ball_waypoint.set_y(0);
+        kick_cmd.set_allocated_ball_waypoint(&ball_waypoint);
+        aisaacpb::Position ball_pos;
+        ball_pos.set_x(0);
+        ball_pos.set_y(0);
+        kick_cmd.set_allocated_ball_pos(&ball_pos);
+        aisaacpb::Velocity ball_vel;
+        ball_vel.set_vx(0);
+        ball_vel.set_vy(0);
+        kick_cmd.set_allocated_ball_vel(&ball_vel);
+        cmd_to_robot.set_allocated_kick(&kick_cmd);
+        cmd_to_robot.set_prohibited_zone_ignore(false);
         
         std::string serialized_str;
         // Encode
-        aisaac_command.SerializeToString(&serialized_str);
+        cmd_to_robot.SerializeToString(&serialized_str);
 
         for (unsigned char c : serialized_str) {
             out.push_back(c);
