@@ -6,7 +6,6 @@
 #include <vector>
 #include <functional>
 #include <cstdlib>
-#include "aisaac_communication/aisaaccommand.pb.h"
 
 namespace aisaac
 {
@@ -73,87 +72,6 @@ namespace aisaac
         std::cout << "XBee IF: " << (xbeeActivated ? "Active" : "Inactive") << std::endl;
         std::cout << "WiFi IF: " << (wifiActivated ? "Active" : "Inactive") << std::endl;
         std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
-    }
-    void AisaacBitmapHandler::convertToString(commandToRobot command, std::vector<unsigned char> &out) {
-        std::cout << "command";
-        std::cout << " robotCommandCoordinateSystemType: " << (int)command.robotCommandCoordinateSystemType;
-        std::cout << " targetX: " << command.targetX;
-        std::cout << " targetY: " << command.targetY;
-        std::cout << " targetAngle: " << command.targetAngle;
-        std::cout << " visionDataValid: " << (int)command.visionDataValid;
-        std::cout << " currentX: " << command.currentX;
-        std::cout << " currentY: " << command.currentY;
-        std::cout << " currentAngle: " << (int)command.currentAngle;
-        std::cout << " kickParameter.sensorUse: " << (int)command.kickParameter.sensorUse;
-        std::cout << " kickParameter.kickType: " << (int)command.kickParameter.kickType;
-        std::cout << " kickParameter.kickStrength: " << (int)command.kickParameter.kickStrength;
-        std::cout << " miscByte: " << (int)command.miscByte;
-        std::cout << std::endl;
-
-        out.clear();
-
-        // Index:0 DATAType5 0b101 + 0b00000
-        out.push_back(0b10100000);
-
-        // Construct Protobuf message
-        aisaacpb::SpcCommand cmd_to_robot;
-        aisaacpb::RobotCommandCoordinateSystemType coord_type;
-        if (command.robotCommandCoordinateSystemType == 0) {
-            coord_type = aisaacpb::RobotCommandCoordinateSystemType::Vector;
-        } else if (command.robotCommandCoordinateSystemType == 1) {
-            coord_type = aisaacpb::RobotCommandCoordinateSystemType::Coordinate;
-        } else if (command.robotCommandCoordinateSystemType == 2) {
-            coord_type = aisaacpb::RobotCommandCoordinateSystemType::Relax;
-        }
-        cmd_to_robot.set_robot_command_coordinate_system_type(coord_type);
-        cmd_to_robot.set_vision_data_valid(command.visionDataValid);
-        aisaacpb::Position current_pos;
-        current_pos.set_x(command.currentX);
-        current_pos.set_y(command.currentY);
-        current_pos.set_theta(command.currentAngle);
-        cmd_to_robot.set_allocated_current_pos(&current_pos);
-        aisaacpb::Velocity move_vec;
-        move_vec.set_vx(command.currentX);
-        move_vec.set_vy(command.currentY);
-        move_vec.set_omega(command.currentAngle);
-        cmd_to_robot.set_allocated_move_vec(&move_vec);
-        aisaacpb::Position target_pos;
-        target_pos.set_x(command.targetX);
-        target_pos.set_y(command.targetY);
-        target_pos.set_theta(command.targetAngle);
-        // https://developers.google.com/protocol-buffers/docs/cpptutorial#writing-a-message
-        // ToDo
-        aisaacpb::Obstacle *obstacle = cmd_to_robot.add_obstacles();
-        obstacle->set_x(0);
-        obstacle->set_y(0);
-        obstacle->set_vx(0);
-        obstacle->set_vy(0);
-        aisaacpb::Kick kick_cmd;
-        kick_cmd.set_sensor_type(aisaacpb::Kick::KickType(command.kickParameter.sensorUse));
-        kick_cmd.set_kick_method(aisaacpb::Kick::KickMethod(command.kickParameter.kickType));
-        kick_cmd.set_kick_strength((int32_t)command.kickParameter.kickStrength);
-        aisaacpb::Position ball_waypoint;
-        ball_waypoint.set_x(0);
-        ball_waypoint.set_y(0);
-        kick_cmd.set_allocated_ball_waypoint(&ball_waypoint);
-        aisaacpb::Position ball_pos;
-        ball_pos.set_x(0);
-        ball_pos.set_y(0);
-        kick_cmd.set_allocated_ball_pos(&ball_pos);
-        aisaacpb::Velocity ball_vel;
-        ball_vel.set_vx(0);
-        ball_vel.set_vy(0);
-        kick_cmd.set_allocated_ball_vel(&ball_vel);
-        cmd_to_robot.set_allocated_kick(&kick_cmd);
-        cmd_to_robot.set_prohibited_zone_ignore(false);
-        
-        std::string serialized_str;
-        // Encode
-        cmd_to_robot.SerializeToString(&serialized_str);
-
-        for (unsigned char c : serialized_str) {
-            out.push_back(c);
-        }
     }
     void AisaacBitmapHandler::generateFT4(commandToRobot command, std::vector<unsigned char> &out) {
 
