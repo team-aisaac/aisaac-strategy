@@ -77,9 +77,9 @@ class Objects(object):
         elif len(self._active_robot_ids) == 2:
             roles = ["RFW", "GK"]
         elif len(self._active_robot_ids) == 1:
-            roles = ["RFW"]
+            roles = ["GK"]
         else:
-            roles = ["RFW"]
+            roles = ["GK"]
             rospy.loginfo_throttle(5.0, str(self._node_name)+": Error! Current active robot ids: " +
                   str(self._active_robot_ids))
 
