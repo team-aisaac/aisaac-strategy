@@ -1,0 +1,19 @@
+Pose goal_pose
+bool prohidited_zone_ignore
+bool midle_target_flag
+Pose middle_goal_pose
+int32 dribble_power
+bool dribble_state
+bool dribbler_active
+int32 kick_power
+bool ball_kick_state
+bool ball_kick_active
+bool free_kick_flg
+PlaceBall ball_goal
+int32 ball_target_allowable_error
+Pose dribble_goal
+int32 dribble_complete_distance 
+Pose current_pose
+Obstacle[] obstacles
+PlaceBall ball_pose
+
