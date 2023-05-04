@@ -264,8 +264,8 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::Kick, sensor_type_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::Kick, kick_method_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::Kick, ball_kick_state_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::Kick, ball_kick_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::Kick, kick_power_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::Kick, ball_kick_active_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::Kick, free_kick_flag_),
@@ -362,40 +362,39 @@ void AddDescriptorsImpl() {
       "omega\030\003 \001(\005\"&\n\014Acceleration\022\n\n\002ax\030\001 \001(\005\022"
       "\n\n\002ay\030\002 \001(\005\"G\n\010Obstacle\022\t\n\001x\030\001 \001(\005\022\t\n\001y\030"
       "\002 \001(\005\022\r\n\005theta\030\003 \001(\005\022\n\n\002vx\030\004 \001(\005\022\n\n\002vy\030\005"
-      " \001(\005\"\321\002\n\004Kick\022,\n\013sensor_type\030\001 \001(\0162\027.ais"
-      "aacpb.Kick.KickType\022.\n\013kick_method\030\002 \001(\016"
-      "2\031.aisaacpb.Kick.KickMethod\022\022\n\nkick_powe"
-      "r\030\003 \001(\005\022\030\n\020ball_kick_active\030\004 \001(\010\022\026\n\016fre"
-      "e_kick_flag\030\005 \001(\010\022%\n\tball_goal\030\006 \001(\0132\022.a"
-      "isaacpb.Position\022#\n\033ball_target_allowabl"
-      "e_error\030\007 \001(\005\"3\n\010KickType\022\010\n\004None\020\000\022\t\n\005F"
-      "orce\020\001\022\n\n\006Sensor\020\002\022\006\n\002XY\020\003\"$\n\nKickMethod"
-      "\022\010\n\004Chip\020\000\022\014\n\010Straight\020\001\"\235\001\n\007Dribble\022\025\n\r"
-      "dribble_power\030\001 \001(\001\022\025\n\rdribble_state\030\002 \001"
-      "(\010\022\027\n\017dribbler_active\030\003 \001(\010\022(\n\014dribble_g"
-      "oal\030\004 \001(\0132\022.aisaacpb.Position\022!\n\031dribble"
-      "_complete_distance\030\005 \001(\005\"\247\002\n\nSpcCommand\022"
-      "F\n\022robot_command_type\030\001 \001(\0162*.aisaacpb.R"
-      "obotCommandCoordinateSystemType\022%\n\tgoal_"
-      "pose\030\002 \001(\0132\022.aisaacpb.Position\022\036\n\026prohib"
-      "ited_zone_ignore\030\003 \001(\010\022\032\n\022middle_target_"
-      "flag\030\004 \001(\010\022,\n\020middle_goal_pose\030\005 \001(\0132\022.a"
-      "isaacpb.Position\022\"\n\007dribble\030\006 \001(\0132\021.aisa"
-      "acpb.Dribble\022\034\n\004kick\030\007 \001(\0132\016.aisaacpb.Ki"
-      "ck\"\310\001\n\014RaspiCommand\022F\n\022robot_command_typ"
-      "e\030\001 \001(\0162*.aisaacpb.RobotCommandCoordinat"
-      "eSystemType\022.\n\022goal_pose_velocity\030\002 \001(\0132"
-      "\022.aisaacpb.Velocity\022\"\n\007dribble\030\003 \001(\0132\021.a"
-      "isaacpb.Dribble\022\034\n\004kick\030\004 \001(\0132\016.aisaacpb"
-      ".Kick\"\220\001\n\nVisionData\0220\n\024own_machine_posi"
-      "tion\030\001 \001(\0132\022.aisaacpb.Position\022)\n\rball_p"
-      "osition\030\002 \001(\0132\022.aisaacpb.Position\022%\n\tobs"
-      "tacles\030\003 \003(\0132\022.aisaacpb.Obstacle*I\n Robo"
-      "tCommandCoordinateSystemType\022\n\n\006Vector\020\000"
-      "\022\016\n\nCoordinate\020\001\022\t\n\005Relax\020\002b\006proto3"
+      " \001(\005\"\237\002\n\004Kick\022\027\n\017ball_kick_state\030\001 \001(\010\022\021"
+      "\n\tball_kick\030\002 \001(\010\022\022\n\nkick_power\030\003 \001(\005\022\030\n"
+      "\020ball_kick_active\030\004 \001(\010\022\026\n\016free_kick_fla"
+      "g\030\005 \001(\010\022%\n\tball_goal\030\006 \001(\0132\022.aisaacpb.Po"
+      "sition\022#\n\033ball_target_allowable_error\030\007 "
+      "\001(\005\"3\n\010KickType\022\010\n\004None\020\000\022\t\n\005Force\020\001\022\n\n\006"
+      "Sensor\020\002\022\006\n\002XY\020\003\"$\n\nKickMethod\022\010\n\004Chip\020\000"
+      "\022\014\n\010Straight\020\001\"\235\001\n\007Dribble\022\025\n\rdribble_po"
+      "wer\030\001 \001(\001\022\025\n\rdribble_state\030\002 \001(\010\022\027\n\017drib"
+      "bler_active\030\003 \001(\010\022(\n\014dribble_goal\030\004 \001(\0132"
+      "\022.aisaacpb.Position\022!\n\031dribble_complete_"
+      "distance\030\005 \001(\005\"\247\002\n\nSpcCommand\022F\n\022robot_c"
+      "ommand_type\030\001 \001(\0162*.aisaacpb.RobotComman"
+      "dCoordinateSystemType\022%\n\tgoal_pose\030\002 \001(\013"
+      "2\022.aisaacpb.Position\022\036\n\026prohibited_zone_"
+      "ignore\030\003 \001(\010\022\032\n\022middle_target_flag\030\004 \001(\010"
+      "\022,\n\020middle_goal_pose\030\005 \001(\0132\022.aisaacpb.Po"
+      "sition\022\"\n\007dribble\030\006 \001(\0132\021.aisaacpb.Dribb"
+      "le\022\034\n\004kick\030\007 \001(\0132\016.aisaacpb.Kick\"\310\001\n\014Ras"
+      "piCommand\022F\n\022robot_command_type\030\001 \001(\0162*."
+      "aisaacpb.RobotCommandCoordinateSystemTyp"
+      "e\022.\n\022goal_pose_velocity\030\002 \001(\0132\022.aisaacpb"
+      ".Velocity\022\"\n\007dribble\030\003 \001(\0132\021.aisaacpb.Dr"
+      "ibble\022\034\n\004kick\030\004 \001(\0132\016.aisaacpb.Kick\"\220\001\n\n"
+      "VisionData\0220\n\024own_machine_position\030\001 \001(\013"
+      "2\022.aisaacpb.Position\022)\n\rball_position\030\002 "
+      "\001(\0132\022.aisaacpb.Position\022%\n\tobstacles\030\003 \003"
+      "(\0132\022.aisaacpb.Obstacle*I\n RobotCommandCo"
+      "ordinateSystemType\022\n\n\006Vector\020\000\022\016\n\nCoordi"
+      "nate\020\001\022\t\n\005Relax\020\002b\006proto3"
   };
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 1475);
+      descriptor, 1425);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "aisaaccommand.proto", &protobuf_RegisterTypes);
 }
@@ -1721,8 +1720,8 @@ void Kick::InitAsDefaultInstance() {
       ::aisaacpb::Position::internal_default_instance());
 }
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int Kick::kSensorTypeFieldNumber;
-const int Kick::kKickMethodFieldNumber;
+const int Kick::kBallKickStateFieldNumber;
+const int Kick::kBallKickFieldNumber;
 const int Kick::kKickPowerFieldNumber;
 const int Kick::kBallKickActiveFieldNumber;
 const int Kick::kFreeKickFlagFieldNumber;
@@ -1746,9 +1745,9 @@ Kick::Kick(const Kick& from)
   } else {
     ball_goal_ = NULL;
   }
-  ::memcpy(&sensor_type_, &from.sensor_type_,
+  ::memcpy(&kick_power_, &from.kick_power_,
     static_cast<size_t>(reinterpret_cast<char*>(&ball_target_allowable_error_) -
-    reinterpret_cast<char*>(&sensor_type_)) + sizeof(ball_target_allowable_error_));
+    reinterpret_cast<char*>(&kick_power_)) + sizeof(ball_target_allowable_error_));
   // @@protoc_insertion_point(copy_constructor:aisaacpb.Kick)
 }
 
@@ -1791,9 +1790,9 @@ void Kick::Clear() {
     delete ball_goal_;
   }
   ball_goal_ = NULL;
-  ::memset(&sensor_type_, 0, static_cast<size_t>(
+  ::memset(&kick_power_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&ball_target_allowable_error_) -
-      reinterpret_cast<char*>(&sensor_type_)) + sizeof(ball_target_allowable_error_));
+      reinterpret_cast<char*>(&kick_power_)) + sizeof(ball_target_allowable_error_));
   _internal_metadata_.Clear();
 }
 
@@ -1807,30 +1806,28 @@ bool Kick::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // .aisaacpb.Kick.KickType sensor_type = 1;
+      // bool ball_kick_state = 1;
       case 1: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(8u /* 8 & 0xFF */)) {
-          int value;
+
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
-                 input, &value)));
-          set_sensor_type(static_cast< ::aisaacpb::Kick_KickType >(value));
+                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
+                 input, &ball_kick_state_)));
         } else {
           goto handle_unusual;
         }
         break;
       }
 
-      // .aisaacpb.Kick.KickMethod kick_method = 2;
+      // bool ball_kick = 2;
       case 2: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(16u /* 16 & 0xFF */)) {
-          int value;
+
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
-                 input, &value)));
-          set_kick_method(static_cast< ::aisaacpb::Kick_KickMethod >(value));
+                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
+                 input, &ball_kick_)));
         } else {
           goto handle_unusual;
         }
@@ -1931,16 +1928,14 @@ void Kick::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // .aisaacpb.Kick.KickType sensor_type = 1;
-  if (this->sensor_type() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteEnum(
-      1, this->sensor_type(), output);
+  // bool ball_kick_state = 1;
+  if (this->ball_kick_state() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(1, this->ball_kick_state(), output);
   }
 
-  // .aisaacpb.Kick.KickMethod kick_method = 2;
-  if (this->kick_method() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteEnum(
-      2, this->kick_method(), output);
+  // bool ball_kick = 2;
+  if (this->ball_kick() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(2, this->ball_kick(), output);
   }
 
   // int32 kick_power = 3;
@@ -1983,16 +1978,14 @@ void Kick::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // .aisaacpb.Kick.KickType sensor_type = 1;
-  if (this->sensor_type() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
-      1, this->sensor_type(), target);
+  // bool ball_kick_state = 1;
+  if (this->ball_kick_state() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(1, this->ball_kick_state(), target);
   }
 
-  // .aisaacpb.Kick.KickMethod kick_method = 2;
-  if (this->kick_method() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
-      2, this->kick_method(), target);
+  // bool ball_kick = 2;
+  if (this->ball_kick() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(2, this->ball_kick(), target);
   }
 
   // int32 kick_power = 3;
@@ -2046,23 +2039,21 @@ size_t Kick::ByteSizeLong() const {
         *ball_goal_);
   }
 
-  // .aisaacpb.Kick.KickType sensor_type = 1;
-  if (this->sensor_type() != 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::EnumSize(this->sensor_type());
-  }
-
-  // .aisaacpb.Kick.KickMethod kick_method = 2;
-  if (this->kick_method() != 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::EnumSize(this->kick_method());
-  }
-
   // int32 kick_power = 3;
   if (this->kick_power() != 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::Int32Size(
         this->kick_power());
+  }
+
+  // bool ball_kick_state = 1;
+  if (this->ball_kick_state() != 0) {
+    total_size += 1 + 1;
+  }
+
+  // bool ball_kick = 2;
+  if (this->ball_kick() != 0) {
+    total_size += 1 + 1;
   }
 
   // bool ball_kick_active = 4;
@@ -2112,14 +2103,14 @@ void Kick::MergeFrom(const Kick& from) {
   if (from.has_ball_goal()) {
     mutable_ball_goal()->::aisaacpb::Position::MergeFrom(from.ball_goal());
   }
-  if (from.sensor_type() != 0) {
-    set_sensor_type(from.sensor_type());
-  }
-  if (from.kick_method() != 0) {
-    set_kick_method(from.kick_method());
-  }
   if (from.kick_power() != 0) {
     set_kick_power(from.kick_power());
+  }
+  if (from.ball_kick_state() != 0) {
+    set_ball_kick_state(from.ball_kick_state());
+  }
+  if (from.ball_kick() != 0) {
+    set_ball_kick(from.ball_kick());
   }
   if (from.ball_kick_active() != 0) {
     set_ball_kick_active(from.ball_kick_active());
@@ -2157,9 +2148,9 @@ void Kick::Swap(Kick* other) {
 void Kick::InternalSwap(Kick* other) {
   using std::swap;
   swap(ball_goal_, other->ball_goal_);
-  swap(sensor_type_, other->sensor_type_);
-  swap(kick_method_, other->kick_method_);
   swap(kick_power_, other->kick_power_);
+  swap(ball_kick_state_, other->ball_kick_state_);
+  swap(ball_kick_, other->ball_kick_);
   swap(ball_kick_active_, other->ball_kick_active_);
   swap(free_kick_flag_, other->free_kick_flag_);
   swap(ball_target_allowable_error_, other->ball_target_allowable_error_);

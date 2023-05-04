@@ -155,6 +155,131 @@ namespace aisaac
             out.push_back(c);
         }
     }
+    void convertFromCommandRealToProtobufEncodedString(const consai_msgs::robot_commands_realConstPtr& msg, std::vector<unsigned char> &out) {
+        out.clear();
+
+        // Index:0 DATAType5, 0 0b101 + 0b00000
+        out.push_back(0b10100000);
+
+        // Construct Protobuf message
+        aisaacpb::SpcCommand command_to_robot;
+        // aisaacpb::RobotCommandCoordinateSystemType coord_type;
+        // if (command.robotCommandCoordinateSystemType == 0) {
+        //     coord_type = aisaacpb::RobotCommandCoordinateSystemType::Vector;
+        // } else if (command.robotCommandCoordinateSystemType == 1) {
+        //     coord_type = aisaacpb::RobotCommandCoordinateSystemType::Coordinate;
+        // } else if (command.robotCommandCoordinateSystemType == 2) {
+        //     coord_type = aisaacpb::RobotCommandCoordinateSystemType::Relax;
+        // }
+        // command_to_robot.set_robot_command_type(coord_type);
+
+        // goal_pose
+        aisaacpb::Position goal_pose;
+        goal_pose.set_x((int32_t)msg->goal_pose.x);
+        goal_pose.set_y((int32_t)msg->goal_pose.y);
+        goal_pose.set_theta((int32_t)msg->goal_pose.theta);
+        command_to_robot.set_allocated_middle_goal_pose(&goal_pose);
+
+        // prohibited_zone_ignore
+        command_to_robot.set_prohibited_zone_ignore(msg->prohidited_zone_ignore);
+
+        // middle_target_flag
+        command_to_robot.set_middle_target_flag(msg->middle_target_flag);
+
+        // middle_goal_pose
+        aisaacpb::Position middle_goal_pose;
+        middle_goal_pose.set_x((int32_t)msg->middle_goal_pose.x);
+        middle_goal_pose.set_y((int32_t)msg->middle_goal_pose.y);
+        middle_goal_pose.set_theta((int32_t)msg->middle_goal_pose.theta);
+        command_to_robot.set_allocated_middle_goal_pose(&middle_goal_pose);
+
+        // Dribble
+        aisaacpb::Dribble dribble;
+        // -dribble_power
+        dribble.set_dribble_power((double)msg->dribble_power);
+        // -dribble_state
+        dribble.set_dribble_state(msg->dribble_state);
+        // -dribbler_active
+        dribble.set_dribbler_active(msg->dribbler_active);
+        // -dribble_goal
+        aisaacpb::Position dribble_goal;
+        dribble_goal.set_x((int32_t)msg->dribble_goal.x);
+        dribble_goal.set_y((int32_t)msg->dribble_goal.y);
+        dribble_goal.set_theta((int32_t)msg->dribble_goal.theta);
+        dribble.set_allocated_dribble_goal(&dribble_goal);
+        // -dribble_complete_distance
+        dribble.set_dribble_complete_distance(msg->dribble_complete_distance);
+        command_to_robot.set_allocated_dribble(&dribble);
+
+        // Kick
+        aisaacpb::Kick kick;
+        // -kick_power
+        kick.set_kick_power(msg->kick_power);
+        // -ball_kick_state
+        kick.set_ball_kick_state(msg->ball_kick_state);
+        // -ball_kick
+        kick.set_ball_kick(msg->ball_kick);
+        // -ball_kick_active
+        kick.set_ball_kick_active(msg->ball_kick_active);
+        // -free_kick_flag
+        kick.set_free_kick_flag(msg->free_kick_flag);
+        // -ball_goal
+        aisaacpb::Position ball_goal;
+        ball_goal.set_x((int32_t)msg->ball_goal.pos_x);
+        ball_goal.set_y((int32_t)msg->ball_goal.pos_y);
+        // msg->ball_goal.vel_x;
+        // msg->ball_goal.vel_y;
+        kick.set_allocated_ball_goal(&ball_goal);
+        // -ball_target_allowable_error
+        kick.set_ball_target_allowable_error(msg->ball_target_allowable_error);
+        command_to_robot.set_allocated_kick(&kick);
+        
+        std::string serialized_str;
+        // Encode
+        command_to_robot.SerializeToString(&serialized_str);
+
+        for (unsigned char c : serialized_str) {
+            out.push_back(c);
+        }
+    }
+    void convertFromCommandRealToProtobufEncodedStringVision(const consai_msgs::robot_commands_realConstPtr& msg, std::vector<unsigned char> &out) {
+        out.clear();
+
+        // Index:0 DATAType5, 1 0b101 + 0b00001
+        out.push_back(0b10100000);
+
+        aisaacpb::VisionData vision_data;
+
+        // current_pose, own_machine_position
+        aisaacpb::Position own_machine_position;
+        own_machine_position.set_x((int32_t)msg->own_machine_position.x);
+        own_machine_position.set_y((int32_t)msg->own_machine_position.y);
+        own_machine_position.set_theta((int32_t)msg->own_machine_position.theta);
+        vision_data.set_allocated_own_machine_position(&own_machine_position);
+        // ball_position
+        aisaacpb::Position ball_position;
+        ball_position.set_x((int32_t)msg->ball_position.x);
+        ball_position.set_y((int32_t)msg->ball_position.y);
+        ball_position.set_theta((int32_t)msg->ball_position.theta);
+        vision_data.set_allocated_ball_position(&ball_position);
+        // obstacles
+        for (auto rx_obstacle in msg->obstacles) {
+            aisaacpb::Obstacle* obstacle = vision_data.add_obstacles();
+            obstacle->set_x(rx_obstacle.pose.x);
+            obstacle->set_y(rx_obstacle.pose.y);
+            obstacle->set_theta(rx_obstacle.pose.theta);
+            obstacle->set_vx(rx_obstacle.vel.x);
+            obstacle->set_vy(rx_obstacle.vel.y);
+        }
+        
+        std::string serialized_str;
+        // Encode
+        vision_data.SerializeToString(&serialized_str);
+
+        for (unsigned char c : serialized_str) {
+            out.push_back(c);
+        }
+    }
     void AisaacBitmapHandler::generateFT4(commandToRobot command, std::vector<unsigned char> &out) {
 
         std::cout << "command";

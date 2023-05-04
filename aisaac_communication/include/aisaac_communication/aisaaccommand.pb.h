@@ -788,23 +788,23 @@ class Kick : public ::google::protobuf::Message /* @@protoc_insertion_point(clas
   ::aisaacpb::Position* mutable_ball_goal();
   void set_allocated_ball_goal(::aisaacpb::Position* ball_goal);
 
-  // .aisaacpb.Kick.KickType sensor_type = 1;
-  void clear_sensor_type();
-  static const int kSensorTypeFieldNumber = 1;
-  ::aisaacpb::Kick_KickType sensor_type() const;
-  void set_sensor_type(::aisaacpb::Kick_KickType value);
-
-  // .aisaacpb.Kick.KickMethod kick_method = 2;
-  void clear_kick_method();
-  static const int kKickMethodFieldNumber = 2;
-  ::aisaacpb::Kick_KickMethod kick_method() const;
-  void set_kick_method(::aisaacpb::Kick_KickMethod value);
-
   // int32 kick_power = 3;
   void clear_kick_power();
   static const int kKickPowerFieldNumber = 3;
   ::google::protobuf::int32 kick_power() const;
   void set_kick_power(::google::protobuf::int32 value);
+
+  // bool ball_kick_state = 1;
+  void clear_ball_kick_state();
+  static const int kBallKickStateFieldNumber = 1;
+  bool ball_kick_state() const;
+  void set_ball_kick_state(bool value);
+
+  // bool ball_kick = 2;
+  void clear_ball_kick();
+  static const int kBallKickFieldNumber = 2;
+  bool ball_kick() const;
+  void set_ball_kick(bool value);
 
   // bool ball_kick_active = 4;
   void clear_ball_kick_active();
@@ -829,9 +829,9 @@ class Kick : public ::google::protobuf::Message /* @@protoc_insertion_point(clas
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::aisaacpb::Position* ball_goal_;
-  int sensor_type_;
-  int kick_method_;
   ::google::protobuf::int32 kick_power_;
+  bool ball_kick_state_;
+  bool ball_kick_;
   bool ball_kick_active_;
   bool free_kick_flag_;
   ::google::protobuf::int32 ball_target_allowable_error_;
@@ -1630,32 +1630,32 @@ inline void Obstacle::set_vy(::google::protobuf::int32 value) {
 
 // Kick
 
-// .aisaacpb.Kick.KickType sensor_type = 1;
-inline void Kick::clear_sensor_type() {
-  sensor_type_ = 0;
+// bool ball_kick_state = 1;
+inline void Kick::clear_ball_kick_state() {
+  ball_kick_state_ = false;
 }
-inline ::aisaacpb::Kick_KickType Kick::sensor_type() const {
-  // @@protoc_insertion_point(field_get:aisaacpb.Kick.sensor_type)
-  return static_cast< ::aisaacpb::Kick_KickType >(sensor_type_);
+inline bool Kick::ball_kick_state() const {
+  // @@protoc_insertion_point(field_get:aisaacpb.Kick.ball_kick_state)
+  return ball_kick_state_;
 }
-inline void Kick::set_sensor_type(::aisaacpb::Kick_KickType value) {
+inline void Kick::set_ball_kick_state(bool value) {
   
-  sensor_type_ = value;
-  // @@protoc_insertion_point(field_set:aisaacpb.Kick.sensor_type)
+  ball_kick_state_ = value;
+  // @@protoc_insertion_point(field_set:aisaacpb.Kick.ball_kick_state)
 }
 
-// .aisaacpb.Kick.KickMethod kick_method = 2;
-inline void Kick::clear_kick_method() {
-  kick_method_ = 0;
+// bool ball_kick = 2;
+inline void Kick::clear_ball_kick() {
+  ball_kick_ = false;
 }
-inline ::aisaacpb::Kick_KickMethod Kick::kick_method() const {
-  // @@protoc_insertion_point(field_get:aisaacpb.Kick.kick_method)
-  return static_cast< ::aisaacpb::Kick_KickMethod >(kick_method_);
+inline bool Kick::ball_kick() const {
+  // @@protoc_insertion_point(field_get:aisaacpb.Kick.ball_kick)
+  return ball_kick_;
 }
-inline void Kick::set_kick_method(::aisaacpb::Kick_KickMethod value) {
+inline void Kick::set_ball_kick(bool value) {
   
-  kick_method_ = value;
-  // @@protoc_insertion_point(field_set:aisaacpb.Kick.kick_method)
+  ball_kick_ = value;
+  // @@protoc_insertion_point(field_set:aisaacpb.Kick.ball_kick)
 }
 
 // int32 kick_power = 3;
