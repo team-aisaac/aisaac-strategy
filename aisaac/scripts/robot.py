@@ -4,7 +4,7 @@ import math
 import rospy
 import rosservice
 
-from consai_msgs.msg import robot_commands
+from consai_msgs.msg import robot_commands, robot_commands_real, Obstacle
 from aisaac.msg import Status, Def_pos
 from aisaac.srv import pid
 
@@ -48,6 +48,10 @@ class Robot(object):
 
         self._command_pub = RobotCommandPublisherWrapper(self.robot_color, self.robot_id)
 
+        self.cmd_v2 = robot_commands_real() # type: robot_commands_real
+        self.cmd_v2.ball_target_allowable_error = 150
+        self.cmd_v2.dribble_complete_distance = 150
+
         # Composition
         self.objects = Objects(self.robot_color, self.robot_side, self.robot_total, self.enemy_total, node="robot"+str(self.robot_id))
         self.ctrld_robot = self.objects.robot[int(self.robot_id)] # type: entity.Robot
@@ -57,9 +61,9 @@ class Robot(object):
 
         self.ball_params = self.objects.ball
 
-        self.pid = RobotPid(self.robot_id, self.objects, self.cmd)
+        self.pid = RobotPid(self.robot_id, self.objects, self.cmd, self.cmd_v2)
         self.status = RobotStatus(self.pid)
-        self.kick = RobotKick(self.pid, self.cmd, self.status)
+        self.kick = RobotKick(self.pid, self.cmd, self.cmd_v2, self.status)
         self.defence = RobotDefence(self.status, self.kick)
         self.keeper = RobotKeeper(self.kick)
 
@@ -126,7 +130,7 @@ class Robot(object):
 
         self.ctrld_robot.handle_loop_callback()
 
-        self._command_pub.publish(self.cmd)
+        self._command_pub.publish(self.cmd, self.cmd_v2)
 
         self._last_pub_time = rospy.Time.now()
         self._last_vel_surge_sway_vec = (self.cmd.vel_surge, self.cmd.vel_sway)
@@ -285,6 +289,7 @@ class Robot(object):
                 self.status.robot_status = "none"
             elif self.status.robot_status == "halt":
                 self.reset_cmd()
+                
 
             elif self.status.robot_status == "shutdown":
                 self.shutdown_cmd()

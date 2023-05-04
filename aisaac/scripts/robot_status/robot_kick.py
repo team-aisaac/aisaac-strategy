@@ -11,7 +11,7 @@ from geometry_msgs.msg import Point
 
 
 class RobotKick(object):
-    def __init__(self, pid, cmd, status):
+    def __init__(self, pid, cmd, cmd_v2, status):
         # type: (robot_pid.RobotPid, aisaac.msg.Status, robot_status.RobotStatus) -> None
         self.kick_power_x = 10
         self.kick_power_z = 0
@@ -22,6 +22,7 @@ class RobotKick(object):
         self.pid = pid
         self.status = status
         self.cmd = cmd
+        self.cmd_v2 = cmd_v2
         self.dispersion1 = [30] * 1
         self.dispersion2 = [30] * 1
         self.rot_dispersion = [10] * 1
@@ -77,11 +78,24 @@ class RobotKick(object):
             self.cmd.omega = 0
             self.cmd.kick_speed_x = 0
             self.status.robot_status = "None"
+
+            # 20220504
+            self.cmd_v2.kick_power = 0
+            self.cmd_v2.ball_kick_state = False
+            self.cmd_v2.ball_kick = False
+
             self.pass_stage = 0
             return
 
         self.cmd.kick_speed_x = power_x
         self.cmd.kick_speed_z = power_z
+
+        # 20220504
+        self.cmd_v2.kick_power = int(power_x)
+        if power_x > 0:
+            # self.cmd_v2.ball_kick_state = True
+            self.cmd_v2.ball_kick = True
+
         self.pid.pid_linear(self.ball_params.get_current_position()[0], self.ball_params.get_current_position()[1], self.pose_theta, ignore_penalty_area=ignore_penalty_area)
         #self.cmd.vel_surge = 3
 
@@ -264,6 +278,11 @@ class RobotKick(object):
         self.cmd.kick_speed_x = 0
         self.cmd.kick_speed_z = 0
 
+        # 20220504
+        self.cmd_v2.kick_power = 0
+        self.cmd_v2.ball_kick_state = False
+        self.cmd_v2.ball_kick = False
+        
         target_x = target_xy[0]
         target_y = target_xy[1]
 
@@ -303,6 +322,11 @@ class RobotKick(object):
                 self.cmd.kick_speed_z = kick_power_x
 
             self.cmd.kick_speed_x = kick_power_x
+            # 20220504
+            self.cmd_v2.kick_power = int(power_x)
+            if power_x > 0:
+                # self.cmd_v2.ball_kick_state = True
+                self.cmd_v2.ball_kick = True
 
         # # 垂線テキスト座標
         # if self.ctrld_robot.get_id() == 0:
@@ -385,6 +409,11 @@ class RobotKick(object):
                     self.cmd.vel_sway = 0
                     self.cmd.omega = 0
                     self.cmd.dribble_power = 0
+                    # 20230504
+                    self.cmd_v2.dribble_power = 0
+                    # self.cmd_v2.dribble_state = False
+                    self.cmd_v2.dribbler_active = False
+
                     self.status.robot_status = "None"
                     self.dribble_stage = 0
                     return
@@ -393,6 +422,11 @@ class RobotKick(object):
                     self.dribble_stage = 2
 
                 self.cmd.dribble_power = self.dribble_power
+                # 20230504
+                self.cmd_v2.dribble_power = self.dribble_power
+                # self.cmd_v2.dribble_state = True
+                self.cmd_v2.dribbler_active = True
+
                 self.pid.pid_straight(target_x, target_y, pose_theta, ignore_penalty_area=ignore_penalty_area, avoid=False)
 
             #目標地付近になったらドリブラーを止めて引きずる(バックスピン防止)
@@ -408,9 +442,19 @@ class RobotKick(object):
                     self.cmd.vel_sway = 0
                     self.cmd.omega = 0
                     self.cmd.dribble_power = 0
+                    # 20230504
+                    self.cmd_v2.dribble_power = 0
+                    # self.cmd_v2.dribble_state = False
+                    self.cmd_v2.dribbler_active = False
+
                     self.status.robot_status = "None"
                     self.dribble_stage = 0
                     return
 
                 self.cmd.dribble_power = 0
+                # 20230504
+                self.cmd_v2.dribble_power = 0
+                # self.cmd_v2.dribble_state = False
+                self.cmd_v2.dribbler_active = False
+
                 self.pid.pid_straight(target_x, target_y, pose_theta, ignore_penalty_area=ignore_penalty_area, avoid=False)
