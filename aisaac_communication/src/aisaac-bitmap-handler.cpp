@@ -6,7 +6,6 @@
 #include <vector>
 #include <functional>
 #include <cstdlib>
-#include "aisaac_communication/aisaaccommand.pb.h"
 
 namespace aisaac
 {

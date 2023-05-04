@@ -98,7 +98,7 @@ public:
 
         // Send command message
         std::vector<unsigned char> commandvec;
-        sender->convertToString(_commands, commandvec);
+        sender->generateFT4(_commands, commandvec);
         sender->sendCommand(robotID, sequenceNumber++, commandvec);
     }
     void shutdown_callback(const aisaac::Shutdown& msg) {
