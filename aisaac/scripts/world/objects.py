@@ -112,7 +112,7 @@ class Objects(object):
                                key=lambda robot: functions.distance_btw_two_points(robot.get_current_position(),
                                                                                    (target_x, target_y)))
         sorted_ids = map(lambda robot: robot.get_id(), sorted_robots)
-        return sorted_ids
+        return list(sorted_ids)
 
     def get_enemy_ids_sorted_by_distance(self, target_xy, enemy_ids=None):
         target_x = target_xy[0]
@@ -127,7 +127,7 @@ class Objects(object):
                                key=lambda enemy: functions.distance_btw_two_points(enemy.get_current_position(),
                                                                                    (target_x, target_y)))
         sorted_ids = map(lambda enemy: enemy.get_id(), sorted_enemys)
-        return sorted_ids
+        return list(sorted_ids)
 
     def get_robot_ids(self):
         return self._robot_ids

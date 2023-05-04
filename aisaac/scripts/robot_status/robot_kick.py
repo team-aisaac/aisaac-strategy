@@ -335,8 +335,8 @@ class RobotKick(object):
 
             self.cmd.kick_speed_x = kick_power_x
             # 20220504
-            self.cmd_v2.kick_power = int(power_x)
-            if power_x > 0:
+            self.cmd_v2.kick_power = int(kick_power_x)
+            if kick_power_x > 0:
                 # self.cmd_v2.ball_kick_state = True
                 self.cmd_v2.ball_kick = True
 
