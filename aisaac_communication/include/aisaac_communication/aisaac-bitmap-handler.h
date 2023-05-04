@@ -1,12 +1,12 @@
 #pragma once
 #include <vector>
 
-#include <consai_msgs/robot_commands.h>
+#include "consai_msgs/robot_commands_real.h"
 
 #include "aisaac-xbee-base.h"
 #include "aisaac-wifi-base.h"
 #include "aisaac-com-topic-struct.h"
-#include "aisaac_communication/aisaaccommand.pb.h"
+#include "aisaaccommand.pb.h"
 
 
 namespace aisaac

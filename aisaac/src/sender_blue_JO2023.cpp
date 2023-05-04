@@ -1,7 +1,7 @@
 #include <ros/ros.h>
 #include <std_msgs/String.h>
 #include <nav_msgs/Odometry.h>
-#include <consai_msgs/robot_commands.h>
+#include <consai_msgs/robot_commands_real.h>
 #include <aisaac/Shutdown.h>
 #include <tf/tf.h>
 #include <vector>
@@ -13,7 +13,7 @@
 #include "aisaac_communication/aisaac-com-topic-struct.h"
 #include "aisaac_communication/aisaac-xbee-linux.h"
 #include "aisaac_communication/aisaac-wifi-linux.h"
-#include "aisaac_communication/aisaaccommand.pb.h"
+// #include "aisaac_communication/aisaaccommand.pb.h"
 
 #define VEL_MAX 3500
 

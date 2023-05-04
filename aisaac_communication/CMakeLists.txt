@@ -3,6 +3,8 @@ project(aisaac_communication)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
+set(PROTO_FILES_DIR "${CMAKE_CURRENT_LIST_DIR}/schemas")
+
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -10,11 +12,37 @@ project(aisaac_communication)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
+  consai_msgs
 )
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
+find_package(Protobuf REQUIRED)
 
+set(PROTO_FILES
+  ${PROTO_FILES_DIR}/aisaaccommand.proto
+)
+
+foreach(PROTO_FILE ${PROTO_FILES})
+  get_filename_component(NAME ${PROTO_FILE} NAME_WE)
+  list(APPEND PROTO_OUTPUT_FILES
+    ${PROTO_FILES_DIR}/${NAME}.pb.cc
+    ${PROTO_FILES_DIR}/${NAME}.pb.h
+  )
+endforeach()
+
+add_custom_command(
+  OUTPUT ${PROTO_OUTPUT_FILES}
+  DEPENDS ${PROTO_FILES}
+
+  COMMAND protobuf::protoc --proto_path=${PROTO_FILES_DIR} ${PROTO_FILES} --cpp_out=${PROTO_FILES_DIR}
+  VERBATIM
+)
+
+add_custom_target(CompileSchemas
+  DEPENDS ${PROTO_OUTPUT_FILES}
+  SOURCES ${PROTO_FILES}
+)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -116,7 +144,8 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(
  include
-  ${catkin_INCLUDE_DIRS}
+ ${catkin_INCLUDE_DIRS}
+ include/${PROJECT_NAME}
 )
 
 ## Declare a C++ library
@@ -129,12 +158,14 @@ add_library (aisaac_communication
   src/aisaac-xbee-linux.cpp
   src/aisaac-wifi-base.cpp
   src/aisaac-wifi-linux.cpp
+  schemas/aisaaccommand.pb.cc
 )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
 # add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(${PROJECT_NAME} CompileSchemas)
 
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
@@ -150,10 +181,17 @@ add_library (aisaac_communication
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_include_directories(${PROJECT_NAME}
+  PUBLIC
+  ${PROTO_FILES_DIR}
+)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(aisaac_communication
   ${catkin_LIBRARIES}
+  protobuf::libprotobuf
+  protobuf::libprotobuf-lite
+  protobuf::libprotoc
 )
 
 #############

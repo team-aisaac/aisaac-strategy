@@ -1,0 +1,90 @@
+syntax = "proto3";
+
+package aisaacpb;
+
+message Position {
+  int32 x = 1;
+  int32 y = 2;
+  int32 theta = 3;
+}
+
+message Velocity {
+  int32 vx = 1;
+  int32 vy = 2;
+  int32 omega = 3;
+}
+
+message Acceleration {
+  int32 ax = 1;
+  int32 ay = 2;
+}
+
+message Obstacle {
+  int32 x = 1;
+  int32 y = 2;
+  int32 theta = 3;
+  int32 vx = 4;
+  int32 vy = 5;
+}
+
+message Kick {
+  enum KickType {
+    None = 0;
+    Force = 1;
+    Sensor = 2;
+    XY = 3;
+  }
+
+  enum KickMethod {
+    Chip = 0;
+    Straight = 1;
+  }
+
+  bool ball_kick_state = 1;
+  bool ball_kick = 2;
+  int32 kick_power = 3;
+  bool ball_kick_active = 4;
+  bool free_kick_flag = 5;
+  Position ball_goal = 6;
+  int32 ball_target_allowable_error = 7;
+}
+
+message Dribble {
+  double dribble_power = 1; // double
+  bool dribble_state = 2; // Dribble flag
+  bool dribbler_active = 3; // Force rotate drribler
+  Position dribble_goal = 4;
+  int32 dribble_complete_distance = 5;
+}
+
+enum RobotCommandCoordinateSystemType {
+  Vector = 0;
+  Coordinate = 1;
+  Relax = 2;
+}
+
+// StrategyPC -> RasPi
+// RasPi -> STM32
+message SpcCommand {
+  RobotCommandCoordinateSystemType robot_command_type = 1;
+  Position goal_pose = 2;
+  bool prohibited_zone_ignore = 3;
+  bool middle_target_flag = 4;
+  Position middle_goal_pose = 5;
+  Dribble dribble = 6;
+  Kick kick = 7;
+  bool halt_flag = 8;
+}
+
+// DWA Result
+// RasPi -> STM32
+message DWAResult {
+  Position dwa_position = 1;
+}
+
+// Vision Data
+message VisionData {
+  Position own_machine_position = 1;
+  Position ball_position = 2;
+  repeated Obstacle obstacles = 3;
+}
