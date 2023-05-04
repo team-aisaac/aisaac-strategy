@@ -140,6 +140,14 @@ class RobotKick(object):
         point.y = target_y
         self._pass_target_pos_publisher.publish(point)
 
+        # 20230504 by sawa
+        self.cmd_v2.ball_goal.x = target_x
+        self.cmd_v2.ball_goal.y = target_y
+        if is_shoot:
+            self.cmd_v2.kick_power = 100
+        else:
+            self.cmd_v2.kick_power = 50
+
         distance = math.sqrt((target_x - self.ball_params.get_current_position()[0])**2 + (target_y - self.ball_params.get_current_position()[1])**2)
         if distance != 0:
             #print self.pass_stage

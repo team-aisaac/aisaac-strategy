@@ -135,7 +135,7 @@ class Robot(object):
         self._last_pub_time = rospy.Time.now()
         self._last_vel_surge_sway_vec = (self.cmd.vel_surge, self.cmd.vel_sway)
         self._last_omega = self.cmd.omega
-        # self.reset_cmd()
+        self.reset_cmd()
 
     def reset_cmd(self):
         default_cmd = robot_commands()
@@ -153,10 +153,20 @@ class Robot(object):
         self.cmd.kick_speed_z = default_cmd.kick_speed_z
         self.cmd.dribble_power = default_cmd.dribble_power
 
+        # 20230504
+        self.cmd_v2 = robot_commands_real()
+        self.cmd_v2.ball_target_allowable_error = 150
+        self.cmd_v2.dribble_complete_distance = 150
 
     def shutdown_cmd(self):
         self.reset_cmd()
         self.cmd.shutdown_flag = True
+        self.cmd_v2.shutdown_flag = True
+        self.store_and_publish_commands()
+
+    def halt_cmd(self):
+        self.reset_cmd()
+        self.cmd_v2.halt_flag = True
         self.store_and_publish_commands()
 
     def print_fps_callback(self, event):
@@ -182,16 +192,36 @@ class Robot(object):
             if self.ctrld_robot.get_id() not in self.objects.get_active_robot_ids():
                 self.ctrld_robot.reset_own_belief()
 
+            self.cmd_v2.obstacles = []
             # カルマンフィルタ,恒等関数フィルタの適用
             # vision_positionからcurrent_positionを決定してつめる
+            # cmd_v2にも詰める
             for robot in self.robot_friend:
                 if robot.get_id() == self.ctrld_robot.get_id():
                     # kalman_filter(self.ctrld_robot)
                     identity_filter(self.ctrld_robot)
+                    self.cmd_v2.current_pose.x, self.cmd_v2.current_pose.y, self.cmd_v2.current_pose.theta =\
+                        self.ctrld_robot.get_current_position(theta=True)
                 else:
                     identity_filter(robot)
+                    tmp_obstacle = Obstacle()
+                    tmp_obstacle.pose.x, tmp_obstacle.pose.y, tmp_obstacle.pose.theta = \
+                        robot.get_current_position(theta=True)
+                    tmp_obstacle.vel.x, tmp_obstacle.vel.y, tmp_obstacle.vel.theta = \
+                        robot.get_current_velocity(theta=True)
+                    self.cmd_v2.obstacles.append(tmp_obstacle)
+                    
             for enemy in self.robot_enemy:
                 identity_filter(enemy)
+                tmp_obstacle = Obstacle()
+                tmp_obstacle.pose.x, tmp_obstacle.pose.y, tmp_obstacle.pose.theta = \
+                    enemy.get_current_position(theta=True)
+                tmp_obstacle.vel.x, tmp_obstacle.vel.y, tmp_obstacle.vel.theta = \
+                    enemy.get_current_velocity(theta=True)
+                self.cmd_v2.obstacles.append(tmp_obstacle)
+
+            # ballの位置を送る
+            self.cmd_v2.ball_position.x, self.cmd_v2.ball_position.y = self.ball_params.get_current_position()
 
             self.ctrld_robot.set_max_velocity(rospy.get_param("/robot_max_velocity", default=config.ROBOT_MAX_VELOCITY)) # m/s 機体の最高速度
 
@@ -224,6 +254,7 @@ class Robot(object):
                 self.kick.pass_ball(self.ctrld_robot.get_pass_target_position()[0],
                                     self.ctrld_robot.get_pass_target_position()[1],
                                     place=True)
+                # TODO: add freekick cmd
             elif self.status.robot_status == "ball_place_dribble":
                 self.kick.dribble_ball(self.ctrld_robot.get_pass_target_position()[0],
                                     self.ctrld_robot.get_pass_target_position()[1], ignore_penalty_area=True)
@@ -288,7 +319,7 @@ class Robot(object):
                 self.reset_cmd()
                 self.status.robot_status = "none"
             elif self.status.robot_status == "halt":
-                self.reset_cmd()
+                self.halt_cmd()
                 
 
             elif self.status.robot_status == "shutdown":
