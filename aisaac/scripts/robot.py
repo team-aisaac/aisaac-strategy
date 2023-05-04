@@ -223,6 +223,10 @@ class Robot(object):
             # ballの位置を送る
             self.cmd_v2.ball_position.x, self.cmd_v2.ball_position.y = self.ball_params.get_current_position()
 
+            # GKの場合、prohidited_zone_ignoreをTrueにする
+            if self.ctrld_robot.get_role() == "GK":
+                 self.cmd_v2.prohidited_zone_ignore = True
+
             self.ctrld_robot.set_max_velocity(rospy.get_param("/robot_max_velocity", default=config.ROBOT_MAX_VELOCITY)) # m/s 機体の最高速度
 
             if self.status.robot_status == "move_linear":
@@ -254,7 +258,8 @@ class Robot(object):
                 self.kick.pass_ball(self.ctrld_robot.get_pass_target_position()[0],
                                     self.ctrld_robot.get_pass_target_position()[1],
                                     place=True)
-                # TODO: add freekick cmd
+                # 20230504 add by sawa
+                self.cmd_v2.free_kick_flag = True
             elif self.status.robot_status == "ball_place_dribble":
                 self.kick.dribble_ball(self.ctrld_robot.get_pass_target_position()[0],
                                     self.ctrld_robot.get_pass_target_position()[1], ignore_penalty_area=True)

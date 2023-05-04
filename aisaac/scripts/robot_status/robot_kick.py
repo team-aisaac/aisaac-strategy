@@ -124,6 +124,10 @@ class RobotKick(object):
         elif _target == "right":
             self.pass_ball(config.GOAL_ENEMY_RIGHT[0], config.GOAL_ENEMY_RIGHT[1] + post_offset,
                            should_wait=should_wait, is_shoot=True, ignore_penalty_area=ignore_penalty_area)
+        
+        # 20230504 add by sawa
+        if ignore_penalty_area:
+            self.cmd_v2.prohidited_zone_ignore = True
 
     def pass_ball(self, target_x, target_y, should_wait=False, is_shoot=False, is_tip_kick=False,
                   ignore_penalty_area=False, place=False):
