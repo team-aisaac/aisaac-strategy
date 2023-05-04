@@ -1130,6 +1130,12 @@ class SpcCommand : public ::google::protobuf::Message /* @@protoc_insertion_poin
   bool middle_target_flag() const;
   void set_middle_target_flag(bool value);
 
+  // bool halt_flag = 8;
+  void clear_halt_flag();
+  static const int kHaltFlagFieldNumber = 8;
+  bool halt_flag() const;
+  void set_halt_flag(bool value);
+
   // @@protoc_insertion_point(class_scope:aisaacpb.SpcCommand)
  private:
 
@@ -1141,6 +1147,7 @@ class SpcCommand : public ::google::protobuf::Message /* @@protoc_insertion_poin
   int robot_command_type_;
   bool prohibited_zone_ignore_;
   bool middle_target_flag_;
+  bool halt_flag_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::protobuf_aisaaccommand_2eproto::TableStruct;
 };
@@ -2142,6 +2149,20 @@ inline void SpcCommand::set_allocated_kick(::aisaacpb::Kick* kick) {
   }
   kick_ = kick;
   // @@protoc_insertion_point(field_set_allocated:aisaacpb.SpcCommand.kick)
+}
+
+// bool halt_flag = 8;
+inline void SpcCommand::clear_halt_flag() {
+  halt_flag_ = false;
+}
+inline bool SpcCommand::halt_flag() const {
+  // @@protoc_insertion_point(field_get:aisaacpb.SpcCommand.halt_flag)
+  return halt_flag_;
+}
+inline void SpcCommand::set_halt_flag(bool value) {
+  
+  halt_flag_ = value;
+  // @@protoc_insertion_point(field_set:aisaacpb.SpcCommand.halt_flag)
 }
 
 // -------------------------------------------------------------------

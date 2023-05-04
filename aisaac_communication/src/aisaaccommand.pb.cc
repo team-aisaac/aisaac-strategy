@@ -293,6 +293,7 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::SpcCommand, middle_goal_pose_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::SpcCommand, dribble_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::SpcCommand, kick_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::SpcCommand, halt_flag_),
   ~0u,  // no _has_bits_
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::aisaacpb::RaspiCommand, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -319,8 +320,8 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROT
   { 33, -1, sizeof(::aisaacpb::Kick)},
   { 45, -1, sizeof(::aisaacpb::Dribble)},
   { 55, -1, sizeof(::aisaacpb::SpcCommand)},
-  { 67, -1, sizeof(::aisaacpb::RaspiCommand)},
-  { 76, -1, sizeof(::aisaacpb::VisionData)},
+  { 68, -1, sizeof(::aisaacpb::RaspiCommand)},
+  { 77, -1, sizeof(::aisaacpb::VisionData)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -373,28 +374,29 @@ void AddDescriptorsImpl() {
       "wer\030\001 \001(\001\022\025\n\rdribble_state\030\002 \001(\010\022\027\n\017drib"
       "bler_active\030\003 \001(\010\022(\n\014dribble_goal\030\004 \001(\0132"
       "\022.aisaacpb.Position\022!\n\031dribble_complete_"
-      "distance\030\005 \001(\005\"\247\002\n\nSpcCommand\022F\n\022robot_c"
+      "distance\030\005 \001(\005\"\272\002\n\nSpcCommand\022F\n\022robot_c"
       "ommand_type\030\001 \001(\0162*.aisaacpb.RobotComman"
       "dCoordinateSystemType\022%\n\tgoal_pose\030\002 \001(\013"
       "2\022.aisaacpb.Position\022\036\n\026prohibited_zone_"
       "ignore\030\003 \001(\010\022\032\n\022middle_target_flag\030\004 \001(\010"
       "\022,\n\020middle_goal_pose\030\005 \001(\0132\022.aisaacpb.Po"
       "sition\022\"\n\007dribble\030\006 \001(\0132\021.aisaacpb.Dribb"
-      "le\022\034\n\004kick\030\007 \001(\0132\016.aisaacpb.Kick\"\310\001\n\014Ras"
-      "piCommand\022F\n\022robot_command_type\030\001 \001(\0162*."
-      "aisaacpb.RobotCommandCoordinateSystemTyp"
-      "e\022.\n\022goal_pose_velocity\030\002 \001(\0132\022.aisaacpb"
-      ".Velocity\022\"\n\007dribble\030\003 \001(\0132\021.aisaacpb.Dr"
-      "ibble\022\034\n\004kick\030\004 \001(\0132\016.aisaacpb.Kick\"\220\001\n\n"
-      "VisionData\0220\n\024own_machine_position\030\001 \001(\013"
-      "2\022.aisaacpb.Position\022)\n\rball_position\030\002 "
-      "\001(\0132\022.aisaacpb.Position\022%\n\tobstacles\030\003 \003"
-      "(\0132\022.aisaacpb.Obstacle*I\n RobotCommandCo"
-      "ordinateSystemType\022\n\n\006Vector\020\000\022\016\n\nCoordi"
-      "nate\020\001\022\t\n\005Relax\020\002b\006proto3"
+      "le\022\034\n\004kick\030\007 \001(\0132\016.aisaacpb.Kick\022\021\n\thalt"
+      "_flag\030\010 \001(\010\"\310\001\n\014RaspiCommand\022F\n\022robot_co"
+      "mmand_type\030\001 \001(\0162*.aisaacpb.RobotCommand"
+      "CoordinateSystemType\022.\n\022goal_pose_veloci"
+      "ty\030\002 \001(\0132\022.aisaacpb.Velocity\022\"\n\007dribble\030"
+      "\003 \001(\0132\021.aisaacpb.Dribble\022\034\n\004kick\030\004 \001(\0132\016"
+      ".aisaacpb.Kick\"\220\001\n\nVisionData\0220\n\024own_mac"
+      "hine_position\030\001 \001(\0132\022.aisaacpb.Position\022"
+      ")\n\rball_position\030\002 \001(\0132\022.aisaacpb.Positi"
+      "on\022%\n\tobstacles\030\003 \003(\0132\022.aisaacpb.Obstacl"
+      "e*I\n RobotCommandCoordinateSystemType\022\n\n"
+      "\006Vector\020\000\022\016\n\nCoordinate\020\001\022\t\n\005Relax\020\002b\006pr"
+      "oto3"
   };
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 1425);
+      descriptor, 1444);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "aisaaccommand.proto", &protobuf_RegisterTypes);
 }
@@ -2563,6 +2565,7 @@ const int SpcCommand::kMiddleTargetFlagFieldNumber;
 const int SpcCommand::kMiddleGoalPoseFieldNumber;
 const int SpcCommand::kDribbleFieldNumber;
 const int SpcCommand::kKickFieldNumber;
+const int SpcCommand::kHaltFlagFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 SpcCommand::SpcCommand()
@@ -2597,15 +2600,15 @@ SpcCommand::SpcCommand(const SpcCommand& from)
     kick_ = NULL;
   }
   ::memcpy(&robot_command_type_, &from.robot_command_type_,
-    static_cast<size_t>(reinterpret_cast<char*>(&middle_target_flag_) -
-    reinterpret_cast<char*>(&robot_command_type_)) + sizeof(middle_target_flag_));
+    static_cast<size_t>(reinterpret_cast<char*>(&halt_flag_) -
+    reinterpret_cast<char*>(&robot_command_type_)) + sizeof(halt_flag_));
   // @@protoc_insertion_point(copy_constructor:aisaacpb.SpcCommand)
 }
 
 void SpcCommand::SharedCtor() {
   ::memset(&goal_pose_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&middle_target_flag_) -
-      reinterpret_cast<char*>(&goal_pose_)) + sizeof(middle_target_flag_));
+      reinterpret_cast<char*>(&halt_flag_) -
+      reinterpret_cast<char*>(&goal_pose_)) + sizeof(halt_flag_));
 }
 
 SpcCommand::~SpcCommand() {
@@ -2657,8 +2660,8 @@ void SpcCommand::Clear() {
   }
   kick_ = NULL;
   ::memset(&robot_command_type_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&middle_target_flag_) -
-      reinterpret_cast<char*>(&robot_command_type_)) + sizeof(middle_target_flag_));
+      reinterpret_cast<char*>(&halt_flag_) -
+      reinterpret_cast<char*>(&robot_command_type_)) + sizeof(halt_flag_));
   _internal_metadata_.Clear();
 }
 
@@ -2763,6 +2766,20 @@ bool SpcCommand::MergePartialFromCodedStream(
         break;
       }
 
+      // bool halt_flag = 8;
+      case 8: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(64u /* 64 & 0xFF */)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
+                 input, &halt_flag_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -2829,6 +2846,11 @@ void SpcCommand::SerializeWithCachedSizes(
       7, this->_internal_kick(), output);
   }
 
+  // bool halt_flag = 8;
+  if (this->halt_flag() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(8, this->halt_flag(), output);
+  }
+
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), output);
@@ -2885,6 +2907,11 @@ void SpcCommand::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
         7, this->_internal_kick(), deterministic, target);
+  }
+
+  // bool halt_flag = 8;
+  if (this->halt_flag() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(8, this->halt_flag(), target);
   }
 
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
@@ -2948,6 +2975,11 @@ size_t SpcCommand::ByteSizeLong() const {
     total_size += 1 + 1;
   }
 
+  // bool halt_flag = 8;
+  if (this->halt_flag() != 0) {
+    total_size += 1 + 1;
+  }
+
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
   SetCachedSize(cached_size);
   return total_size;
@@ -2996,6 +3028,9 @@ void SpcCommand::MergeFrom(const SpcCommand& from) {
   if (from.middle_target_flag() != 0) {
     set_middle_target_flag(from.middle_target_flag());
   }
+  if (from.halt_flag() != 0) {
+    set_halt_flag(from.halt_flag());
+  }
 }
 
 void SpcCommand::CopyFrom(const ::google::protobuf::Message& from) {
@@ -3029,6 +3064,7 @@ void SpcCommand::InternalSwap(SpcCommand* other) {
   swap(robot_command_type_, other->robot_command_type_);
   swap(prohibited_zone_ignore_, other->prohibited_zone_ignore_);
   swap(middle_target_flag_, other->middle_target_flag_);
+  swap(halt_flag_, other->halt_flag_);
   _internal_metadata_.Swap(&other->_internal_metadata_);
 }
 
