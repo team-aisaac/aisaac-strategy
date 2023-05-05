@@ -89,7 +89,11 @@ if __name__ == '__main__':
     r = rospy.Rate(MAIN_CYCLE)
 
     while not rospy.is_shutdown():
-        manageRobots()
-        publishExistingIds()
+        try:
+            manageRobots()
+            publishExistingIds()
 
-        r.sleep()
+            r.sleep()
+        except:
+            manageRobots()
+            publishExistingIds()

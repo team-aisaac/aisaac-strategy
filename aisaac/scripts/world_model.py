@@ -369,3 +369,6 @@ if __name__ == "__main__":
             traceback.print_exc()
             if rospy.get_param("is_test", False):
                 break
+            else:
+                run_world_model()
+
