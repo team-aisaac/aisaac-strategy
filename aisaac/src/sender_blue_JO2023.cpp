@@ -13,7 +13,7 @@
 #include "aisaac_communication/aisaac-com-topic-struct.h"
 #include "aisaac_communication/aisaac-xbee-linux.h"
 #include "aisaac_communication/aisaac-wifi-linux.h"
-#include "aisaac_communication/aisaaccommand.pb.h"
+// #include "aisaac_communication/aisaaccommand.pb.h"
 
 #define VEL_MAX 3500
 

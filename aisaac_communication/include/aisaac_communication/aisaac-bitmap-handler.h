@@ -6,7 +6,7 @@
 #include "aisaac-xbee-base.h"
 #include "aisaac-wifi-base.h"
 #include "aisaac-com-topic-struct.h"
-#include "aisaac_communication/aisaaccommand.pb.h"
+#include "aisaaccommand.pb.h"
 
 
 namespace aisaac
