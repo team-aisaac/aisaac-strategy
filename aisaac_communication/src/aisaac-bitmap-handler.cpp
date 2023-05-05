@@ -96,7 +96,7 @@ namespace aisaac
         aisaacpb::Position goal_pose;
         goal_pose.set_x((int32_t)(msg->goal_pose.x * 1000.0));  // m -> mm
         goal_pose.set_y((int32_t)(msg->goal_pose.y * 1000.0));  // m -> mm
-        goal_pose.set_theta((int32_t)(msg->goal_pose.theta * 180.0 / M_PI));    // rad -> deg
+        goal_pose.set_theta((int32_t)(msg->goal_pose.theta * 18000.0 / M_PI));    // rad -> deg (x100)
         command_to_robot.set_allocated_middle_goal_pose(&goal_pose);
 
         // prohibited_zone_ignore
@@ -109,7 +109,7 @@ namespace aisaac
         aisaacpb::Position middle_goal_pose;
         middle_goal_pose.set_x((int32_t)(msg->middle_goal_pose.x * 1000.0));    // m -> mm
         middle_goal_pose.set_y((int32_t)(msg->middle_goal_pose.y * 1000.0));    // m -> mm
-        middle_goal_pose.set_theta((int32_t)(msg->middle_goal_pose.theta * 180.0 / M_PI));  // rad -> deg
+        middle_goal_pose.set_theta((int32_t)(msg->middle_goal_pose.theta * 18000.0 / M_PI));  // rad -> deg (x100)
         command_to_robot.set_allocated_middle_goal_pose(&middle_goal_pose);
 
         // Dribble
@@ -124,7 +124,7 @@ namespace aisaac
         aisaacpb::Position dribble_goal;
         dribble_goal.set_x((int32_t)(msg->dribble_goal.x * 1000.0));    // m -> mm
         dribble_goal.set_y((int32_t)(msg->dribble_goal.y * 1000.0));    // m -> mm
-        dribble_goal.set_theta((int32_t)(msg->dribble_goal.theta * 180.0 / M_PI));  // rad -> deg
+        dribble_goal.set_theta((int32_t)(msg->dribble_goal.theta * 18000.0 / M_PI));  // rad -> deg (x100)
         dribble.set_allocated_dribble_goal(&dribble_goal);
         // -dribble_complete_distance
         dribble.set_dribble_complete_distance(msg->dribble_complete_distance);  // mm
