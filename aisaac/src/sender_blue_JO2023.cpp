@@ -102,19 +102,19 @@ int main(int argc, char **argv) {
 
     trHandlers[0].robotID = 0;
     trHandlers[0].setSender(&sender);
-    command_sub[0] = nh.subscribe("/blue/robot_0/robot_commands_real", 1, &TopicRxHandler::command_callback, &trHandlers[0]);
+    command_sub[0] = nh.subscribe("/blue/robot_0/robot_commands_real", 1, &TopicRxHandler::command_real_callback, &trHandlers[0]);
     trHandlers[1].robotID = 1;
     trHandlers[1].setSender(&sender);
-    command_sub[1] = nh.subscribe("/blue/robot_1/robot_commands_real", 1, &TopicRxHandler::command_callback, &trHandlers[1]);
+    command_sub[1] = nh.subscribe("/blue/robot_1/robot_commands_real", 1, &TopicRxHandler::command_real_callback, &trHandlers[1]);
     trHandlers[2].robotID = 2;
     trHandlers[2].setSender(&sender);
-    command_sub[2] = nh.subscribe("/blue/robot_2/robot_commands_real", 1, &TopicRxHandler::command_callback, &trHandlers[2]);
+    command_sub[2] = nh.subscribe("/blue/robot_2/robot_commands_real", 1, &TopicRxHandler::command_real_callback, &trHandlers[2]);
     trHandlers[3].robotID = 3;
     trHandlers[3].setSender(&sender);
-    command_sub[3] = nh.subscribe("/blue/robot_3/robot_commands_real", 1, &TopicRxHandler::command_callback, &trHandlers[3]);
+    command_sub[3] = nh.subscribe("/blue/robot_3/robot_commands_real", 1, &TopicRxHandler::command_real_callback, &trHandlers[3]);
     trHandlers[4].robotID = 4;
     trHandlers[4].setSender(&sender);
-    command_sub[4] = nh.subscribe("/blue/robot_4/robot_commands_real", 1, &TopicRxHandler::command_callback, &trHandlers[4]);
+    command_sub[4] = nh.subscribe("/blue/robot_4/robot_commands_real", 1, &TopicRxHandler::command_real_callback, &trHandlers[4]);
 
     errorFlag = 0;
 
