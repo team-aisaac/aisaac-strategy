@@ -1,7 +1,7 @@
 #include <ros/ros.h>
 #include <std_msgs/String.h>
 #include <nav_msgs/Odometry.h>
-#include <consai_msgs/robot_commands.h>
+#include <consai_msgs/robot_commands_real.h>
 #include <aisaac/Shutdown.h>
 #include <tf/tf.h>
 #include <vector>

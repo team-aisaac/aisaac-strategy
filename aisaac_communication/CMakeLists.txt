@@ -10,6 +10,7 @@ project(aisaac_communication)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
+  consai_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -116,7 +117,8 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(
  include
-  ${catkin_INCLUDE_DIRS}
+ ${catkin_INCLUDE_DIRS}
+ include/${PROJECT_NAME}
 )
 
 ## Declare a C++ library
