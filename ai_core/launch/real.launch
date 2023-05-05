@@ -7,7 +7,7 @@
 
   <!-- Run Sender -->
   <!-- <node name="sender" pkg="aissac" type="sender_xbee_yellow" required="true"> -->
-  <node name="sender" pkg="aissac" type="sender_xbee_blue" required="true">
+  <node name="sender" pkg="aisaac" type="sender_blue_JO2023" required="true">
   <!-- <remap from="/robot_0/robot_commands" to="/ssl_joy/ssl_joystick/robot_commands" /> -->
-  <!-- </node> -->
+  </node>
 </launch>
