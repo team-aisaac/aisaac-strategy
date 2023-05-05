@@ -210,7 +210,7 @@ def run_world_model():
 
             elif referee_branch == "STOP":
                 strat_calcrator = world_model.get_strategy_calcurator("stop")
-                strat = strat_calcrator.calcurate(strat_ctx)
+                strat = strat_calcrator.calcurate(strat_ctx, objects=world_model._objects)
 
             elif referee_branch == "NORMAL_START":
                 if not strat_ctx.get_last("kickoff_complete", namespace="world_model") \

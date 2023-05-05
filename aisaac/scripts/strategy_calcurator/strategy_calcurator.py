@@ -72,7 +72,7 @@ class StrategyCalcuratorBase(object):
 
         # 毎ループnewするのは重いので辞書に格納しておく
         self._static_strategies = {
-            'initial': InitialStaticStrategy(),
+            'initial': InitialStaticStrategy(objects=self._objects),
             'stop': StopStaticStrategy()
         }
 
