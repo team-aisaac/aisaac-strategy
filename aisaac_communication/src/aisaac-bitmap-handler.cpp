@@ -183,14 +183,14 @@ namespace aisaac
 
         // obstacles
         auto obstacles = msg->obstacles;
-        // for (auto rx_obstacle in msg) {
-        //     aisaacpb::Obstacle* obstacle = vision_data.add_obstacles();
-        //     obstacle->set_x(rx_obstacle.pose.x);
-        //     obstacle->set_y(rx_obstacle.pose.y);
-        //     obstacle->set_theta(rx_obstacle.pose.theta);
-        //     obstacle->set_vx(rx_obstacle.vel.x);
-        //     obstacle->set_vy(rx_obstacle.vel.y);
-        // }
+        for (auto rx_obstacle : obstacles) {
+            aisaacpb::Obstacle* obstacle = vision_data.add_obstacles();
+            obstacle->set_x(rx_obstacle.pose.x);
+            obstacle->set_y(rx_obstacle.pose.y);
+            obstacle->set_theta(rx_obstacle.pose.theta);
+            obstacle->set_vx(rx_obstacle.vel.x);
+            obstacle->set_vy(rx_obstacle.vel.y);
+        }
         
         std::string serialized_str;
         // Encode
