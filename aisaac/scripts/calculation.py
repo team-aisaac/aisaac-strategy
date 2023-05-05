@@ -82,10 +82,10 @@ class Calculation():
         self.g_down_y = -0.6      # ゴールポストの下側のy座標:x_GR
         self.g_center_x = -6.0    # ゴールの中央のx座標:y_GC
         self.g_center_y = 0.0    # ゴールの中央のy座標:x_GC
-        self.p_area_up_x = -4.8   # ペナルティエリアの上側の角のx座標:y_PL
-        self.p_area_up_y = 1.2   # ペナルティエリアの上側の角のy座標:x_PL
-        self.p_area_down_x = -4.8   # ペナルティエリアの下側の角のx座標:y_PR
-        self.p_area_down_y = -1.2   # ペナルティエリアの下側の角のy座標:x_PR
+        self.p_area_up_x = -4.2   # ペナルティエリアの上側の角のx座標:y_PL
+        self.p_area_up_y = 1.8   # ペナルティエリアの上側の角のy座標:x_PL
+        self.p_area_down_x = -4.2   # ペナルティエリアの下側の角のx座標:y_PR
+        self.p_area_down_y = -1.8   # ペナルティエリアの下側の角のy座標:x_PR
         
         self.line_up_x = 0.0        # ボールとゴールポストを結んだ線と防御ラインとの交点の上側のx座標:y_LL
         self.line_up_y = 0.0        # ボールとゴールポストを結んだ線と防御ラインとの交点の上側のy座標:x_LL
@@ -97,7 +97,7 @@ class Calculation():
         self.line_down_r_x = 0.0    # ロボットの半径を考慮した補正後の座標:y_LR'
         self.line_down_r_y = 0.0    # ロボットの半径を考慮した補正後の座標:x_LR'
 
-        self.offset_r = 0.          # オフセット値
+        self.offset_r = 0.1          # オフセット値
         self.robot_r = 90.0/1000.0  # ロボット半径
         self.robot_a = 1.0          # ロボットの加速度
         self.ball_MAX_SPEED = 6.5   # ボールの最大速度
