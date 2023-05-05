@@ -157,7 +157,7 @@ namespace aisaac
     void convertFromCommandRealToProtobufEncodedString(const consai_msgs::robot_commands_realConstPtr& msg, std::vector<unsigned char> &out) {
         out.clear();
 
-        // Index:0 DATAType5, 0 0b101 + 0b00000
+        // Index:0 DATAType(5, 0) 0b101 + 0b00000
         out.push_back(0b10100000);
 
         // Construct Protobuf message
@@ -244,8 +244,8 @@ namespace aisaac
     void convertFromCommandRealToProtobufEncodedStringVision(const consai_msgs::robot_commands_realConstPtr& msg, std::vector<unsigned char> &out) {
         out.clear();
 
-        // Index:0 DATAType5, 1 0b101 + 0b00001
-        out.push_back(0b10100000);
+        // Index:0 DATAType(5, 2) 0b101 + 0b00010
+        out.push_back(0b10100010);
 
         aisaacpb::VisionData vision_data;
 
