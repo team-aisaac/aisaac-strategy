@@ -28,6 +28,10 @@ class Entity(object):
         self._vision_position_y = 0.
         self._vision_orientation = 0.
 
+        self._current_velocity_x = 0.
+        self._current_velocity_y = 0.
+        self._current_velocity_theta = 0.
+
         self._max_velocity = 0.
 
     def set_current_position(self, x, y, theta=None):
@@ -68,8 +72,11 @@ class Entity(object):
     def set_current_velocity_orientation(self, vtheta):
         self._current_velocity_orientation = vtheta
 
-    def get_current_velocity(self):
-        return self._current_velocity_x, self._current_velocity_y
+    def get_current_velocity(self, theta=False):
+        if not theta:
+            return self._current_velocity_x, self._current_velocity_y
+        else:
+            return self._current_velocity_x, self._current_velocity_y, self._current_velocity_orientation
 
     def get_current_velocity_orientation(self):
         return self._current_velocity_orientation

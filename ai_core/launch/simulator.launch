@@ -2,7 +2,7 @@
   <!-- Run Vision -->
   <node name="receiver" pkg="grsim_wrapper" type="detection.py" required="true">
     <param name="multicast_addr" type="string" value="224.5.23.2" />
-    <param name="multicast_port" value="10020" />
+    <param name="multicast_port" value="10006" />
   </node>
 
   <!-- Run Sender -->
