@@ -73,7 +73,7 @@ namespace aisaac
         std::cout << "WiFi IF: " << (wifiActivated ? "Active" : "Inactive") << std::endl;
         std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
     }
-    void convertFromCommandRealToProtobufEncodedString(const consai_msgs::robot_commands_realConstPtr& msg, std::vector<unsigned char> &out) {
+    void AisaacBitmapHandler::convertFromCommandRealToProtobufEncodedString(const consai_msgs::robot_commands_realConstPtr& msg, std::vector<unsigned char> &out) {
         out.clear();
 
         // Index:0 DATAType(5, 0) 0b101 + 0b00000
@@ -160,7 +160,7 @@ namespace aisaac
             out.push_back(c);
         }
     }
-    void convertFromCommandRealToProtobufEncodedStringVision(const consai_msgs::robot_commands_realConstPtr& msg, std::vector<unsigned char> &out) {
+    void AisaacBitmapHandler::convertFromCommandRealToProtobufEncodedStringVision(const consai_msgs::robot_commands_realConstPtr& msg, std::vector<unsigned char> &out) {
         out.clear();
 
         // Index:0 DATAType(5, 2) 0b101 + 0b00010
