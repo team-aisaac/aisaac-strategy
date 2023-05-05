@@ -1,8 +1,13 @@
 #pragma once
 #include <vector>
+
+#include "consai_msgs/robot_commands_real.h"
+
 #include "aisaac-xbee-base.h"
 #include "aisaac-wifi-base.h"
 #include "aisaac-com-topic-struct.h"
+#include "aisaaccommand.pb.h"
+
 
 namespace aisaac
 {
@@ -26,6 +31,9 @@ namespace aisaac
         int setNodePHYAddress(int, phyTechnology, std::vector<unsigned char>);
         void showInstanceStatus();
         void setShutdown(bool);
+        void convertToString(commandToRobot, std::vector<unsigned char>&);
+        void convertFromCommandRealToProtobufEncodedString(const consai_msgs::robot_commands_realConstPtr&, std::vector<unsigned char>&);
+        void convertFromCommandRealToProtobufEncodedStringVision(const consai_msgs::robot_commands_realConstPtr&, std::vector<unsigned char>&);
         void generateFT4(commandToRobot, std::vector<unsigned char>&);
         int parseFT4(std::vector<unsigned char> in, commandToRobot &out);
         void sendCommand(int, unsigned char, std::vector<unsigned char>);
