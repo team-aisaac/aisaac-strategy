@@ -8,11 +8,11 @@ from common import functions
 import rospy
 import config
 from geometry_msgs.msg import Point
-
+from consai_msgs.msg import robot_commands, robot_commands_real
 
 class RobotKick(object):
     def __init__(self, pid, cmd, cmd_v2, status):
-        # type: (robot_pid.RobotPid, aisaac.msg.Status, robot_status.RobotStatus) -> None
+        # type: (robot_pid.RobotPid, robot_commands, robot_commands_real, robot_status) -> None
         self.kick_power_x = 10
         self.kick_power_z = 0
         self.dribble_power = 10
@@ -276,7 +276,7 @@ class RobotKick(object):
                            auto_kick=True, is_shoot=True, ignore_penalty_area=True, is_tip_kick=True)
 
     def _recieve_ball(self, target_xy, next_target_xy, auto_kick=False, is_shoot=False, ignore_penalty_area=False, is_tip_kick=False):
-        # type: (typing.Tuple[float], typing.Tuple[float]) -> None
+        # type: (typing.Tuple[float], typing.Tuple[float], bool, bool, bool, bool) -> None
         """
         Parameters
         ----------

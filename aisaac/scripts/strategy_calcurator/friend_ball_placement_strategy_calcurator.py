@@ -26,7 +26,7 @@ class FriendBallPlacement(StrategyCalcuratorBase):
         self.leave_range = 0.5
 
     def calcurate(self, strategy_context=None, place_ball_position=[0,0]):
-        # type: (StrategyContext) -> StrategyBase
+        # type: (StrategyContext, List) -> StrategyBase
         self.place_point = place_ball_position
         self.ball_dispersion.append(
             functions.distance_btw_two_points(self.place_point, self._ball_params.get_current_position()))

@@ -33,7 +33,7 @@ class StrategyBase(object):
     全部のロボットのプロセスに指示を出す。
     """
 
-    def __init__(self, robot_ids=range(config.NUM_FRIEND_ROBOT), clone_base=None):
+    def __init__(self, robot_ids=range(config.NUM_FRIEND_ROBOT), clone_base=None, objects=None):
         # type: (List[int], StrategyBase) -> None
 
         if not clone_base:
@@ -83,25 +83,42 @@ class InitialStaticStrategy(StaticStrategy):
     """
     とりあえず適当な配置につくStrategy
     """
-    def __init__(self, robot_ids=range(config.NUM_FRIEND_ROBOT)):
-        # type: (List[int]) -> None
-        super(InitialStaticStrategy, self).__init__(robot_ids)
-
+    def __init__(self, robot_ids=range(config.NUM_FRIEND_ROBOT), objects=None):
+        # type: (List[int], List) -> None
+        super(InitialStaticStrategy, self).__init__(robot_ids, objects=None)
+        self.objects = None
         status = _get_default_status()
         status.status = 'move_linear'
+        if objects is not None:
+            self.objects = objects
 
         initial_positions = [
+            [-4.0, 0.0],
             [-0.6, 0.0],
             [-0.6, -1.0],
             [-3.0, 1.0],
-            [-3.0, -1.0],
-            [-4.0, 0.0],
+            [-3.0, -1.0]
         ]
 
-        for robot_id in self._all_robot_status.keys():
-            status.pid_goal_pos_x = initial_positions[robot_id][0]
-            status.pid_goal_pos_y = initial_positions[robot_id][1]
-            self._all_robot_status[robot_id] = copy.deepcopy(status)
+        initial_positions_with_roles = {
+            "GK": [-4.0, 0.0],
+            "LFW": [-0.6, 0.0],
+            "RFW": [-0.6, -1.0],
+            "LDF": [-3.0, 1.0],
+            "RDF": [-3.0, -1.0]
+        }
+
+        if self.objects is not None:
+            for robot_id in self._all_robot_status.keys():
+                status.pid_goal_pos_x = initial_positions_with_roles[self.objects.get_robot_by_id(robot_id).get_role()][0]
+                status.pid_goal_pos_y = initial_positions_with_roles[self.objects.get_robot_by_id(robot_id).get_role()][1]
+                self._all_robot_status[robot_id] = copy.deepcopy(status)
+        else:
+            for robot_id in self._all_robot_status.keys():
+                status.pid_goal_pos_x = initial_positions[robot_id][0]
+                status.pid_goal_pos_y = initial_positions[robot_id][1]
+                self._all_robot_status[robot_id] = copy.deepcopy(status)
+
 
 
 class StopStaticStrategy(StaticStrategy):

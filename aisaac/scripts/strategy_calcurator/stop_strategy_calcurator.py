@@ -12,7 +12,7 @@ class StopStrategyCalculator(StrategyCalcuratorBase):
     def __init__(self, objects):
         super(StopStrategyCalculator, self).__init__(objects)
 
-    def calcurate(self, strategy_context=None):
+    def calcurate(self, strategy_context=None, objects=None):
         # (context.StrategyContext) -> strategy.StrategyBase
         strategy_context.update("placed_ball_position", self._ball_params.get_current_position(), namespace="world_model")
         strategy_context.update("enemy_kick", False, namespace="world_model")
