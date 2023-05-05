@@ -91,11 +91,11 @@ class InitialStaticStrategy(StaticStrategy):
         status.status = 'move_linear'
 
         initial_positions = [
+            [-4.0, 0.0],
             [-0.6, 0.0],
             [-0.6, -1.0],
             [-3.0, 1.0],
-            [-3.0, -1.0],
-            [-4.0, 0.0],
+            [-3.0, -1.0]
         ]
 
         for robot_id in self._all_robot_status.keys():

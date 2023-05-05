@@ -54,7 +54,7 @@ class Robot(object):
 
         # Composition
         self.objects = Objects(self.robot_color, self.robot_side, self.robot_total, self.enemy_total, node="robot"+str(self.robot_id))
-        self.ctrld_robot = self.objects.robot[int(self.robot_id)] # type: entity.Robot
+        self.ctrld_robot = self.objects.robot[int(self.robot_id)]
 
         self.robot_friend = self.objects.robot
         self.robot_enemy = self.objects.enemy
@@ -199,6 +199,7 @@ class Robot(object):
         self.reset_cmd()
         self.cmd.shutdown_flag = True
         self.cmd_v2.shutdown_flag = True
+        self.cmd_v2.halt_flag = True
         self.store_and_publish_commands()
 
     def halt_cmd(self):
@@ -324,7 +325,7 @@ class Robot(object):
                 self.kick.receive_ball(
                     self.defence.def2_pos_x, self.defence.def2_pos_y)
 
-            # kicker
+            # keeper
             elif self.status.robot_status == "keeper":
                 self.keeper.keeper()
 
@@ -334,31 +335,21 @@ class Robot(object):
                                     is_tip_kick=True,
                                     ignore_penalty_area=True)
 
-
             elif self.status.robot_status == "stop":
+                # TODO: resetする必要があるか確認
                 self.reset_cmd()
                 self.status.robot_status = "none"
             elif self.status.robot_status == "halt":
                 self.halt_cmd()
-                
 
             elif self.status.robot_status == "shutdown":
                 self.shutdown_cmd()
 
+            # 最後にまとめて送る
             self.store_and_publish_commands()
 
             self._last_loop_time = self._current_loop_time
             self.loop_rate.sleep()
-
-        """
-
-    def goal_pose_listener(self):
-        rospy.Subscriber("/robot_" + self.robot_id + "/goal_pose", Pose, self.ctrld_robot.goal_pose_callback)
-
-    def target_pose_listener(self):
-        rospy.Subscriber("/robot_" + self.robot_id + "/target_pose", Pose, self.ctrld_robot.target_pose_callback)
-
-        """
 
     def status_listener(self):
         rospy.Subscriber("/" + self.robot_color + "/robot_" +
@@ -369,26 +360,12 @@ class Robot(object):
         if service_name not in rosservice.get_service_list():
             rospy.Service(service_name, pid, self.pid.set_pid_callback)
 
-    """
-    def kick(self, req):
-        self.cmd.kick_speed_x = 3
-        return True
-
-    def kick_end(self, req):
-        self.cmd.kick_speed_x = 0
-        return True
-
-    def kick_server(self):
-        rospy.Service("/robot_0/kick", Kick, self.kick)
-        rospy.Service("/robot_0/kick_end", Kick, self.kick_end)
-    """
-
     def def_pos_listener(self):
         rospy.Subscriber("/" + self.robot_color + "/def_pos",
                          Def_pos, self.defence.def_pos_callback)
 
-
 def run_robot():
+    # robot 単体を動かす用。world_modelから立ち上げる時は利用されない
     robot = Robot()
     try:
         robot.run()
@@ -400,6 +377,7 @@ def run_robot():
 
 
 if __name__ == "__main__":
+    # robot 単体を動かす用。world_modelから立ち上げる時は利用されない
     rospy.init_node("robot")
 
     while True and not rospy.is_shutdown():
@@ -412,31 +390,3 @@ if __name__ == "__main__":
             traceback.print_exc()
             if rospy.get_param("is_test", False):
                 break
-
-
-"""
-    robot.odom_listener()
-    #robot.goal_pose_listener()
-    #robot.goal_pose_listener()
-    robot.status_listener()
-    #robot.kick_server()
-    loop_rate = rospy.Rate(ROBOT_LOOP_RATE)
-
-    print("start")
-
-    while not rospy.is_shutdown():
-        if robot.status.robot_status == "move_linear":
-            robot.pid.pid_linear(robot.ctrld_robot.goal_pos_x, robot.ctrld_robot.goal_pos_y,
-            robot.ctrld_robot.goal_pos_theta)
-        if robot.status.robot_status == "move_circle":
-            robot.pid.pid_circle(robot.pid.pid_circle_center_x, robot.ctrld_robot.goal_pos_x,
-            robot.ctrld_robot.goal_pos_y, robot.pid.pid_circle_center_y, robot.ctrld_robot.goal_pos_theta)
-        if robot.status.robot_status == "kick":
-            robot.kick.kick_x()
-        if robot.status.robot_status == "pass":
-            robot.kick.pass_ball(robot.ctrld_robot.target_pos_x, robot.ctrld_robot.target_pos_y)
-
-        print(robot.status.robot_status)
-        loop_rate.sleep()
-
-"""

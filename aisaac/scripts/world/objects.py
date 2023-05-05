@@ -49,7 +49,7 @@ class Objects(object):
             # for robot, role in zip(self.robot, roles):
             #     robot.set_role(role)
 
-            roles = ["RFW", "LFW", "RDF", "LDF", "GK"]
+            roles = ["GK", "RFW", "LFW", "RDF", "LDF"]
             for robot_id, role in zip(self._robot_ids, roles):
                 self.get_robot_by_id(robot_id).set_role(role)
             self.roles = roles # 保存
@@ -69,13 +69,13 @@ class Objects(object):
 
     def redefine_roles(self, event):
         if len(self._active_robot_ids) == 5:
-            roles = ["RFW", "LFW", "RDF", "LDF", "GK"]
+            roles = ["GK", "RFW", "LFW", "RDF", "LDF"]
         elif len(self._active_robot_ids) == 4:
-            roles = ["RFW", "LFW", "LDF", "GK"]
+            roles = ["GK", "RFW", "LFW", "LDF"]
         elif len(self._active_robot_ids) == 3:
-            roles = ["RFW", "LDF", "GK"]
+            roles = ["GK", "RFW", "LDF"]
         elif len(self._active_robot_ids) == 2:
-            roles = ["RFW", "GK"]
+            roles = ["GK", "RFW"]
         elif len(self._active_robot_ids) == 1:
             roles = ["GK"]
         else:

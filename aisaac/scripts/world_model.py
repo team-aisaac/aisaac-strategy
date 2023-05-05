@@ -26,7 +26,6 @@ from common.world_model_status_publisher import WorldModelStatusPublisher
 
 from std_msgs.msg import String, Float32
 
-from common.filter import identity_filter
 import robot
 import threading
 import time
