@@ -31,7 +31,6 @@ namespace aisaac
         int setNodePHYAddress(int, phyTechnology, std::vector<unsigned char>);
         void showInstanceStatus();
         void setShutdown(bool);
-        void convertToString(commandToRobot, std::vector<unsigned char>&);
         void convertFromCommandRealToProtobufEncodedString(const consai_msgs::robot_commands_realConstPtr&, std::vector<unsigned char>&);
         void convertFromCommandRealToProtobufEncodedStringVision(const consai_msgs::robot_commands_realConstPtr&, std::vector<unsigned char>&);
         void generateFT4(commandToRobot, std::vector<unsigned char>&);
