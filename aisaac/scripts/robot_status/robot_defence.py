@@ -1,7 +1,4 @@
 import math
-import robot_status
-import robot_kick
-
 
 class RobotDefence:
     def __init__(self, status, kick):

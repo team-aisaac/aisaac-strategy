@@ -191,10 +191,10 @@ def run_world_model():
 
             # 恒等関数フィルタの適用
             # vision_positionからcurrent_positionを決定してつめる
-            for robot in world_model.get_objects().robot:
-                identity_filter(robot)
-            for enemy in world_model.get_objects().enemy:
-                identity_filter(enemy)
+            # for robot in world_model.get_objects().robot:
+            #     identity_filter(robot)
+            # for enemy in world_model.get_objects().enemy:
+            #     identity_filter(enemy)
 
             referee_branch = referee.get_referee_branch()
 

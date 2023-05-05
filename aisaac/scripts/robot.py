@@ -59,8 +59,6 @@ class Robot(object):
         self.robot_friend = self.objects.robot
         self.robot_enemy = self.objects.enemy
 
-        self.ball_params = self.objects.ball
-
         self.pid = RobotPid(self.robot_id, self.objects, self.cmd, self.cmd_v2)
         self.status = RobotStatus(self.pid)
         self.kick = RobotKick(self.pid, self.cmd, self.cmd_v2, self.status)
@@ -135,7 +133,45 @@ class Robot(object):
         self._last_pub_time = rospy.Time.now()
         self._last_vel_surge_sway_vec = (self.cmd.vel_surge, self.cmd.vel_sway)
         self._last_omega = self.cmd.omega
-        self.reset_cmd()
+        # self.reset_cmd()
+
+    def update_positions(self):
+        # 場外にいる場合、カルマンフィルタの信念(分散)を初期化する
+        if self.ctrld_robot.get_id() not in self.objects.get_active_robot_ids():
+            self.ctrld_robot.reset_own_belief()
+
+        self.cmd_v2.obstacles = []
+        # カルマンフィルタ,恒等関数フィルタの適用
+        # vision_positionからcurrent_positionを決定してつめる
+        # cmd_v2にも詰める
+        for robot_id in self.objects.get_active_robot_ids():
+            if robot_id == self.ctrld_robot.get_id():
+                # kalman_filter(self.ctrld_robot)
+                identity_filter(self.ctrld_robot)
+                self.cmd_v2.current_pose.x, self.cmd_v2.current_pose.y, self.cmd_v2.current_pose.theta =\
+                    self.ctrld_robot.get_current_position(theta=True)
+            else:
+                robot = self.objects.get_robot_by_id(robot_id)
+                identity_filter(robot)
+                tmp_obstacle = Obstacle()
+                tmp_obstacle.vel.x, tmp_obstacle.vel.y, tmp_obstacle.vel.theta = \
+                    robot.get_current_velocity(theta=True)
+                tmp_obstacle.pose.x, tmp_obstacle.pose.y, tmp_obstacle.pose.theta = \
+                    robot.get_current_position(theta=True)
+                self.cmd_v2.obstacles.append(tmp_obstacle)
+                
+        for enemy_id in self.objects.get_active_enemy_ids():
+            enemy = self.objects.get_enemy_by_id(enemy_id)
+            identity_filter(enemy)
+            tmp_obstacle = Obstacle()
+            tmp_obstacle.vel.x, tmp_obstacle.vel.y, tmp_obstacle.vel.theta = \
+                enemy.get_current_velocity(theta=True)
+            tmp_obstacle.pose.x, tmp_obstacle.pose.y, tmp_obstacle.pose.theta = \
+                enemy.get_current_position(theta=True)
+            self.cmd_v2.obstacles.append(tmp_obstacle)
+
+        # ballの位置を送る
+        self.cmd_v2.ball_position.x, self.cmd_v2.ball_position.y = self.objects.ball.get_current_position()
 
     def reset_cmd(self):
         default_cmd = robot_commands()
@@ -154,7 +190,8 @@ class Robot(object):
         self.cmd.dribble_power = default_cmd.dribble_power
 
         # 20230504
-        self.cmd_v2 = robot_commands_real()
+        # TODO: stop時の初期化
+        # self.cmd_v2 = robot_commands_real()
         self.cmd_v2.ball_target_allowable_error = 150
         self.cmd_v2.dribble_complete_distance = 150
 
@@ -167,7 +204,9 @@ class Robot(object):
     def halt_cmd(self):
         self.reset_cmd()
         self.cmd_v2.halt_flag = True
-        self.store_and_publish_commands()
+
+    def not_halt_cmd(self):
+        self.cmd_v2.halt_flag = False
 
     def print_fps_callback(self, event):
         if len(self._fps) > 0:
@@ -188,40 +227,7 @@ class Robot(object):
             elapsed_time = self._current_loop_time - self._last_loop_time
             self._fps.append(1./elapsed_time)
 
-            # 場外にいる場合、カルマンフィルタの信念(分散)を初期化する
-            if self.ctrld_robot.get_id() not in self.objects.get_active_robot_ids():
-                self.ctrld_robot.reset_own_belief()
-
-            self.cmd_v2.obstacles = []
-            # カルマンフィルタ,恒等関数フィルタの適用
-            # vision_positionからcurrent_positionを決定してつめる
-            # cmd_v2にも詰める
-            for robot in self.robot_friend:
-                if robot.get_id() == self.ctrld_robot.get_id():
-                    # kalman_filter(self.ctrld_robot)
-                    identity_filter(self.ctrld_robot)
-                    self.cmd_v2.current_pose.x, self.cmd_v2.current_pose.y, self.cmd_v2.current_pose.theta =\
-                        self.ctrld_robot.get_current_position(theta=True)
-                else:
-                    identity_filter(robot)
-                    tmp_obstacle = Obstacle()
-                    tmp_obstacle.pose.x, tmp_obstacle.pose.y, tmp_obstacle.pose.theta = \
-                        robot.get_current_position(theta=True)
-                    tmp_obstacle.vel.x, tmp_obstacle.vel.y, tmp_obstacle.vel.theta = \
-                        robot.get_current_velocity(theta=True)
-                    self.cmd_v2.obstacles.append(tmp_obstacle)
-                    
-            for enemy in self.robot_enemy:
-                identity_filter(enemy)
-                tmp_obstacle = Obstacle()
-                tmp_obstacle.pose.x, tmp_obstacle.pose.y, tmp_obstacle.pose.theta = \
-                    enemy.get_current_position(theta=True)
-                tmp_obstacle.vel.x, tmp_obstacle.vel.y, tmp_obstacle.vel.theta = \
-                    enemy.get_current_velocity(theta=True)
-                self.cmd_v2.obstacles.append(tmp_obstacle)
-
-            # ballの位置を送る
-            self.cmd_v2.ball_position.x, self.cmd_v2.ball_position.y = self.ball_params.get_current_position()
+            self.update_positions()
 
             # GKの場合、prohidited_zone_ignoreをTrueにする
             if self.ctrld_robot.get_role() == "GK":
@@ -277,12 +283,16 @@ class Robot(object):
 
             elif self.status.robot_status == "penalty_shoot":
                 self.kick.shoot_ball(ignore_penalty_area=True)
+                self.cmd_v2.prohidited_zone_ignore = True
             elif self.status.robot_status == "penalty_shoot_right":
                 self.kick.shoot_ball(target="right", ignore_penalty_area=True)
+                self.cmd_v2.prohidited_zone_ignore = True
             elif self.status.robot_status == "penalty_shoot_left":
                 self.kick.shoot_ball(target="left", ignore_penalty_area=True)
+                self.cmd_v2.prohidited_zone_ignore = True
             elif self.status.robot_status == "penalty_shoot_center":
                 self.kick.shoot_ball(target="center", ignore_penalty_area=True)
+                self.cmd_v2.prohidited_zone_ignore = True
 
             elif self.status.robot_status == "receive":
                 self.kick.receive_ball(self.ctrld_robot.get_future_position()[0],
@@ -290,6 +300,7 @@ class Robot(object):
             elif self.status.robot_status == "receive_direct_pass":
                 self.kick.receive_and_direct_pass(self.ctrld_robot.get_future_position(),
                                                   self.ctrld_robot.get_pass_target_position())
+                self.cmd_v2.prohidited_zone_ignore = True
             elif self.status.robot_status == "receive_direct_shoot":
                 self.kick.receive_and_direct_shoot(self.ctrld_robot.get_future_position())
             elif self.status.robot_status == "receive_direct_shoot_left":
@@ -298,6 +309,8 @@ class Robot(object):
                 self.kick.receive_and_direct_shoot(self.ctrld_robot.get_future_position(), target="right")
             elif self.status.robot_status == "receive_direct_shoot_center":
                 self.kick.receive_and_direct_shoot(self.ctrld_robot.get_future_position(), target="center")
+            
+            # defence
             elif self.status.robot_status == "defence1":
                 self.defence.move_defence(
                     self.defence.def1_pos_x, self.defence.def1_pos_y)
@@ -311,6 +324,7 @@ class Robot(object):
                 self.kick.receive_ball(
                     self.defence.def2_pos_x, self.defence.def2_pos_y)
 
+            # kicker
             elif self.status.robot_status == "keeper":
                 self.keeper.keeper()
 
@@ -319,6 +333,7 @@ class Robot(object):
                                     self.ctrld_robot.get_pass_target_position()[1],
                                     is_tip_kick=True,
                                     ignore_penalty_area=True)
+
 
             elif self.status.robot_status == "stop":
                 self.reset_cmd()

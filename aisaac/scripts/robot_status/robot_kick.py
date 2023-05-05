@@ -9,13 +9,10 @@ import rospy
 import config
 from geometry_msgs.msg import Point
 from consai_msgs.msg import robot_commands, robot_commands_real
-import robot_pid
-import robot_status
-
 
 class RobotKick(object):
     def __init__(self, pid, cmd, cmd_v2, status):
-        # type: (robot_pid.RobotPid, robot_commands, robot_commands_real, robot_status.RobotStatus) -> None
+        # type: (robot_pid.RobotPid, robot_commands, robot_commands_real, robot_status) -> None
         self.kick_power_x = 10
         self.kick_power_z = 0
         self.dribble_power = 10

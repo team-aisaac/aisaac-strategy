@@ -36,11 +36,11 @@ class Objects(object):
             self.robot_total = robot_total
             self.enemy_total = enemy_total
 
-            self._robot_ids = range(self.robot_total)
-            self._enemy_ids = range(self.enemy_total)
+            self._robot_ids = list(range(self.robot_total))
+            self._enemy_ids = list(range(self.enemy_total))
 
-            self._active_robot_ids = range(self.robot_total)
-            self._active_enemy_ids = range(self.robot_total)
+            self._active_robot_ids = list(range(self.robot_total))
+            self._active_enemy_ids = list(range(self.enemy_total))
 
             self.robot = [entity.Robot(id=i) for i in self._robot_ids]  # type: typing.List[entity.Robot]
             self.enemy = [entity.Robot(id=i) for i in self._enemy_ids]  # type: typing.List[entity.Robot]

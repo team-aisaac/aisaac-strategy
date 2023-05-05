@@ -3,7 +3,6 @@
 import numpy as np
 import rospy
 from common import functions
-import robot_kick
 
 
 class RobotKeeper(object):
