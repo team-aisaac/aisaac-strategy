@@ -8,11 +8,11 @@ from common import functions
 import rospy
 import config
 from geometry_msgs.msg import Point
-
+from consai_msgs.msg import robot_commands, robot_commands_real
 
 class RobotKick(object):
-    def __init__(self, pid, cmd, status):
-        # type: (robot_pid.RobotPid, aisaac.msg.Status, robot_status.RobotStatus) -> None
+    def __init__(self, pid, cmd, cmd_v2, status):
+        # type: (robot_pid.RobotPid, robot_commands, robot_commands_real, robot_status) -> None
         self.kick_power_x = 10
         self.kick_power_z = 0
         self.dribble_power = 10
@@ -22,6 +22,7 @@ class RobotKick(object):
         self.pid = pid
         self.status = status
         self.cmd = cmd
+        self.cmd_v2 = cmd_v2
         self.dispersion1 = [30] * 1
         self.dispersion2 = [30] * 1
         self.rot_dispersion = [10] * 1
@@ -77,11 +78,24 @@ class RobotKick(object):
             self.cmd.omega = 0
             self.cmd.kick_speed_x = 0
             self.status.robot_status = "None"
+
+            # 20220504
+            self.cmd_v2.kick_power = 0
+            self.cmd_v2.ball_kick_state = False
+            self.cmd_v2.ball_kick = False
+
             self.pass_stage = 0
             return
 
         self.cmd.kick_speed_x = power_x
         self.cmd.kick_speed_z = power_z
+
+        # 20220504
+        self.cmd_v2.kick_power = int(power_x)
+        if power_x > 0:
+            # self.cmd_v2.ball_kick_state = True
+            self.cmd_v2.ball_kick = True
+
         self.pid.pid_linear(self.ball_params.get_current_position()[0], self.ball_params.get_current_position()[1], self.pose_theta, ignore_penalty_area=ignore_penalty_area)
         #self.cmd.vel_surge = 3
 
@@ -110,6 +124,10 @@ class RobotKick(object):
         elif _target == "right":
             self.pass_ball(config.GOAL_ENEMY_RIGHT[0], config.GOAL_ENEMY_RIGHT[1] + post_offset,
                            should_wait=should_wait, is_shoot=True, ignore_penalty_area=ignore_penalty_area)
+        
+        # 20230504 add by sawa
+        if ignore_penalty_area:
+            self.cmd_v2.prohidited_zone_ignore = True
 
     def pass_ball(self, target_x, target_y, should_wait=False, is_shoot=False, is_tip_kick=False,
                   ignore_penalty_area=False, place=False):
@@ -125,6 +143,14 @@ class RobotKick(object):
         point.x = target_x
         point.y = target_y
         self._pass_target_pos_publisher.publish(point)
+
+        # 20230504 by sawa
+        self.cmd_v2.ball_goal.x = target_x
+        self.cmd_v2.ball_goal.y = target_y
+        if is_shoot:
+            self.cmd_v2.kick_power = 100
+        else:
+            self.cmd_v2.kick_power = 50
 
         distance = math.sqrt((target_x - self.ball_params.get_current_position()[0])**2 + (target_y - self.ball_params.get_current_position()[1])**2)
         if distance != 0:
@@ -250,7 +276,7 @@ class RobotKick(object):
                            auto_kick=True, is_shoot=True, ignore_penalty_area=True, is_tip_kick=True)
 
     def _recieve_ball(self, target_xy, next_target_xy, auto_kick=False, is_shoot=False, ignore_penalty_area=False, is_tip_kick=False):
-        # type: (typing.Tuple[float], typing.Tuple[float]) -> None
+        # type: (typing.Tuple[float], typing.Tuple[float], bool, bool, bool, bool) -> None
         """
         Parameters
         ----------
@@ -264,6 +290,11 @@ class RobotKick(object):
         self.cmd.kick_speed_x = 0
         self.cmd.kick_speed_z = 0
 
+        # 20220504
+        self.cmd_v2.kick_power = 0
+        self.cmd_v2.ball_kick_state = False
+        self.cmd_v2.ball_kick = False
+        
         target_x = target_xy[0]
         target_y = target_xy[1]
 
@@ -303,6 +334,11 @@ class RobotKick(object):
                 self.cmd.kick_speed_z = kick_power_x
 
             self.cmd.kick_speed_x = kick_power_x
+            # 20220504
+            self.cmd_v2.kick_power = int(kick_power_x)
+            if kick_power_x > 0:
+                # self.cmd_v2.ball_kick_state = True
+                self.cmd_v2.ball_kick = True
 
         # # 垂線テキスト座標
         # if self.ctrld_robot.get_id() == 0:
@@ -385,6 +421,11 @@ class RobotKick(object):
                     self.cmd.vel_sway = 0
                     self.cmd.omega = 0
                     self.cmd.dribble_power = 0
+                    # 20230504
+                    self.cmd_v2.dribble_power = 0
+                    # self.cmd_v2.dribble_state = False
+                    self.cmd_v2.dribbler_active = False
+
                     self.status.robot_status = "None"
                     self.dribble_stage = 0
                     return
@@ -393,6 +434,11 @@ class RobotKick(object):
                     self.dribble_stage = 2
 
                 self.cmd.dribble_power = self.dribble_power
+                # 20230504
+                self.cmd_v2.dribble_power = self.dribble_power
+                # self.cmd_v2.dribble_state = True
+                self.cmd_v2.dribbler_active = True
+
                 self.pid.pid_straight(target_x, target_y, pose_theta, ignore_penalty_area=ignore_penalty_area, avoid=False)
 
             #目標地付近になったらドリブラーを止めて引きずる(バックスピン防止)
@@ -408,9 +454,19 @@ class RobotKick(object):
                     self.cmd.vel_sway = 0
                     self.cmd.omega = 0
                     self.cmd.dribble_power = 0
+                    # 20230504
+                    self.cmd_v2.dribble_power = 0
+                    # self.cmd_v2.dribble_state = False
+                    self.cmd_v2.dribbler_active = False
+
                     self.status.robot_status = "None"
                     self.dribble_stage = 0
                     return
 
                 self.cmd.dribble_power = 0
+                # 20230504
+                self.cmd_v2.dribble_power = 0
+                # self.cmd_v2.dribble_state = False
+                self.cmd_v2.dribbler_active = False
+
                 self.pid.pid_straight(target_x, target_y, pose_theta, ignore_penalty_area=ignore_penalty_area, avoid=False)

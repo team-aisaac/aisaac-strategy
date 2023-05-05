@@ -26,7 +26,6 @@ from common.world_model_status_publisher import WorldModelStatusPublisher
 
 from std_msgs.msg import String, Float32
 
-from common.filter import identity_filter
 import robot
 import threading
 import time
@@ -191,10 +190,10 @@ def run_world_model():
 
             # 恒等関数フィルタの適用
             # vision_positionからcurrent_positionを決定してつめる
-            for robot in world_model.get_objects().robot:
-                identity_filter(robot)
-            for enemy in world_model.get_objects().enemy:
-                identity_filter(enemy)
+            # for robot in world_model.get_objects().robot:
+            #     identity_filter(robot)
+            # for enemy in world_model.get_objects().enemy:
+            #     identity_filter(enemy)
 
             referee_branch = referee.get_referee_branch()
 
@@ -211,7 +210,7 @@ def run_world_model():
 
             elif referee_branch == "STOP":
                 strat_calcrator = world_model.get_strategy_calcurator("stop")
-                strat = strat_calcrator.calcurate(strat_ctx)
+                strat = strat_calcrator.calcurate(strat_ctx, objects=world_model._objects)
 
             elif referee_branch == "NORMAL_START":
                 if not strat_ctx.get_last("kickoff_complete", namespace="world_model") \
@@ -370,3 +369,6 @@ if __name__ == "__main__":
             traceback.print_exc()
             if rospy.get_param("is_test", False):
                 break
+            else:
+                run_world_model()
+

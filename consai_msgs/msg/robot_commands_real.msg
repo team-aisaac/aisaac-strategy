@@ -18,3 +18,4 @@ Pose current_pose
 Obstacle[] obstacles
 PlaceBall ball_position
 bool shutdown_flag
+bool halt_flag

@@ -74,6 +74,7 @@ namespace aisaac
         std::cout << "WiFi IF: " << (wifiActivated ? "Active" : "Inactive") << std::endl;
         std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
     }
+
     void AisaacBitmapHandler::convertFromCommandRealToProtobufEncodedString(const consai_msgs::robot_commands_realConstPtr& msg, std::vector<unsigned char> &out) {
         out.clear();
 

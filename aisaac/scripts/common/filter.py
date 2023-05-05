@@ -77,6 +77,8 @@ def identity_filter(robot):
     #     return None
 
     x, y, theta = robot.get_vision_position()
+    x_bf, y_bf, theta_bf = robot.get_current_position(theta=True)
+    robot.set_current_velocity((x-x_bf)/ROBOT_DT, (y-y_bf)/ROBOT_DT, (theta-theta_bf)/ROBOT_DT)
     robot.set_current_position(x, y, theta)
 
 def detect_outlier(robot):

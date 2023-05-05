@@ -12,7 +12,7 @@ from geometry_msgs.msg import PoseStamped, Point
 ROBOT_LOOP_RATE = config.ROBOT_LOOP_RATE
 
 class RobotPid(object):    
-    def __init__(self, robot_id, objects, cmd):
+    def __init__(self, robot_id, objects, cmd, cmd_v2):
         self.robot_id = int(robot_id)
         self.ctrld_robot = objects.robot[int(robot_id)]
         self.friend = objects.robot
@@ -20,6 +20,7 @@ class RobotPid(object):
         self.ball_params = objects.ball
         self.objects = objects
         self.cmd = cmd
+        self.cmd_v2 = cmd_v2
 
         self.path_replan_flag = True
         self.goal_change_flag = True
@@ -624,6 +625,11 @@ class RobotPid(object):
         self.cmd.omega = Vr
         self.cmd.theta = goal_pos_theta
 
+        # 20230504
+        self.cmd_v2.goal_pose.x = goal_pos_x
+        self.cmd_v2.goal_pose.y = goal_pos_y
+        self.cmd_v2.goal_pose.theta = goal_pos_theta
+
         self.prev_goal_pos_x = self.next_goal_pos_x
         self.prev_goal_pos_y = self.next_goal_pos_y
 
@@ -725,6 +731,11 @@ class RobotPid(object):
         self.cmd.vel_sway = -Vx*math.sin(self.ctrld_robot.get_current_orientation())+Vy*math.cos(self.ctrld_robot.get_current_orientation())
         self.cmd.omega = Vr
         self.cmd.theta = goal_pos_theta
+
+        # 20230504
+        self.cmd_v2.goal_pose.x = goal_pos_x
+        self.cmd_v2.goal_pose.y = goal_pos_y
+        self.cmd_v2.goal_pose.theta = goal_pos_theta
 
         self.prev_goal_pos_x = self.next_goal_pos_x
         self.prev_goal_pos_y = self.next_goal_pos_y

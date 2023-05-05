@@ -4,7 +4,7 @@ import math
 import rospy
 import rosservice
 
-from consai_msgs.msg import robot_commands
+from consai_msgs.msg import robot_commands, robot_commands_real, Obstacle
 from aisaac.msg import Status, Def_pos
 from aisaac.srv import pid
 
@@ -48,18 +48,20 @@ class Robot(object):
 
         self._command_pub = RobotCommandPublisherWrapper(self.robot_color, self.robot_id)
 
+        self.cmd_v2 = robot_commands_real() # type: robot_commands_real
+        self.cmd_v2.ball_target_allowable_error = 150
+        self.cmd_v2.dribble_complete_distance = 150
+
         # Composition
         self.objects = Objects(self.robot_color, self.robot_side, self.robot_total, self.enemy_total, node="robot"+str(self.robot_id))
-        self.ctrld_robot = self.objects.robot[int(self.robot_id)] # type: entity.Robot
+        self.ctrld_robot = self.objects.robot[int(self.robot_id)]
 
         self.robot_friend = self.objects.robot
         self.robot_enemy = self.objects.enemy
 
-        self.ball_params = self.objects.ball
-
-        self.pid = RobotPid(self.robot_id, self.objects, self.cmd)
-        self.status = RobotStatus(self.pid)
-        self.kick = RobotKick(self.pid, self.cmd, self.status)
+        self.pid = RobotPid(self.robot_id, self.objects, self.cmd, self.cmd_v2)
+        self.status = RobotStatus(self.pid, self.cmd_v2)
+        self.kick = RobotKick(self.pid, self.cmd, self.cmd_v2, self.status)
         self.defence = RobotDefence(self.status, self.kick)
         self.keeper = RobotKeeper(self.kick)
 
@@ -126,12 +128,50 @@ class Robot(object):
 
         self.ctrld_robot.handle_loop_callback()
 
-        self._command_pub.publish(self.cmd)
+        self._command_pub.publish(self.cmd, self.cmd_v2)
 
         self._last_pub_time = rospy.Time.now()
         self._last_vel_surge_sway_vec = (self.cmd.vel_surge, self.cmd.vel_sway)
         self._last_omega = self.cmd.omega
         # self.reset_cmd()
+
+    def update_positions(self):
+        # 場外にいる場合、カルマンフィルタの信念(分散)を初期化する
+        if self.ctrld_robot.get_id() not in self.objects.get_active_robot_ids():
+            self.ctrld_robot.reset_own_belief()
+
+        self.cmd_v2.obstacles = []
+        # カルマンフィルタ,恒等関数フィルタの適用
+        # vision_positionからcurrent_positionを決定してつめる
+        # cmd_v2にも詰める
+        for robot_id in self.objects.get_active_robot_ids():
+            if robot_id == self.ctrld_robot.get_id():
+                # kalman_filter(self.ctrld_robot)
+                identity_filter(self.ctrld_robot)
+                self.cmd_v2.current_pose.x, self.cmd_v2.current_pose.y, self.cmd_v2.current_pose.theta =\
+                    self.ctrld_robot.get_current_position(theta=True)
+            else:
+                robot = self.objects.get_robot_by_id(robot_id)
+                identity_filter(robot)
+                tmp_obstacle = Obstacle()
+                tmp_obstacle.vel.x, tmp_obstacle.vel.y, tmp_obstacle.vel.theta = \
+                    robot.get_current_velocity(theta=True)
+                tmp_obstacle.pose.x, tmp_obstacle.pose.y, tmp_obstacle.pose.theta = \
+                    robot.get_current_position(theta=True)
+                self.cmd_v2.obstacles.append(tmp_obstacle)
+                
+        for enemy_id in self.objects.get_active_enemy_ids():
+            enemy = self.objects.get_enemy_by_id(enemy_id)
+            identity_filter(enemy)
+            tmp_obstacle = Obstacle()
+            tmp_obstacle.vel.x, tmp_obstacle.vel.y, tmp_obstacle.vel.theta = \
+                enemy.get_current_velocity(theta=True)
+            tmp_obstacle.pose.x, tmp_obstacle.pose.y, tmp_obstacle.pose.theta = \
+                enemy.get_current_position(theta=True)
+            self.cmd_v2.obstacles.append(tmp_obstacle)
+
+        # ballの位置を送る
+        self.cmd_v2.ball_position.x, self.cmd_v2.ball_position.y = self.objects.ball.get_current_position()
 
     def reset_cmd(self):
         default_cmd = robot_commands()
@@ -149,11 +189,38 @@ class Robot(object):
         self.cmd.kick_speed_z = default_cmd.kick_speed_z
         self.cmd.dribble_power = default_cmd.dribble_power
 
+        # 20230504
+        # TODO: stop時の初期化
+        self.cmd_v2.prohidited_zone_ignore = False
+        self.cmd_v2.dribble_power = 0
+        self.cmd_v2.dribble_state = False
+        self.cmd_v2.dribbler_active = False
+        self.cmd_v2.ball_kick_state = False
+        self.cmd_v2.ball_kick = False
+        self.cmd_v2.ball_kick_active = False
+        self.cmd_v2.free_kick_flag = False
+        self.cmd_v2.kick_power = 0
+        self.cmd_v2.ball_kick_state = False
+        self.cmd_v2.ball_kick = False
+        self.cmd_v2.ball_kick_active = False
+        self.cmd_v2.shutdown_flag = False
+        self.cmd_v2.halt_flag = False
+        self.cmd_v2.ball_target_allowable_error = 150
+        self.cmd_v2.dribble_complete_distance = 150
 
     def shutdown_cmd(self):
         self.reset_cmd()
         self.cmd.shutdown_flag = True
+        self.cmd_v2.shutdown_flag = True
+        self.cmd_v2.halt_flag = True
         self.store_and_publish_commands()
+
+    def halt_cmd(self):
+        self.reset_cmd()
+        self.cmd_v2.halt_flag = True
+
+    def not_halt_cmd(self):
+        self.cmd_v2.halt_flag = False
 
     def print_fps_callback(self, event):
         if len(self._fps) > 0:
@@ -174,20 +241,11 @@ class Robot(object):
             elapsed_time = self._current_loop_time - self._last_loop_time
             self._fps.append(1./elapsed_time)
 
-            # 場外にいる場合、カルマンフィルタの信念(分散)を初期化する
-            if self.ctrld_robot.get_id() not in self.objects.get_active_robot_ids():
-                self.ctrld_robot.reset_own_belief()
+            self.update_positions()
 
-            # カルマンフィルタ,恒等関数フィルタの適用
-            # vision_positionからcurrent_positionを決定してつめる
-            for robot in self.robot_friend:
-                if robot.get_id() == self.ctrld_robot.get_id():
-                    # kalman_filter(self.ctrld_robot)
-                    identity_filter(self.ctrld_robot)
-                else:
-                    identity_filter(robot)
-            for enemy in self.robot_enemy:
-                identity_filter(enemy)
+            # GKの場合、prohidited_zone_ignoreをTrueにする
+            if self.ctrld_robot.get_role() == "GK":
+                 self.cmd_v2.prohidited_zone_ignore = True
 
             self.ctrld_robot.set_max_velocity(rospy.get_param("/robot_max_velocity", default=config.ROBOT_MAX_VELOCITY)) # m/s 機体の最高速度
 
@@ -220,6 +278,8 @@ class Robot(object):
                 self.kick.pass_ball(self.ctrld_robot.get_pass_target_position()[0],
                                     self.ctrld_robot.get_pass_target_position()[1],
                                     place=True)
+                # 20230504 add by sawa
+                self.cmd_v2.free_kick_flag = True
             elif self.status.robot_status == "ball_place_dribble":
                 self.kick.dribble_ball(self.ctrld_robot.get_pass_target_position()[0],
                                     self.ctrld_robot.get_pass_target_position()[1], ignore_penalty_area=True)
@@ -237,12 +297,16 @@ class Robot(object):
 
             elif self.status.robot_status == "penalty_shoot":
                 self.kick.shoot_ball(ignore_penalty_area=True)
+                self.cmd_v2.prohidited_zone_ignore = True
             elif self.status.robot_status == "penalty_shoot_right":
                 self.kick.shoot_ball(target="right", ignore_penalty_area=True)
+                self.cmd_v2.prohidited_zone_ignore = True
             elif self.status.robot_status == "penalty_shoot_left":
                 self.kick.shoot_ball(target="left", ignore_penalty_area=True)
+                self.cmd_v2.prohidited_zone_ignore = True
             elif self.status.robot_status == "penalty_shoot_center":
                 self.kick.shoot_ball(target="center", ignore_penalty_area=True)
+                self.cmd_v2.prohidited_zone_ignore = True
 
             elif self.status.robot_status == "receive":
                 self.kick.receive_ball(self.ctrld_robot.get_future_position()[0],
@@ -250,6 +314,7 @@ class Robot(object):
             elif self.status.robot_status == "receive_direct_pass":
                 self.kick.receive_and_direct_pass(self.ctrld_robot.get_future_position(),
                                                   self.ctrld_robot.get_pass_target_position())
+                self.cmd_v2.prohidited_zone_ignore = True
             elif self.status.robot_status == "receive_direct_shoot":
                 self.kick.receive_and_direct_shoot(self.ctrld_robot.get_future_position())
             elif self.status.robot_status == "receive_direct_shoot_left":
@@ -258,6 +323,8 @@ class Robot(object):
                 self.kick.receive_and_direct_shoot(self.ctrld_robot.get_future_position(), target="right")
             elif self.status.robot_status == "receive_direct_shoot_center":
                 self.kick.receive_and_direct_shoot(self.ctrld_robot.get_future_position(), target="center")
+            
+            # defence
             elif self.status.robot_status == "defence1":
                 self.defence.move_defence(
                     self.defence.def1_pos_x, self.defence.def1_pos_y)
@@ -271,6 +338,7 @@ class Robot(object):
                 self.kick.receive_ball(
                     self.defence.def2_pos_x, self.defence.def2_pos_y)
 
+            # keeper
             elif self.status.robot_status == "keeper":
                 self.keeper.keeper()
 
@@ -281,28 +349,21 @@ class Robot(object):
                                     ignore_penalty_area=True)
 
             elif self.status.robot_status == "stop":
+                # TODO: resetする必要があるか確認
                 self.reset_cmd()
                 self.status.robot_status = "none"
             elif self.status.robot_status == "halt":
-                self.reset_cmd()
+                self.halt_cmd()
 
             elif self.status.robot_status == "shutdown":
                 self.shutdown_cmd()
 
+            # 最後にまとめて送る
             self.store_and_publish_commands()
+            self.reset_cmd()
 
             self._last_loop_time = self._current_loop_time
             self.loop_rate.sleep()
-
-        """
-
-    def goal_pose_listener(self):
-        rospy.Subscriber("/robot_" + self.robot_id + "/goal_pose", Pose, self.ctrld_robot.goal_pose_callback)
-
-    def target_pose_listener(self):
-        rospy.Subscriber("/robot_" + self.robot_id + "/target_pose", Pose, self.ctrld_robot.target_pose_callback)
-
-        """
 
     def status_listener(self):
         rospy.Subscriber("/" + self.robot_color + "/robot_" +
@@ -313,26 +374,12 @@ class Robot(object):
         if service_name not in rosservice.get_service_list():
             rospy.Service(service_name, pid, self.pid.set_pid_callback)
 
-    """
-    def kick(self, req):
-        self.cmd.kick_speed_x = 3
-        return True
-
-    def kick_end(self, req):
-        self.cmd.kick_speed_x = 0
-        return True
-
-    def kick_server(self):
-        rospy.Service("/robot_0/kick", Kick, self.kick)
-        rospy.Service("/robot_0/kick_end", Kick, self.kick_end)
-    """
-
     def def_pos_listener(self):
         rospy.Subscriber("/" + self.robot_color + "/def_pos",
                          Def_pos, self.defence.def_pos_callback)
 
-
 def run_robot():
+    # robot 単体を動かす用。world_modelから立ち上げる時は利用されない
     robot = Robot()
     try:
         robot.run()
@@ -344,6 +391,7 @@ def run_robot():
 
 
 if __name__ == "__main__":
+    # robot 単体を動かす用。world_modelから立ち上げる時は利用されない
     rospy.init_node("robot")
 
     while True and not rospy.is_shutdown():
@@ -356,31 +404,3 @@ if __name__ == "__main__":
             traceback.print_exc()
             if rospy.get_param("is_test", False):
                 break
-
-
-"""
-    robot.odom_listener()
-    #robot.goal_pose_listener()
-    #robot.goal_pose_listener()
-    robot.status_listener()
-    #robot.kick_server()
-    loop_rate = rospy.Rate(ROBOT_LOOP_RATE)
-
-    print("start")
-
-    while not rospy.is_shutdown():
-        if robot.status.robot_status == "move_linear":
-            robot.pid.pid_linear(robot.ctrld_robot.goal_pos_x, robot.ctrld_robot.goal_pos_y,
-            robot.ctrld_robot.goal_pos_theta)
-        if robot.status.robot_status == "move_circle":
-            robot.pid.pid_circle(robot.pid.pid_circle_center_x, robot.ctrld_robot.goal_pos_x,
-            robot.ctrld_robot.goal_pos_y, robot.pid.pid_circle_center_y, robot.ctrld_robot.goal_pos_theta)
-        if robot.status.robot_status == "kick":
-            robot.kick.kick_x()
-        if robot.status.robot_status == "pass":
-            robot.kick.pass_ball(robot.ctrld_robot.target_pos_x, robot.ctrld_robot.target_pos_y)
-
-        print(robot.status.robot_status)
-        loop_rate.sleep()
-
-"""

@@ -36,11 +36,11 @@ class Objects(object):
             self.robot_total = robot_total
             self.enemy_total = enemy_total
 
-            self._robot_ids = range(self.robot_total)
-            self._enemy_ids = range(self.enemy_total)
+            self._robot_ids = list(range(self.robot_total))
+            self._enemy_ids = list(range(self.enemy_total))
 
-            self._active_robot_ids = range(self.robot_total)
-            self._active_enemy_ids = range(self.robot_total)
+            self._active_robot_ids = list(range(self.robot_total))
+            self._active_enemy_ids = list(range(self.enemy_total))
 
             self.robot = [entity.Robot(id=i) for i in self._robot_ids]  # type: typing.List[entity.Robot]
             self.enemy = [entity.Robot(id=i) for i in self._enemy_ids]  # type: typing.List[entity.Robot]
@@ -49,7 +49,7 @@ class Objects(object):
             # for robot, role in zip(self.robot, roles):
             #     robot.set_role(role)
 
-            roles = ["RFW", "LFW", "RDF", "LDF", "GK"]
+            roles = ["GK", "RFW", "LFW", "RDF", "LDF"]
             for robot_id, role in zip(self._robot_ids, roles):
                 self.get_robot_by_id(robot_id).set_role(role)
             self.roles = roles # 保存
@@ -69,13 +69,13 @@ class Objects(object):
 
     def redefine_roles(self, event):
         if len(self._active_robot_ids) == 5:
-            roles = ["RFW", "LFW", "RDF", "LDF", "GK"]
+            roles = ["GK", "RFW", "LFW", "RDF", "LDF"]
         elif len(self._active_robot_ids) == 4:
-            roles = ["RFW", "LFW", "LDF", "GK"]
+            roles = ["GK", "RFW", "LFW", "LDF"]
         elif len(self._active_robot_ids) == 3:
-            roles = ["RFW", "LDF", "GK"]
+            roles = ["GK", "RFW", "LDF"]
         elif len(self._active_robot_ids) == 2:
-            roles = ["RFW", "GK"]
+            roles = ["GK", "RFW"]
         elif len(self._active_robot_ids) == 1:
             roles = ["GK"]
         else:
@@ -112,7 +112,7 @@ class Objects(object):
                                key=lambda robot: functions.distance_btw_two_points(robot.get_current_position(),
                                                                                    (target_x, target_y)))
         sorted_ids = map(lambda robot: robot.get_id(), sorted_robots)
-        return sorted_ids
+        return list(sorted_ids)
 
     def get_enemy_ids_sorted_by_distance(self, target_xy, enemy_ids=None):
         target_x = target_xy[0]
@@ -127,7 +127,7 @@ class Objects(object):
                                key=lambda enemy: functions.distance_btw_two_points(enemy.get_current_position(),
                                                                                    (target_x, target_y)))
         sorted_ids = map(lambda enemy: enemy.get_id(), sorted_enemys)
-        return sorted_ids
+        return list(sorted_ids)
 
     def get_robot_ids(self):
         return self._robot_ids

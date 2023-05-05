@@ -61,7 +61,7 @@ class ContextBase(object):
         return self._updated
 
     def update(self, key, new_value, namespace=""):
-        # type: (str, object) -> None
+        # type: (str, object, str) -> None
         # 次のデータを登録する。実際の更新の実行は１ループ終了時に
         # fire_one_loop_eventが呼ばれたときのみに行われる。
 
@@ -69,7 +69,7 @@ class ContextBase(object):
         self._new_context[_key] = new_value
 
     def force_update(self, key, new_value, namespace=""):
-        # type: (str, object) -> None
+        # type: (str, object, str) -> None
         # 1ループ1回までの制限にかからず、強制的にアップデートする。
         # これを使うなら値の管理は自己責任で。
         _key = str(namespace) + "/" + str(key)
@@ -78,7 +78,7 @@ class ContextBase(object):
         self._context[_key].pop(0)
 
     def reset(self, key, default=None, namespace=""):
-        # type: (str, object) -> None
+        # type: (str, object, str) -> None
         # リセットする。defaultが指定されていればそちらの値でリセットする。
         _key = str(namespace) + "/" + str(key)
         if default:
@@ -96,20 +96,20 @@ class ContextBase(object):
         return (rostimes[-1] - rostimes[-2]).to_sec()
 
     def get_all(self, key, namespace=""):
-        # type: (str) -> object
+        # type: (str, str) -> object
         # 保存している情報をリストで全て返す。先頭が最も古いもの。最後が最も新しいもの。
         _key = str(namespace) + "/" + str(key)
         return self._context[_key]
 
     def get_last(self, key, namespace=""):
-        # type: (str) -> object
+        # type: (str, str) -> object
         # 一つ前のループのデータを取得できる。１ループが終了し、
         # fire_one_loop_eventが呼ばれるまで更新されない。
         _key = str(namespace) + "/" + str(key)
         return self._context[_key][-1]
 
     def get_oldest(self, key, namespace=""):
-        # type: (str) -> object
+        # type: (str, str) -> object
         # 最も古いデータを取得する関数
         _key = str(namespace) + "/" + str(key)
         return self._context[_key][0]
