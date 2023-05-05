@@ -28,7 +28,7 @@ class EnemyBallPlacement(StrategyCalcuratorBase):
         self.leave_range = 0.5
 
     def calcurate(self, strategy_context=None, place_ball_position=[0,0]):
-        # type: (StrategyContext) -> StrategyBase
+        # type: (StrategyContext, List) -> StrategyBase
 
         if self._detect_enemy_kick(strategy_context):
             strategy_context.update("enemy_kick", True, namespace="world_model")

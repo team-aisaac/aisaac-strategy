@@ -17,7 +17,7 @@ class RobotCommandPublisherWrapper(object):
 
 
     def publish(self, msg, msg_v2):
-        # type: (robot_commands) -> None
+        # type: (robot_commands, robot_commands_real) -> None
 
         kick_power_threshold = [0.1, 1.0, 2.0, 3.0]
         sim_kick_speed = math.sqrt(msg.kick_speed_x**2 + msg.kick_speed_z**2)

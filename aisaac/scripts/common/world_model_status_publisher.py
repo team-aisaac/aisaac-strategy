@@ -5,6 +5,7 @@ from aisaac.msg import Status
 import rospy
 import config
 from strategy_calcurator.strategy import StrategyBase
+from world import objects
 
 try:
     from typing import Dict, List

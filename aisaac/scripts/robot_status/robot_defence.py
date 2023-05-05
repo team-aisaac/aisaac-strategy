@@ -1,9 +1,11 @@
 import math
+import robot_status
+import robot_kick
 
 
 class RobotDefence:
     def __init__(self, status, kick):
-        # type: (robot_status.RobotStatus) -> None
+        # type: (robot_status.RobotStatus, robot_kick.RobotKick) -> None
         self.status = status
         self.ball_params = status.pid.ball_params
         self.pid = status.pid
