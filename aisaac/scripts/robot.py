@@ -60,7 +60,7 @@ class Robot(object):
         self.robot_enemy = self.objects.enemy
 
         self.pid = RobotPid(self.robot_id, self.objects, self.cmd, self.cmd_v2)
-        self.status = RobotStatus(self.pid)
+        self.status = RobotStatus(self.pid, self.cmd_v2)
         self.kick = RobotKick(self.pid, self.cmd, self.cmd_v2, self.status)
         self.defence = RobotDefence(self.status, self.kick)
         self.keeper = RobotKeeper(self.kick)
@@ -191,7 +191,20 @@ class Robot(object):
 
         # 20230504
         # TODO: stop時の初期化
-        # self.cmd_v2 = robot_commands_real()
+        self.cmd_v2.prohidited_zone_ignore = False
+        self.cmd_v2.dribble_power = 0
+        self.cmd_v2.dribble_state = False
+        self.cmd_v2.dribbler_active = False
+        self.cmd_v2.ball_kick_state = False
+        self.cmd_v2.ball_kick = False
+        self.cmd_v2.ball_kick_active = False
+        self.cmd_v2.free_kick_flag = False
+        self.cmd_v2.kick_power = 0
+        self.cmd_v2.ball_kick_state = False
+        self.cmd_v2.ball_kick = False
+        self.cmd_v2.ball_kick_active = False
+        self.cmd_v2.shutdown_flag = False
+        self.cmd_v2.halt_flag = False
         self.cmd_v2.ball_target_allowable_error = 150
         self.cmd_v2.dribble_complete_distance = 150
 
@@ -347,6 +360,7 @@ class Robot(object):
 
             # 最後にまとめて送る
             self.store_and_publish_commands()
+            self.reset_cmd()
 
             self._last_loop_time = self._current_loop_time
             self.loop_rate.sleep()
