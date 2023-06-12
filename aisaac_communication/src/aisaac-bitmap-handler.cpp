@@ -1,6 +1,7 @@
 #include "aisaac_communication/aisaac-bitmap-handler.h"
 #include "aisaac_communication/aisaac-xbee-base.h"
 #include "aisaac_communication/aisaac-wifi-base.h"
+#include "aisaac_communication/protocol.h"
 #include <iostream>
 #include <iomanip>
 #include <vector>
@@ -75,133 +76,63 @@ namespace aisaac
         std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
     }
 
-    void AisaacBitmapHandler::convertFromCommandRealToProtobufEncodedString(const consai_msgs::robot_commands_realConstPtr& msg, std::vector<unsigned char> &out) {
-        out.clear();
 
-        // Index:0 DATAType(5, 0) 0b101 + 0b00000
-        out.push_back(0b10100000);
-
-        // Construct Protobuf message
-        aisaacpb::SpcCommand command_to_robot;
-        // aisaacpb::RobotCommandCoordinateSystemType coord_type;
-        // if (command.robotCommandCoordinateSystemType == 0) {
-        //     coord_type = aisaacpb::RobotCommandCoordinateSystemType::Vector;
-        // } else if (command.robotCommandCoordinateSystemType == 1) {
-        //     coord_type = aisaacpb::RobotCommandCoordinateSystemType::Coordinate;
-        // } else if (command.robotCommandCoordinateSystemType == 2) {
-        //     coord_type = aisaacpb::RobotCommandCoordinateSystemType::Relax;
-        // }
-        // command_to_robot.set_robot_command_type(coord_type);
-
-        // goal_pose
-        aisaacpb::Position goal_pose;
-        goal_pose.set_x((int32_t)(msg->goal_pose.x * 1000.0));  // m -> mm
-        goal_pose.set_y((int32_t)(msg->goal_pose.y * 1000.0));  // m -> mm
-        goal_pose.set_theta((int32_t)(msg->goal_pose.theta * 18000.0 / M_PI));    // rad -> deg (x100)
-        command_to_robot.set_allocated_middle_goal_pose(&goal_pose);
-
-        // prohibited_zone_ignore
-        command_to_robot.set_prohibited_zone_ignore(msg->prohidited_zone_ignore);
-
-        // middle_target_flag
-        command_to_robot.set_middle_target_flag(msg->middle_target_flag);
-
-        // middle_goal_pose
-        aisaacpb::Position middle_goal_pose;
-        middle_goal_pose.set_x((int32_t)(msg->middle_goal_pose.x * 1000.0));    // m -> mm
-        middle_goal_pose.set_y((int32_t)(msg->middle_goal_pose.y * 1000.0));    // m -> mm
-        middle_goal_pose.set_theta((int32_t)(msg->middle_goal_pose.theta * 18000.0 / M_PI));  // rad -> deg (x100)
-        command_to_robot.set_allocated_middle_goal_pose(&middle_goal_pose);
-
-        // Dribble
-        aisaacpb::Dribble dribble;
-        // -dribble_power
-        dribble.set_dribble_power((double)msg->dribble_power);
-        // -dribble_state
-        dribble.set_dribble_state(msg->dribble_state);
-        // -dribbler_active
-        dribble.set_dribbler_active(msg->dribbler_active);
-        // -dribble_goal
-        aisaacpb::Position dribble_goal;
-        dribble_goal.set_x((int32_t)(msg->dribble_goal.x * 1000.0));    // m -> mm
-        dribble_goal.set_y((int32_t)(msg->dribble_goal.y * 1000.0));    // m -> mm
-        dribble_goal.set_theta((int32_t)(msg->dribble_goal.theta * 18000.0 / M_PI));  // rad -> deg (x100)
-        dribble.set_allocated_dribble_goal(&dribble_goal);
-        // -dribble_complete_distance
-        dribble.set_dribble_complete_distance(msg->dribble_complete_distance);  // mm
-        command_to_robot.set_allocated_dribble(&dribble);
-
+    void AisaacBitmapHandler::encodeCommandMessage(const consai_msgs::robot_commands_realConstPtr& msg, std::vector<unsiged char> &out) {
+        _strategy_pc_command command;
+        command.goal_pose.x = (int32_t)(msg->goal_pose.x * 1000.0); // m -> mm
+        command.goal_pose.y = (int32_t)(msg->goal_pose.x * 1000.0); // m -> mm
+        command.goal_pose.theta = (int32_t)(msg->goal_pose.x * 18000.0 / M_PI); // rad -> deg x100
+        command.middle_goal_pose.x = (int32_t)(msg->middle_goal_pose.x * 1000.0);   // m -> mm
+        command.middle_goal_pose.y = (int32_t)(msg->middle_goal_pose.y * 1000.0);   // m -> mm
+        command.middle_goal_pose.theta = (int32_t)(msg->middle_goal_pose.theta * 1000.0);   // m -> mm
+        command.prohibited_zone_ignore = msg->prohibited_zone_ignore;
+        command.middle_target_flag = msg->middle_target_flag;
+        command.halt_flag = false;  // ToDo impliment
         // Kick
-        aisaacpb::Kick kick;
-        // -kick_power
-        kick.set_kick_power(msg->kick_power);
-        // -ball_kick_state
-        kick.set_ball_kick_state(msg->ball_kick_state);
-        // -ball_kick
-        kick.set_ball_kick(msg->ball_kick);
-        // -ball_kick_active
-        kick.set_ball_kick_active(msg->ball_kick_active);
-        // -free_kick_flag
-        kick.set_free_kick_flag(msg->free_kick_flag);
-        // -ball_goal
-        aisaacpb::Position ball_goal;
-        ball_goal.set_x((int32_t)(msg->ball_goal.x * 1000.0));  // m -> mm
-        ball_goal.set_y((int32_t)(msg->ball_goal.y * 1000.0));  // m -> mm
-        // msg->ball_goal.vel_x;
-        // msg->ball_goal.vel_y;
-        kick.set_allocated_ball_goal(&ball_goal);
-        // -ball_target_allowable_error
-        kick.set_ball_target_allowable_error(msg->ball_target_allowable_error); // mm
-        command_to_robot.set_allocated_kick(&kick);
-        
-        std::string serialized_str;
-        // Encode
-        command_to_robot.SerializeToString(&serialized_str);
+        command.kick_power = (uint32_t)(msg->kick_power);
+        command.ball_kick_state = msg->ball_kick_state;
+        command.ball_kick = msg->ball_kick;
+        command.ball_kick_active = msg->ball_kick_active;
+        command.free_kick_flag = msg->free_kick_flag;
+        command.ball_goal.x = (int32_t)(msg->ball_goal.x * 1000.0); // m -> mm
+        command.ball_goal.y = (int32_t)(msg->ball_goal.y * 1000.0); // m -> mm
+        command.ball_target_allowable_error = msg->ball_target_allowable_error; // m
+        command.kick_type = 0;  // ToDo impliment
+        // Dribble
+        command.dribble_power = (uint32_t)(msg->dribble_power);
+        command.dribble_goal.x = (int32_t)(msg->dribble_goal.x * 1000.0);   // m -> mm
+        command.dribble_goal.y = (int32_t)(msg->dribble_goal.y * 1000.0);   // m -> mm
+        command.dribble_goal.theta = (int32_t)(msg->dribble_goal.theta * 18000.0 / M_PI);   // rad -> deg x100
+        command.dribble_complete_distance = msg->dribble_complete_distance; // mm
+        command.dribble_state = msg->dribble_state;
+        command.dribbler_active = msg->dribbler_active;
 
-        for (unsigned char c : serialized_str) {
-            out.push_back(c);
-        }
+        encodeStrategyPcCommand(&command, out.data());
     }
-    void AisaacBitmapHandler::convertFromCommandRealToProtobufEncodedStringVision(const consai_msgs::robot_commands_realConstPtr& msg, std::vector<unsigned char> &out) {
-        out.clear();
 
-        // Index:0 DATAType(5, 2) 0b101 + 0b00010
-        out.push_back(0b10100010);
+    void AisaacBitmapHandler::encodeVisionInfo(const consai_msgs::robot_commands_realConstPtr& msg, std::vector<unsiged char> &out) {
+        _vision_data vision_data;
+        vision_data.current_pose.x = (int32_t)(msg->current_pose.x);   // mm
+        vision_data.current_pose.y = (int32_t)(msg->current_pose.y);   // mm
+        vision_data.current_pose.theta = (int32_t)(msg->current_pose.theta);
 
-        aisaacpb::VisionData vision_data;
+        vision_data.ball_position.x = (int32_t)(msg->ball_position.x);
+        vision_data.ball_position.y = (int32_t)(msg->ball_position.y);
 
-        // current_pose, own_machine_position
-        aisaacpb::Position own_machine_position;
-        own_machine_position.set_x((int32_t)msg->current_pose.x);
-        own_machine_position.set_y((int32_t)msg->current_pose.y);
-        own_machine_position.set_theta((int32_t)msg->current_pose.theta);
-        vision_data.set_allocated_own_machine_position(&own_machine_position);
-        
-        // ball_position
-        aisaacpb::Position ball_position;
-        ball_position.set_x((int32_t)msg->ball_position.x);
-        ball_position.set_y((int32_t)msg->ball_position.y);
-        vision_data.set_allocated_ball_position(&ball_position);
-
-        // obstacles
         auto obstacles = msg->obstacles;
-        for (auto rx_obstacle : obstacles) {
-            aisaacpb::Obstacle* obstacle = vision_data.add_obstacles();
-            obstacle->set_x(rx_obstacle.pose.x);
-            obstacle->set_y(rx_obstacle.pose.y);
-            obstacle->set_theta(rx_obstacle.pose.theta);
-            obstacle->set_vx(rx_obstacle.vel.x);
-            obstacle->set_vy(rx_obstacle.vel.y);
+        int index = 0;
+        for (auto obstacle : obstacles) {
+            vision_data.obstacles[index].x = obstacle.pose.x;
+            vision_data.obstacles[index].y = obstacle.pose.y;
+            vision_data.obstacles[index].theta = obstacle.pose.theta;
+            vision_data.obstacles[index].vx = obstacle.vel.x;
+            vision_data.obstacles[index].vy = obstacle.vel.x;
         }
-        
-        std::string serialized_str;
-        // Encode
-        vision_data.SerializeToString(&serialized_str);
+        vision_data.number_of_obstacles = index+1;
 
-        for (unsigned char c : serialized_str) {
-            out.push_back(c);
-        }
+        encodeVisionData()
     }
+
     void AisaacBitmapHandler::generateFT4(commandToRobot command, std::vector<unsigned char> &out) {
 
         std::cout << "command";

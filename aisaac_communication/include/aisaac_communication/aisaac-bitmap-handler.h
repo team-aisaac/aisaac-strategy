@@ -5,8 +5,7 @@
 
 #include "aisaac-xbee-base.h"
 #include "aisaac-wifi-base.h"
-#include "aisaac-com-topic-struct.h"
-#include "aisaaccommand.pb.h"
+//#include "aisaac-com-topic-struct.h"
 
 
 namespace aisaac
@@ -31,8 +30,10 @@ namespace aisaac
         int setNodePHYAddress(int, phyTechnology, std::vector<unsigned char>);
         void showInstanceStatus();
         void setShutdown(bool);
-        void convertFromCommandRealToProtobufEncodedString(const consai_msgs::robot_commands_realConstPtr&, std::vector<unsigned char>&);
-        void convertFromCommandRealToProtobufEncodedStringVision(const consai_msgs::robot_commands_realConstPtr&, std::vector<unsigned char>&);
+
+        void encodeCommandMessage(const consai_msgs::robot_commands_realConstPtr&, std::vector<unsiged char>&);
+        void encodeVisionInfo(const consai_msgs::robot_commands_realConstPtr&, std::vector<unsiged char>&);
+        
         void generateFT4(commandToRobot, std::vector<unsigned char>&);
         int parseFT4(std::vector<unsigned char> in, commandToRobot &out);
         void sendCommand(int, unsigned char, std::vector<unsigned char>);
