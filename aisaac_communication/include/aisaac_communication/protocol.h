@@ -1,4 +1,6 @@
-#pragma once
+#ifndef _PROTOCOL_H_
+#define _PROTOCOL_H_
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -7,13 +9,6 @@ extern "C" {
 #include <stdbool.h>
 
 #define MAX_OBSTACLE_NUM 31
-
-int encodeStrategyPcCommand(_strategy_pc_command *command, char *buffer);
-int decodeStrategyPcCommand(_strategy_pc_command *command, char *buffer, uint8_t buffer_length);
-int encodeDwaResult(_dwa_result *dwa_result, char *buffer);
-int decodeDwaResult(_dwa_result *dwa_result, char *buffer, uint8_t buffer_length);
-int encodeVisionData(_vision_data *vision_data, char *buffer);
-int decodeVisionData(_vision_data *vision_data, char *buffer, uint16_t buffer_length);
 
 typedef struct {
     int32_t x;
@@ -69,7 +64,15 @@ typedef struct {
     uint8_t number_of_obstacles;
     _Obstacle obstacles[MAX_OBSTACLE_NUM];
 } _vision_data;
+
+int encodeStrategyPcCommand(_strategy_pc_command *command, unsigned char *buffer);
+int decodeStrategyPcCommand(_strategy_pc_command *command, unsigned char *buffer, uint8_t buffer_length);
+int encodeDwaResult(_dwa_result *dwa_result, unsigned char *buffer);
+int decodeDwaResult(_dwa_result *dwa_result, unsigned char *buffer, uint8_t buffer_length);
+int encodeVisionData(_vision_data *vision_data, unsigned char *buffer);
+int decodeVisionData(_vision_data *vision_data, unsigned char *buffer, uint16_t buffer_length);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-
+#endif /* _PROTOCOL_H_ */

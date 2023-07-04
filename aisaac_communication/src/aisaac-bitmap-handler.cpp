@@ -77,7 +77,7 @@ namespace aisaac
     }
 
 
-    void AisaacBitmapHandler::encodeCommandMessage(const consai_msgs::robot_commands_realConstPtr& msg, std::vector<unsiged char> &out) {
+    void AisaacBitmapHandler::encodeCommandMessage(const consai_msgs::robot_commands_realConstPtr& msg, std::vector<unsigned char> &out) {
         _strategy_pc_command command;
         command.goal_pose.x = (int32_t)(msg->goal_pose.x * 1000.0); // m -> mm
         command.goal_pose.y = (int32_t)(msg->goal_pose.x * 1000.0); // m -> mm
@@ -85,7 +85,7 @@ namespace aisaac
         command.middle_goal_pose.x = (int32_t)(msg->middle_goal_pose.x * 1000.0);   // m -> mm
         command.middle_goal_pose.y = (int32_t)(msg->middle_goal_pose.y * 1000.0);   // m -> mm
         command.middle_goal_pose.theta = (int32_t)(msg->middle_goal_pose.theta * 1000.0);   // m -> mm
-        command.prohibited_zone_ignore = msg->prohibited_zone_ignore;
+        command.prohibited_zone_ignore = msg->prohidited_zone_ignore;   // ToDo: Fix variable name
         command.middle_target_flag = msg->middle_target_flag;
         command.halt_flag = false;  // ToDo impliment
         // Kick
@@ -110,7 +110,7 @@ namespace aisaac
         encodeStrategyPcCommand(&command, out.data());
     }
 
-    void AisaacBitmapHandler::encodeVisionInfo(const consai_msgs::robot_commands_realConstPtr& msg, std::vector<unsiged char> &out) {
+    void AisaacBitmapHandler::encodeVisionInfo(const consai_msgs::robot_commands_realConstPtr& msg, std::vector<unsigned char> &out) {
         _vision_data vision_data;
         vision_data.current_pose.x = (int32_t)(msg->current_pose.x);   // mm
         vision_data.current_pose.y = (int32_t)(msg->current_pose.y);   // mm
@@ -130,7 +130,7 @@ namespace aisaac
         }
         vision_data.number_of_obstacles = index+1;
 
-        encodeVisionData()
+        encodeVisionData(&vision_data, out.data());
     }
 
     void AisaacBitmapHandler::generateFT4(commandToRobot command, std::vector<unsigned char> &out) {

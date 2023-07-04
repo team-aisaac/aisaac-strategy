@@ -1,4 +1,4 @@
-#include "include/aisaac_communication/protocol.h"
+#include "aisaac_communication/protocol.h"
 #include <stdint.h>
 #include <arpa/inet.h>
 #include <string.h>
@@ -13,7 +13,7 @@ const uint8_t strategy_pc_command_data_type = 0b10100001;   // 5-1
 const uint8_t dwa_result_data_type = 0b10100010;   // 5-2
 const uint8_t vision_data_data_type = 0b10100011;   // 5-3
 
-int encodeStrategyPcCommand(_strategy_pc_command *command, char *buffer) {
+int encodeStrategyPcCommand(_strategy_pc_command *command, unsigned char *buffer) {
     uint8_t buffer_index = 0;
     uint32_t tmp_u32;
 
@@ -90,7 +90,7 @@ int encodeStrategyPcCommand(_strategy_pc_command *command, char *buffer) {
     return buffer_index;
 }
 
-int decodeStrategyPcCommand(_strategy_pc_command *command, char *buffer, uint8_t buffer_length) {
+int decodeStrategyPcCommand(_strategy_pc_command *command, unsigned char *buffer, uint8_t buffer_length) {
     uint8_t buffer_index = 0;
     uint32_t tmp_u32;
     // Check buffer length
@@ -171,7 +171,7 @@ int decodeStrategyPcCommand(_strategy_pc_command *command, char *buffer, uint8_t
     return buffer_index;
 }
 
-int encodeDwaResult(_dwa_result *dwa_result, char *buffer) {
+int encodeDwaResult(_dwa_result *dwa_result, unsigned char *buffer) {
     uint8_t buffer_index = 0;
     uint32_t tmp_u32;
 
@@ -193,7 +193,7 @@ int encodeDwaResult(_dwa_result *dwa_result, char *buffer) {
     return buffer_index;
 }
 
-int decodeDwaResult(_dwa_result *dwa_result, char *buffer, uint8_t buffer_length) {
+int decodeDwaResult(_dwa_result *dwa_result, unsigned char *buffer, uint8_t buffer_length) {
     uint8_t buffer_index = 0;
     uint32_t tmp_u32;
     // Check buffer length
@@ -219,7 +219,7 @@ int decodeDwaResult(_dwa_result *dwa_result, char *buffer, uint8_t buffer_length
     return buffer_index;
 }
 
-int encodeVisionData(_vision_data *vision_data, char *buffer) {
+int encodeVisionData(_vision_data *vision_data, unsigned char *buffer) {
     uint16_t buffer_index = 0;
     uint32_t tmp_u32;
 
@@ -273,7 +273,7 @@ int encodeVisionData(_vision_data *vision_data, char *buffer) {
     return buffer_index;
 }
 
-int decodeVisionData(_vision_data *vision_data, char *buffer, uint16_t buffer_length) {
+int decodeVisionData(_vision_data *vision_data, unsigned char *buffer, uint16_t buffer_length) {
     uint16_t buffer_index = 0;
     uint32_t tmp_u32;
     // Check buffer length

@@ -10,7 +10,7 @@
 #include <signal.h>
 #include <errno.h>
 #include "aisaac_communication/aisaac-bitmap-handler.h"
-#include "aisaac_communication/aisaac-com-topic-struct.h"
+// #include "aisaac_communication/aisaac-com-topic-struct.h"
 #include "aisaac_communication/aisaac-xbee-linux.h"
 #include "aisaac_communication/aisaac-wifi-linux.h"
 // #include "aisaac_communication/aisaaccommand.pb.h"
@@ -44,10 +44,10 @@ public:
     void command_real_callback(const consai_msgs::robot_commands_realConstPtr& msg) {
         // Send SSL Vision data
         std::vector<unsigned char> commandvec;
-        sender->convertFromCommandRealToProtobufEncodedStringVision(msg, commandvec);
+        sender->encodeVisionInfo(msg, commandvec);
         sender->sendCommand(robotID, sequenceNumber, commandvec);
         // Send command message
-        sender->convertFromCommandRealToProtobufEncodedString(msg, commandvec);
+        sender->encodeCommandMessage(msg, commandvec);
         sender->sendCommand(robotID, sequenceNumber++, commandvec);
     }
     void setSender(aisaac::Sender *_sender) {
