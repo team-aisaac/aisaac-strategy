@@ -8,91 +8,80 @@
 
 #define RX_ASSERT(x) (assert(send.x == recv.x));
 
-const uint8_t protocol_version = 0b00100001;    // Ver. 2.1
+const uint8_t protocol_version = 0b00100010;    // Ver. 2.2
 const uint8_t strategy_pc_command_data_type = 0b10100001;   // 5-1
 const uint8_t dwa_result_data_type = 0b10100010;   // 5-2
 const uint8_t vision_data_data_type = 0b10100011;   // 5-3
+const uint8_t manual_controller_data_type = 0b10100100; // 5-4
+const uint8_t robot_odometry_data_type = 0b10100101; // 5-5
+const uint8_t robot_observed_ball_data_type = 0b10100110;    // 5-6
 
-int encodeStrategyPcCommand(_strategy_pc_command *command, unsigned char *buffer) {
+int encodeStrategyPcCommand(_strategy_pc_command *command, char *buffer) {
     uint8_t buffer_index = 0;
-    uint32_t tmp_u32;
+    uint16_t tmp_u16;
 
     buffer[buffer_index] = protocol_version;
     buffer_index += 1;
     buffer[buffer_index] = strategy_pc_command_data_type;
     buffer_index += 1;
 
-    tmp_u32 = htonl(command->goal_pose.x);
-    memcpy(&buffer[buffer_index], &tmp_u32, 4);
-    buffer_index += 4;
-    tmp_u32 = htonl(command->goal_pose.y);
-    memcpy(&buffer[buffer_index], &tmp_u32, 4);
-    buffer_index += 4;
-    tmp_u32 = htonl(command->goal_pose.theta);
-    memcpy(&buffer[buffer_index], &tmp_u32, 4);
-    buffer_index += 4;
-    tmp_u32 = htonl(command->middle_goal_pose.x);
-    memcpy(&buffer[buffer_index], &tmp_u32, 4);
-    buffer_index += 4;
-    tmp_u32 = htonl(command->middle_goal_pose.y);
-    memcpy(&buffer[buffer_index], &tmp_u32, 4);
-    buffer_index += 4;
-    tmp_u32 = htonl(command->middle_goal_pose.theta);
-    memcpy(&buffer[buffer_index], &tmp_u32, 4);
-    buffer_index += 4;
-    buffer[buffer_index] = (char)command->prohibited_zone_ignore << 2
-        | (char)command->middle_target_flag << 1
-        | (char)command->halt_flag;
-    buffer_index += 1;
-    // Kick
-    tmp_u32 = htonl(command->kick_power);
-    memcpy(&buffer[buffer_index], &tmp_u32, 4);
-    buffer_index += 4;
-    tmp_u32 = htonl(command->ball_goal.x);
-    memcpy(&buffer[buffer_index], &tmp_u32, 4);
-    buffer_index += 4;
-    tmp_u32 = htonl(command->ball_goal.y);
-    memcpy(&buffer[buffer_index], &tmp_u32, 4);
-    buffer_index += 4;
-    tmp_u32 = htonl(command->ball_goal.theta);
-    memcpy(&buffer[buffer_index], &tmp_u32, 4);
-    buffer_index += 4;
-    tmp_u32 = htonl(command->ball_target_allowable_error);
-    memcpy(&buffer[buffer_index], &tmp_u32, 4);
-    buffer_index += 4;
-    buffer[buffer_index] = (char)(command->kick_type);
-    buffer_index += 1;
-    buffer[buffer_index] = (char)(command->ball_kick_state) << 3
-        | (char)(command->ball_kick) << 2
-        | (char)(command->ball_kick_active) << 1
-        | (char)(command->free_kick_flag);
+    buffer[buffer_index] =
+        (char)command->halt_flag << 7
+        | (char)command->stop_game_flag << 6
+        | (char)command->ball_placement_flag << 5
+        | (char)command->ball_placement_team << 4
+        | (char)command->in_game << 3
+        | (char)command->robot_position_init << 2
+        | (char)command->dribble_state << 1
+        | (char)command->dribble_advance;
     buffer_index += 1;
     // Dribble
-    tmp_u32= htonl(command->dribble_power);
-    memcpy(&buffer[buffer_index], &tmp_u32, 4);
-    buffer_index += 4;
-    tmp_u32 = htonl(command->dribble_goal.x);
-    memcpy(&buffer[buffer_index], &tmp_u32, 4);
-    buffer_index += 4;
-    tmp_u32 = htonl(command->dribble_goal.y);
-    memcpy(&buffer[buffer_index], &tmp_u32, 4);
-    buffer_index += 4;
-    tmp_u32 = htonl(command->dribble_goal.theta);
-    memcpy(&buffer[buffer_index], &tmp_u32, 4);
-    buffer_index += 4;
-    tmp_u32 = htonl(command->dribble_complete_distance);
-    memcpy(&buffer[buffer_index], &tmp_u32, 4);
-    buffer_index += 4;
-    buffer[buffer_index] = (char)(command->dribble_state) << 1
-        | (char)(command->dribbler_active);
+    tmp_u16= htons(command->dribble_enabble_error);
+    memcpy(&buffer[buffer_index], &tmp_u16, 2);
+    buffer_index += 2;
+    tmp_u16= htons(command->dribble_target_ball_x);
+    memcpy(&buffer[buffer_index], &tmp_u16, 2);
+    buffer_index += 2;
+    tmp_u16= htons(command->dribble_target_ball_y);
+    memcpy(&buffer[buffer_index], &tmp_u16, 2);
+    buffer_index += 2;
+    buffer[buffer_index] = (char)(command->dribble_type);
     buffer_index += 1;
+    // Kick
+    buffer[buffer_index] =
+        (char)(command->ball_kick_state) << 3
+        | (char)(command->free_kick_flag) << 2
+        | (char)(command->ball_kick) << 1
+        | (char)(command->kick_straight);
+    buffer_index += 1;
+    tmp_u16 = htons(command->ball_target_allowable_error);
+    memcpy(&buffer[buffer_index], &tmp_u16, 2);
+    buffer_index += 2;
+    tmp_u16 = htons(command->target_ball_x);
+    memcpy(&buffer[buffer_index], &tmp_u16, 2);
+    buffer_index += 2;
+    tmp_u16 = htons(command->target_ball_y);
+    memcpy(&buffer[buffer_index], &tmp_u16, 2);
+    buffer_index += 2;
+    buffer[buffer_index] = (char)(command->kick_type);
+    buffer_index += 1;
+    // Target position
+    tmp_u16 = htons(command->robot_position_target_x);
+    memcpy(&buffer[buffer_index], &tmp_u16, 2);
+    buffer_index += 2;
+    tmp_u16 = htons(command->robot_position_target_y);
+    memcpy(&buffer[buffer_index], &tmp_u16, 2);
+    buffer_index += 2;
+    tmp_u16 = htons(command->robot_position_target_theta);
+    memcpy(&buffer[buffer_index], &tmp_u16, 2);
+    buffer_index += 2;
 
     return buffer_index;
 }
 
-int decodeStrategyPcCommand(_strategy_pc_command *command, unsigned char *buffer, uint8_t buffer_length) {
+int decodeStrategyPcCommand(_strategy_pc_command *command, char *buffer, uint8_t buffer_length) {
     uint8_t buffer_index = 0;
-    uint32_t tmp_u32;
+    uint16_t tmp_u16;
     // Check buffer length
     assert(buffer_length > 70);
 
@@ -103,125 +92,64 @@ int decodeStrategyPcCommand(_strategy_pc_command *command, unsigned char *buffer
     command->data_type = strategy_pc_command_data_type;
     buffer_index += 1;
 
-    memcpy(&tmp_u32, &buffer[buffer_index], 4);
-    command->goal_pose.x = ntohl(tmp_u32);
-    buffer_index += 4;
-    memcpy(&tmp_u32, &buffer[buffer_index], 4);
-    command->goal_pose.y = ntohl(tmp_u32);
-    buffer_index += 4;
-    memcpy(&tmp_u32, &buffer[buffer_index], 4);
-    command->goal_pose.theta = ntohl(tmp_u32);
-    buffer_index += 4;
-    memcpy(&tmp_u32, &buffer[buffer_index], 4);
-    command->middle_goal_pose.x = ntohl(tmp_u32);
-    buffer_index += 4;
-    memcpy(&tmp_u32, &buffer[buffer_index], 4);
-    command->middle_goal_pose.y = ntohl(tmp_u32);
-    buffer_index += 4;
-    memcpy(&tmp_u32, &buffer[buffer_index], 4);
-    command->middle_goal_pose.theta = ntohl(tmp_u32);
-    buffer_index += 4;
-    command->prohibited_zone_ignore = (buffer[buffer_index] & 0b100) == 0b100;
-    command->middle_target_flag = (buffer[buffer_index] & 0b10) == 0b10;
-    command->halt_flag = (buffer[buffer_index] & 0b1) == 0b1;
-    buffer_index += 1;
-    // Kick
-    memcpy(&tmp_u32, &buffer[buffer_index], 4);
-    command->kick_power = ntohl(tmp_u32);
-    buffer_index += 4;
-    memcpy(&tmp_u32, &buffer[buffer_index], 4);
-    command->ball_goal.x = ntohl(tmp_u32);
-    buffer_index += 4;
-    memcpy(&tmp_u32, &buffer[buffer_index], 4);
-    command->ball_goal.y = ntohl(tmp_u32);
-    buffer_index += 4;
-    memcpy(&tmp_u32, &buffer[buffer_index], 4);
-    command->ball_goal.theta = ntohl(tmp_u32);
-    buffer_index += 4;
-    memcpy(&tmp_u32, &buffer[buffer_index], 4);
-    command->ball_target_allowable_error = ntohl(tmp_u32);
-    buffer_index += 4;
-    command->kick_type = buffer[buffer_index];
-    buffer_index += 1;
-    command->ball_kick_state = (buffer[buffer_index] & 0b1000) == 0b1000;
-    command->ball_kick = (buffer[buffer_index] & 0b100) == 0b100;
-    command->ball_kick_active = (buffer[buffer_index] & 0b10) == 0b10;
-    command->free_kick_flag = (buffer[buffer_index] & 0b1) == 0b1;
-    buffer_index += 1;
+    command->halt_flag = (buffer[buffer_index] & 0b10000000) == 0b10000000;
+    command->stop_game_flag = (buffer[buffer_index] & 0b1000000) == 0b1000000;
+    command->ball_placement_flag = (buffer[buffer_index] & 0b100000) == 0b100000;
+    command->ball_placement_team = (buffer[buffer_index] & 0b10000) == 0b10000;
+    command->in_game = (buffer[buffer_index] & 0b1000) == 0b1000;
+    command->robot_position_init = (buffer[buffer_index] & 0b100) == 0b100;
+
     // Dribble
-    memcpy(&tmp_u32, &buffer[buffer_index], 4);
-    command->dribble_power = ntohl(tmp_u32);
-    buffer_index += 4;
-    memcpy(&tmp_u32, &buffer[buffer_index], 4);
-    command->dribble_goal.x = ntohl(tmp_u32);
-    buffer_index += 4;
-    memcpy(&tmp_u32, &buffer[buffer_index], 4);
-    command->dribble_goal.y = ntohl(tmp_u32);
-    buffer_index += 4;
-    memcpy(&tmp_u32, &buffer[buffer_index], 4);
-    command->dribble_goal.theta = ntohl(tmp_u32);
-    buffer_index += 4;
-    memcpy(&tmp_u32, &buffer[buffer_index], 4);
-    command->dribble_complete_distance = ntohl(tmp_u32);
-    buffer_index += 4;
     command->dribble_state = (buffer[buffer_index] & 0b10) == 0b10;
-    command->dribbler_active = (buffer[buffer_index] & 0b1) == 0b1;
+    command->dribble_advance = (buffer[buffer_index] & 0b1) == 0b1;
     buffer_index += 1;
+    memcpy(&tmp_u16, &buffer[buffer_index], 2);
+    command->dribble_enabble_error = (uint16_t)ntohs(tmp_u16);
+    buffer_index += 2;
+    memcpy(&tmp_u16, &buffer[buffer_index], 2);
+    command->dribble_target_ball_x = (int16_t)ntohs(tmp_u16);
+    buffer_index += 2;
+    memcpy(&tmp_u16, &buffer[buffer_index], 2);
+    command->dribble_target_ball_y = (int16_t)ntohs(tmp_u16);
+    buffer_index += 2;
+    command->dribble_type = (uint8_t)buffer[buffer_index];
+    buffer_index += 1;
+
+    // Kick
+    command->ball_kick_state = (buffer[buffer_index] & 0b1000) == 0b1000;
+    command->free_kick_flag = (buffer[buffer_index] & 0b100) == 0b100;
+    command->ball_kick = (buffer[buffer_index] & 0b10) == 0b10;
+    command->kick_straight = (buffer[buffer_index] & 0b1) == 0b1;
+    buffer_index += 1;
+    memcpy(&tmp_u16, &buffer[buffer_index], 2);
+    command->ball_target_allowable_error = (uint16_t)ntohs(tmp_u16);
+    buffer_index += 2;
+    memcpy(&tmp_u16, &buffer[buffer_index], 2);
+    command->target_ball_x = (int16_t)ntohs(tmp_u16);
+    buffer_index += 2;
+    memcpy(&tmp_u16, &buffer[buffer_index], 2);
+    command->target_ball_y = (int16_t)ntohs(tmp_u16);
+    buffer_index += 2;
+    command->kick_type = (uint8_t)buffer[buffer_index];
+    buffer_index += 1;
+
+    // Target position
+    memcpy(&tmp_u16, &buffer[buffer_index], 2);
+    command->robot_position_target_x = (int16_t)ntohs(tmp_u16);
+    buffer_index += 2;
+    memcpy(&tmp_u16, &buffer[buffer_index], 2);
+    command->robot_position_target_y = (int16_t)ntohs(tmp_u16);
+    buffer_index += 2;
+    memcpy(&tmp_u16, &buffer[buffer_index], 2);
+    command->robot_position_target_theta = (int16_t)ntohs(tmp_u16);
+    buffer_index += 2;
 
     return buffer_index;
 }
 
-int encodeDwaResult(_dwa_result *dwa_result, unsigned char *buffer) {
-    uint8_t buffer_index = 0;
-    uint32_t tmp_u32;
-
-    buffer[buffer_index] = protocol_version;
-    buffer_index += 1;
-    buffer[buffer_index] = dwa_result_data_type;
-    buffer_index += 1;
-
-    tmp_u32 = htonl(dwa_result->dwa_position.x);
-    memcpy(&buffer[buffer_index], &tmp_u32, 4);
-    buffer_index += 4;
-    tmp_u32 = htonl(dwa_result->dwa_position.y);
-    memcpy(&buffer[buffer_index], &tmp_u32, 4);
-    buffer_index += 4;
-    tmp_u32 = htonl(dwa_result->dwa_position.theta);
-    memcpy(&buffer[buffer_index], &tmp_u32, 4);
-    buffer_index += 4;
-
-    return buffer_index;
-}
-
-int decodeDwaResult(_dwa_result *dwa_result, unsigned char *buffer, uint8_t buffer_length) {
-    uint8_t buffer_index = 0;
-    uint32_t tmp_u32;
-    // Check buffer length
-    assert(buffer_length > 14);
-
-    assert((uint8_t)buffer[buffer_index] == protocol_version);
-    dwa_result->protocol_version = protocol_version;
-    buffer_index += 1;
-    assert((uint8_t)buffer[buffer_index] == dwa_result_data_type);
-    dwa_result->data_type = dwa_result_data_type;
-    buffer_index += 1;
-
-    memcpy(&tmp_u32, &buffer[buffer_index], 4);
-    dwa_result->dwa_position.x = ntohl(tmp_u32);
-    buffer_index += 4;
-    memcpy(&tmp_u32, &buffer[buffer_index], 4);
-    dwa_result->dwa_position.y = ntohl(tmp_u32);
-    buffer_index += 4;
-    memcpy(&tmp_u32, &buffer[buffer_index], 4);
-    dwa_result->dwa_position.theta = ntohl(tmp_u32);
-    buffer_index += 4;
-
-    return buffer_index;
-}
-
-int encodeVisionData(_vision_data *vision_data, unsigned char *buffer) {
+int encodeVisionData(_vision_data *vision_data, char *buffer) {
     uint16_t buffer_index = 0;
-    uint32_t tmp_u32;
+    uint16_t tmp_u16;
 
     buffer[buffer_index] = protocol_version;
     buffer_index += 1;
@@ -229,55 +157,85 @@ int encodeVisionData(_vision_data *vision_data, unsigned char *buffer) {
     buffer_index += 1;
 
     // Current Pose
-    tmp_u32 = htonl(vision_data->current_pose.x);
-    memcpy(&buffer[buffer_index], &tmp_u32, 4);
-    buffer_index += 4;
-    tmp_u32 = htonl(vision_data->current_pose.y);
-    memcpy(&buffer[buffer_index], &tmp_u32, 4);
-    buffer_index += 4;
-    tmp_u32 = htonl(vision_data->current_pose.theta);
-    memcpy(&buffer[buffer_index], &tmp_u32, 4);
-    buffer_index += 4;
+    tmp_u16 = htons(vision_data->current_pose.x);
+    memcpy(&buffer[buffer_index], &tmp_u16, 2);
+    buffer_index += 2;
+    tmp_u16 = htons(vision_data->current_pose.y);
+    memcpy(&buffer[buffer_index], &tmp_u16, 2);
+    buffer_index += 2;
+    tmp_u16 = htons(vision_data->current_pose.theta);
+    memcpy(&buffer[buffer_index], &tmp_u16, 2);
+    buffer_index += 2;
+    tmp_u16 = htons(vision_data->current_pose.vx);
+    memcpy(&buffer[buffer_index], &tmp_u16, 2);
+    buffer_index += 2;
+    tmp_u16 = htons(vision_data->current_pose.vy);
+    memcpy(&buffer[buffer_index], &tmp_u16, 2);
+    buffer_index += 2;
+    tmp_u16 = htons(vision_data->current_pose.omega);
+    memcpy(&buffer[buffer_index], &tmp_u16, 2);
+    buffer_index += 2;
+    buffer[buffer_index] =
+        (char) vision_data->current_pose.camera_valid << 1
+        | (char) vision_data->current_pose.data_valid;
+    buffer_index += 1;
+
     // Ball Position
-    tmp_u32 = htonl(vision_data->ball_position.x);
-    memcpy(&buffer[buffer_index], &tmp_u32, 4);
-    buffer_index += 4;
-    tmp_u32 = htonl(vision_data->ball_position.y);
-    memcpy(&buffer[buffer_index], &tmp_u32, 4);
-    buffer_index += 4;
-    tmp_u32 = htonl(vision_data->ball_position.theta);
-    memcpy(&buffer[buffer_index], &tmp_u32, 4);
-    buffer_index += 4;
+    tmp_u16 = htons(vision_data->ball_position.x);
+    memcpy(&buffer[buffer_index], &tmp_u16, 2);
+    buffer_index += 2;
+    tmp_u16 = htons(vision_data->ball_position.y);
+    memcpy(&buffer[buffer_index], &tmp_u16, 2);
+    buffer_index += 2;
+    tmp_u16 = htons(vision_data->ball_position.vx);
+    memcpy(&buffer[buffer_index], &tmp_u16, 2);
+    buffer_index += 2;
+    tmp_u16 = htons(vision_data->ball_position.vy);
+    memcpy(&buffer[buffer_index], &tmp_u16, 2);
+    buffer_index += 2;
+    buffer[buffer_index] =
+        (char) vision_data->ball_position.camera_valid << 1
+        | (char) vision_data->ball_position.data_valid;
+    buffer_index += 1;
+
     // Obstacles
     assert(vision_data->number_of_obstacles < 32);
     buffer[buffer_index] = vision_data->number_of_obstacles;
     buffer_index += 1;
     for (int obstacle_index = 0; obstacle_index < vision_data->number_of_obstacles; obstacle_index++) {
-        tmp_u32 = htonl(vision_data->obstacles[obstacle_index].x);
-        memcpy(&buffer[buffer_index], &tmp_u32, 4);
-        buffer_index += 4;
-        tmp_u32 = htonl(vision_data->obstacles[obstacle_index].y);
-        memcpy(&buffer[buffer_index], &tmp_u32, 4);
-        buffer_index += 4;
-        tmp_u32 = htonl(vision_data->obstacles[obstacle_index].theta);
-        memcpy(&buffer[buffer_index], &tmp_u32, 4);
-        buffer_index += 4;
-        tmp_u32 = htonl(vision_data->obstacles[obstacle_index].vx);
-        memcpy(&buffer[buffer_index], &tmp_u32, 4);
-        buffer_index += 4;
-        tmp_u32 = htonl(vision_data->obstacles[obstacle_index].vy);
-        memcpy(&buffer[buffer_index], &tmp_u32, 4);
-        buffer_index += 4;
+        tmp_u16 = htons(vision_data->obstacles[obstacle_index].x);
+        memcpy(&buffer[buffer_index], &tmp_u16, 2);
+        buffer_index += 2;
+        tmp_u16 = htons(vision_data->obstacles[obstacle_index].y);
+        memcpy(&buffer[buffer_index], &tmp_u16, 2);
+        buffer_index += 2;
+        tmp_u16 = htons(vision_data->obstacles[obstacle_index].theta);
+        memcpy(&buffer[buffer_index], &tmp_u16, 2);
+        buffer_index += 2;
+        tmp_u16 = htons(vision_data->obstacles[obstacle_index].vx);
+        memcpy(&buffer[buffer_index], &tmp_u16, 2);
+        buffer_index += 2;
+        tmp_u16 = htons(vision_data->obstacles[obstacle_index].vy);
+        memcpy(&buffer[buffer_index], &tmp_u16, 2);
+        buffer_index += 2;
+        tmp_u16 = htons(vision_data->obstacles[obstacle_index].omega);
+        memcpy(&buffer[buffer_index], &tmp_u16, 2);
+        buffer_index += 2;
+        buffer[buffer_index] =
+            (char) vision_data->obstacles[obstacle_index].camera_valid << 1
+            | (char) vision_data->obstacles[obstacle_index].data_valid;
+        buffer_index += 1;
     }
 
     return buffer_index;
 }
 
-int decodeVisionData(_vision_data *vision_data, unsigned char *buffer, uint16_t buffer_length) {
+int decodeVisionData(_vision_data *vision_data, char *buffer, uint16_t buffer_length) {
     uint16_t buffer_index = 0;
+    uint16_t tmp_u16;
     uint32_t tmp_u32;
     // Check buffer length
-    assert(buffer_length > 647);
+    assert(buffer_length > 647);    // Need update max length
 
     assert((uint8_t)buffer[buffer_index] == protocol_version);
     vision_data->protocol_version = protocol_version;
@@ -287,184 +245,224 @@ int decodeVisionData(_vision_data *vision_data, unsigned char *buffer, uint16_t 
     buffer_index += 1;
 
     // Current Pose
-    memcpy(&tmp_u32, &buffer[buffer_index], 4);
-    vision_data->current_pose.x = ntohl(tmp_u32);
-    buffer_index += 4;
-    memcpy(&tmp_u32, &buffer[buffer_index], 4);
-    vision_data->current_pose.y = ntohl(tmp_u32);
-    buffer_index += 4;
-    memcpy(&tmp_u32, &buffer[buffer_index], 4);
-    vision_data->current_pose.theta = ntohl(tmp_u32);
-    buffer_index += 4;
+    memcpy(&tmp_u16, &buffer[buffer_index], 2);
+    vision_data->current_pose.x = (int16_t)ntohs(tmp_u16);
+    buffer_index += 2;
+    memcpy(&tmp_u16, &buffer[buffer_index], 2);
+    vision_data->current_pose.y = (int16_t)ntohs(tmp_u16);
+    buffer_index += 2;
+    memcpy(&tmp_u16, &buffer[buffer_index], 2);
+    vision_data->current_pose.theta = (int16_t)ntohs(tmp_u16);
+    buffer_index += 2;
+    memcpy(&tmp_u16, &buffer[buffer_index], 2);
+    vision_data->current_pose.vx = (int16_t)ntohs(tmp_u16);
+    buffer_index += 2;
+    memcpy(&tmp_u16, &buffer[buffer_index], 2);
+    vision_data->current_pose.vy = (int16_t)ntohs(tmp_u16);
+    buffer_index += 2;
+    memcpy(&tmp_u16, &buffer[buffer_index], 2);
+    vision_data->current_pose.omega = (int16_t)ntohs(tmp_u16);
+    buffer_index += 2;
+    vision_data->current_pose.camera_valid = (buffer[buffer_index] & 0b10) == 0b10;
+    vision_data->current_pose.data_valid = (buffer[buffer_index] & 0b1) == 0b1;
+    buffer_index += 1;
+
     // Ball Position
-    memcpy(&tmp_u32, &buffer[buffer_index], 4);
-    vision_data->ball_position.x = ntohl(tmp_u32);
-    buffer_index += 4;
-    memcpy(&tmp_u32, &buffer[buffer_index], 4);
-    vision_data->ball_position.y = ntohl(tmp_u32);
-    buffer_index += 4;
-    memcpy(&tmp_u32, &buffer[buffer_index], 4);
-    vision_data->ball_position.theta = ntohl(tmp_u32);
-    buffer_index += 4;
+    memcpy(&tmp_u16, &buffer[buffer_index], 2);
+    vision_data->ball_position.x = (int16_t)ntohs(tmp_u16);
+    buffer_index += 2;
+    memcpy(&tmp_u16, &buffer[buffer_index], 2);
+    vision_data->ball_position.y = (int16_t)ntohs(tmp_u16);
+    buffer_index += 2;
+    memcpy(&tmp_u16, &buffer[buffer_index], 2);
+    vision_data->ball_position.vx = (int16_t)ntohs(tmp_u16);
+    buffer_index += 2;
+    memcpy(&tmp_u16, &buffer[buffer_index], 2);
+    vision_data->ball_position.vy = (int16_t)ntohs(tmp_u16);
+    buffer_index += 2;
+    vision_data->ball_position.camera_valid = (buffer[buffer_index] & 0b10) == 0b10;
+    vision_data->ball_position.data_valid = (buffer[buffer_index] & 0b1) == 0b1;
+    buffer_index += 1;
+
     // Obstacles
     vision_data->number_of_obstacles = buffer[buffer_index];
     buffer_index += 1;
     for (int obstacle_index = 0; obstacle_index < vision_data->number_of_obstacles; obstacle_index++) {
-        memcpy(&tmp_u32, &buffer[buffer_index], 4);
-        vision_data->obstacles[obstacle_index].x = ntohl(tmp_u32);
-        buffer_index += 4;
-        memcpy(&tmp_u32, &buffer[buffer_index], 4);
-        vision_data->obstacles[obstacle_index].y = ntohl(tmp_u32);
-        buffer_index += 4;
-        memcpy(&tmp_u32, &buffer[buffer_index], 4);
-        vision_data->obstacles[obstacle_index].theta = ntohl(tmp_u32);
-        buffer_index += 4;
-        memcpy(&tmp_u32, &buffer[buffer_index], 4);
-        vision_data->obstacles[obstacle_index].vx = ntohl(tmp_u32);
-        buffer_index += 4;
-        memcpy(&tmp_u32, &buffer[buffer_index], 4);
-        vision_data->obstacles[obstacle_index].vy = ntohl(tmp_u32);
-        buffer_index += 4;
+        memcpy(&tmp_u16, &buffer[buffer_index], 2);
+        vision_data->obstacles[obstacle_index].x = (int16_t)ntohs(tmp_u16);
+        buffer_index += 2;
+        memcpy(&tmp_u16, &buffer[buffer_index], 2);
+        vision_data->obstacles[obstacle_index].y = (int16_t)ntohs(tmp_u16);
+        buffer_index += 2;
+        memcpy(&tmp_u16, &buffer[buffer_index], 2);
+        vision_data->obstacles[obstacle_index].theta = (int16_t)ntohs(tmp_u16);
+        buffer_index += 2;
+        memcpy(&tmp_u16, &buffer[buffer_index], 2);
+        vision_data->obstacles[obstacle_index].vx = (int16_t)ntohs(tmp_u16);
+        buffer_index += 2;
+        memcpy(&tmp_u16, &buffer[buffer_index], 2);
+        vision_data->obstacles[obstacle_index].vy = (int16_t)ntohs(tmp_u16);
+        buffer_index += 2;
+        memcpy(&tmp_u16, &buffer[buffer_index], 2);
+        vision_data->obstacles[obstacle_index].omega = (int16_t)ntohs(tmp_u16);
+        buffer_index += 2;
+        vision_data->obstacles[obstacle_index].camera_valid = (buffer[buffer_index] & 0b10) == 0b10;
+        vision_data->obstacles[obstacle_index].data_valid = (buffer[buffer_index] & 0b1) == 0b1;
+        buffer_index += 1;
     }
 
     return buffer_index;
 }
 
-int main() {
-    // test code
-    {
-        _strategy_pc_command send, recv;
-        send.goal_pose.x = 1000;
-        send.goal_pose.y = -1000;
-        send.goal_pose.theta = 10000;
-        send.middle_goal_pose.x = 2000;
-        send.middle_goal_pose.y = -2000;
-        send.middle_goal_pose.theta = 20000;
-        send.prohibited_zone_ignore = false;
-        send.middle_target_flag = true;
-        send.halt_flag = false;
-        send.kick_power = 3000;
-        send.ball_goal.x = 4000;
-        send.ball_goal.y = -4000;
-        send.ball_goal.theta = 40000;
-        send.ball_target_allowable_error = 5000;
-        send.kick_type = 3;
-        send.ball_kick_state = true;
-        send.ball_kick = false;
-        send.ball_kick_active = true;
-        send.free_kick_flag = false;
-        send.dribble_power = 6000;
-        send.dribble_goal.x = 7000;
-        send.dribble_goal.y = -7000;
-        send.dribble_goal.theta = 70000;
-        send.dribble_complete_distance = 8000;
-        send.dribble_state = true;
-        send.dribbler_active = false;
+int encodeManualContollerData(_manual_controller_data *controller_data, char *buffer) {
+    uint8_t buffer_index = 0;
+    uint32_t tmp_u32;
 
-        char buffer[200];
+    buffer[buffer_index] = protocol_version;
+    buffer_index += 1;
+    buffer[buffer_index] = manual_controller_data_type;
+    buffer_index += 1;
 
-        int length = encodeStrategyPcCommand(&send, &buffer[0]);
-        decodeStrategyPcCommand(&recv, &buffer[0], 200);
+    buffer[buffer_index] =
+        (char)controller_data->controller_start << 4
+        | (char)controller_data->dribbler_on << 3
+        | (char)controller_data->kick_straight << 2
+        | (char)controller_data->kick_tip << 1
+        | (char)controller_data->emergency_stop;
+    buffer_index += 1;
 
-        printf("len: %d\r\n", length);
-        printf("[ ");
-        for (int i = 0; i < length; i++) {
-            printf("%d, ", (uint8_t)buffer[i]);
-        }
-        printf(" ];\r\n");
+    memcpy(&tmp_u32, &buffer[buffer_index], 4);
+    controller_data->robot_vx = (int32_t)ntohl(tmp_u32);
+    buffer_index += 4;
+    memcpy(&tmp_u32, &buffer[buffer_index], 4);
+    controller_data->robot_vy = (int32_t)ntohl(tmp_u32);
+    buffer_index += 4;
+    memcpy(&tmp_u32, &buffer[buffer_index], 4);
+    controller_data->robot_vw = (int32_t)ntohl(tmp_u32);
+    buffer_index += 4;
 
-        RX_ASSERT(goal_pose.x)
-        RX_ASSERT(goal_pose.y)
-        RX_ASSERT(goal_pose.theta)
-        RX_ASSERT(middle_goal_pose.x)
-        RX_ASSERT(middle_goal_pose.y)
-        RX_ASSERT(middle_goal_pose.theta)
-        RX_ASSERT(prohibited_zone_ignore)
-        RX_ASSERT(middle_target_flag)
-        RX_ASSERT(halt_flag)
-        // Kick
-        RX_ASSERT(kick_power)
-        RX_ASSERT(ball_goal.x)
-        RX_ASSERT(ball_goal.y)
-        RX_ASSERT(ball_goal.theta)
-        RX_ASSERT(ball_target_allowable_error)
-        RX_ASSERT(kick_type)
-        // RX_ASSERT(ball_kick_state)
-        RX_ASSERT(ball_kick)
-        // RX_ASSERT(ball_kick_active)
-        RX_ASSERT(free_kick_flag)
-        // Dribble
-        RX_ASSERT(dribble_power)
-        RX_ASSERT(dribble_goal.x)
-        RX_ASSERT(dribble_goal.y)
-        RX_ASSERT(dribble_goal.theta)
-        RX_ASSERT(dribble_complete_distance)
-        RX_ASSERT(dribble_state)
-        RX_ASSERT(dribbler_active)
-    }
+    return buffer_index;
+}
 
-    {
-        _dwa_result send, recv;
-        send.dwa_position.x = 100;
-        send.dwa_position.y = -10000;
-        send.dwa_position.theta = 200;
+int decodeManualContollerData(_manual_controller_data *controller_data, char *buffer, uint8_t buffer_length) {
+    uint8_t buffer_index = 0;
+    uint32_t tmp_u32;
+    // Check buffer length
+    assert(buffer_length > 14);
 
-        char buffer[15];
+    assert((uint8_t)buffer[buffer_index] == protocol_version);
+    controller_data->protocol_version = protocol_version;
+    buffer_index += 1;
+    assert((uint8_t)buffer[buffer_index] == manual_controller_data_type);
+    controller_data->data_type = manual_controller_data_type;
+    buffer_index += 1;
 
-        int length = encodeDwaResult(&send, &buffer[0]);
-        decodeDwaResult(&recv, &buffer[0], 15);
+    controller_data->controller_start = (buffer[buffer_index] & 0b10000) == 0b10000;
+    controller_data->dribbler_on = (buffer[buffer_index] & 0b1000) == 0b1000;
+    controller_data->kick_straight = (buffer[buffer_index] & 0b100) == 0b100;
+    controller_data->kick_tip = (buffer[buffer_index] & 0b10) == 0b10;
+    controller_data->emergency_stop = (buffer[buffer_index] & 0b1) == 0b1;
+    buffer_index += 1;
 
-        printf("len: %d\r\n", length);
-        printf("[ ");
-        for (int i = 0; i < length; i++) {
-            printf("%d, ", (uint8_t)buffer[i]);
-        }
-        printf(" ];\r\n");
+    memcpy(&tmp_u32, &buffer[buffer_index], 4);
+    controller_data->robot_vx = (int32_t)ntohl(tmp_u32);
+    buffer_index += 4;
+    memcpy(&tmp_u32, &buffer[buffer_index], 4);
+    controller_data->robot_vy = (int32_t)ntohl(tmp_u32);
+    buffer_index += 4;
+    memcpy(&tmp_u32, &buffer[buffer_index], 4);
+    controller_data->robot_vw = (int32_t)ntohl(tmp_u32);
+    buffer_index += 4;
 
-        RX_ASSERT(dwa_position.x)
-        RX_ASSERT(dwa_position.y)
-        RX_ASSERT(dwa_position.theta)
-    }
+    return buffer_index;
+}
 
-    {
-        _vision_data send, recv;
-        send.current_pose.x = 100;
-        send.current_pose.y = -100;
-        send.current_pose.theta = 1000;
-        send.ball_position.x = 200;
-        send.ball_position.y = -200;
-        send.number_of_obstacles = 31;
-        for (int i = 0; i < send.number_of_obstacles; i++) {
-            send.obstacles[i].x = 2000 + i;
-            send.obstacles[i].y = -2000 - i;
-            send.obstacles[i].theta = 20000 + i;
-            send.obstacles[i].vx = 3000 + i;
-            send.obstacles[i].vy = -3000 - i;
-        }
+int encodeRobotOdometryData(_robot_odometry_data *odometry_data, char *buffer) {
+    uint8_t buffer_index = 0;
+    uint16_t tmp_u16;
 
-        char buffer[680];
+    buffer[buffer_index] = protocol_version;
+    buffer_index += 1;
+    buffer[buffer_index] = robot_odometry_data_type;
+    buffer_index += 1;
 
-        int length = encodeVisionData(&send, &buffer[0]);
-        decodeVisionData(&recv, &buffer[0], 680);
+    tmp_u16 = htons(odometry_data->robot_position_x);
+    memcpy(&buffer[buffer_index], &tmp_u16, 2);
+    buffer_index += 2;
+    tmp_u16 = htons(odometry_data->robot_position_y);
+    memcpy(&buffer[buffer_index], &tmp_u16, 2);
+    buffer_index += 2;
+    tmp_u16 = htons(odometry_data->robot_position_theta);
+    memcpy(&buffer[buffer_index], &tmp_u16, 2);
+    buffer_index += 2;
 
-        printf("len: %d\r\n", length);
-        printf("[ ");
-        for (int i = 0; i < length; i++) {
-            printf("%d, ", (uint8_t)buffer[i]);
-        }
-        printf(" ];\r\n");
+    return buffer_index;
+}
 
-        RX_ASSERT(current_pose.x)
-        RX_ASSERT(current_pose.y)
-        RX_ASSERT(current_pose.theta)
-        RX_ASSERT(ball_position.x)
-        RX_ASSERT(ball_position.y)
-        for (int i = 0; i < send.number_of_obstacles; i++) {
-            RX_ASSERT(obstacles[i].x)
-            RX_ASSERT(obstacles[i].y)
-            RX_ASSERT(obstacles[i].theta)
-        }
-    }
+int decodeRobotOdometryData(_robot_odometry_data *odometry_data, char *buffer, uint8_t buffer_length) {
+    uint8_t buffer_index = 0;
+    uint16_t tmp_u16;
+    // Check buffer length
+    assert(buffer_length > 7);
 
-    return 0;
+    assert((uint8_t)buffer[buffer_index] == protocol_version);
+    odometry_data->protocol_version = protocol_version;
+    buffer_index += 1;
+    assert((uint8_t)buffer[buffer_index] == robot_odometry_data_type);
+    odometry_data->data_type = robot_odometry_data_type;
+    buffer_index += 1;
+
+    memcpy(&tmp_u16, &buffer[buffer_index], 2);
+    odometry_data->robot_position_x = (int16_t)ntohs(tmp_u16);
+    buffer_index += 2;
+    memcpy(&tmp_u16, &buffer[buffer_index], 2);
+    odometry_data->robot_position_y = (int16_t)ntohs(tmp_u16);
+    buffer_index += 2;
+    memcpy(&tmp_u16, &buffer[buffer_index], 2);
+    odometry_data->robot_position_theta = (int16_t)ntohs(tmp_u16);
+    buffer_index += 2;
+
+    return buffer_index;
+}
+
+int encodeRobotObservedBallData(_robot_observed_ball_data *ball_data, char *buffer) {
+    uint8_t buffer_index = 0;
+    uint16_t tmp_u16;
+
+    buffer[buffer_index] = protocol_version;
+    buffer_index += 1;
+    buffer[buffer_index] = robot_observed_ball_data_type;
+    buffer_index += 1;
+
+    tmp_u16 = htons(ball_data->ball_position_x);
+    memcpy(&buffer[buffer_index], &tmp_u16, 2);
+    buffer_index += 2;
+    tmp_u16 = htons(ball_data->ball_position_y);
+    memcpy(&buffer[buffer_index], &tmp_u16, 2);
+    buffer_index += 2;
+
+    return buffer_index;
+}
+
+int decodeRobotObservedBallData(_robot_observed_ball_data *ball_data, char *buffer, uint8_t buffer_length) {
+    uint8_t buffer_index = 0;
+    uint16_t tmp_u16;
+    // Check buffer length
+    assert(buffer_length > 5);
+
+    assert((uint8_t)buffer[buffer_index] == protocol_version);
+    ball_data->protocol_version = protocol_version;
+    buffer_index += 1;
+    assert((uint8_t)buffer[buffer_index] == robot_observed_ball_data_type);
+    ball_data->data_type = robot_observed_ball_data_type;
+    buffer_index += 1;
+
+    memcpy(&tmp_u16, &buffer[buffer_index], 2);
+    ball_data->ball_position_x = (int16_t)ntohs(tmp_u16);
+    buffer_index += 2;
+    memcpy(&tmp_u16, &buffer[buffer_index], 2);
+    ball_data->ball_position_y = (int16_t)ntohs(tmp_u16);
+    buffer_index += 2;
+
+    return buffer_index;
 }

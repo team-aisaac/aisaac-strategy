@@ -79,35 +79,51 @@ namespace aisaac
 
     void AisaacBitmapHandler::encodeCommandMessage(const consai_msgs::robot_commands_realConstPtr& msg, std::vector<unsigned char> &out) {
         _strategy_pc_command command;
-        command.goal_pose.x = (int32_t)(msg->goal_pose.x * 1000.0); // m -> mm
-        command.goal_pose.y = (int32_t)(msg->goal_pose.x * 1000.0); // m -> mm
-        command.goal_pose.theta = (int32_t)(msg->goal_pose.x * 18000.0 / M_PI); // rad -> deg x100
-        command.middle_goal_pose.x = (int32_t)(msg->middle_goal_pose.x * 1000.0);   // m -> mm
-        command.middle_goal_pose.y = (int32_t)(msg->middle_goal_pose.y * 1000.0);   // m -> mm
-        command.middle_goal_pose.theta = (int32_t)(msg->middle_goal_pose.theta * 1000.0);   // m -> mm
-        command.prohibited_zone_ignore = msg->prohidited_zone_ignore;   // ToDo: Fix variable name
-        command.middle_target_flag = msg->middle_target_flag;
-        command.halt_flag = false;  // ToDo impliment
-        // Kick
-        command.kick_power = (uint32_t)(msg->kick_power);
-        command.ball_kick_state = msg->ball_kick_state;
-        command.ball_kick = msg->ball_kick;
-        command.ball_kick_active = msg->ball_kick_active;
-        command.free_kick_flag = msg->free_kick_flag;
-        command.ball_goal.x = (int32_t)(msg->ball_goal.x * 1000.0); // m -> mm
-        command.ball_goal.y = (int32_t)(msg->ball_goal.y * 1000.0); // m -> mm
-        command.ball_target_allowable_error = msg->ball_target_allowable_error; // m
-        command.kick_type = 0;  // ToDo impliment
-        // Dribble
-        command.dribble_power = (uint32_t)(msg->dribble_power);
-        command.dribble_goal.x = (int32_t)(msg->dribble_goal.x * 1000.0);   // m -> mm
-        command.dribble_goal.y = (int32_t)(msg->dribble_goal.y * 1000.0);   // m -> mm
-        command.dribble_goal.theta = (int32_t)(msg->dribble_goal.theta * 18000.0 / M_PI);   // rad -> deg x100
-        command.dribble_complete_distance = msg->dribble_complete_distance; // mm
-        command.dribble_state = msg->dribble_state;
-        command.dribbler_active = msg->dribbler_active;
 
-        encodeStrategyPcCommand(&command, out.data());
+        command.halt_flag = false;  // ToDo impliment
+        command.stop_game_flag = false;
+        command.ball_placement_flag = false;
+        command.ball_placement_team = false;
+        command.in_game = false;
+        command.robot_position_init = false;
+
+        // Dribble
+        command.dribble_state = msg->dribble_state;
+        command.dribble_advance = false;
+        command.dribble_enabble_error = 0;
+        command.dribble_target_ball_x = 0;
+        command.dribble_target_ball_y = 0;
+        command.dribble_type = 0;
+        // Kick
+        command.ball_kick_state = msg->ball_kick_state;
+        command.free_kick_flag = msg->free_kick_flag;
+        command.ball_kick = msg->ball_kick;
+        command.kick_straight = false;
+        command.ball_target_allowable_error = msg->ball_target_allowable_error; // m
+        command.target_ball_x = (int32_t)(msg->ball_goal.x * 1000.0); // m -> mm
+        command.target_ball_y = (int32_t)(msg->ball_goal.y * 1000.0); // m -> mm
+        command.kick_type = 0;  // ToDo impliment
+        // Target position
+        command.robot_position_target_x = (int32_t)(msg->goal_pose.x * 1000.0); // m -> mm
+        command.robot_position_target_x = (int32_t)(msg->goal_pose.x * 1000.0); // m -> mm
+        command.robot_position_target_theta = (int32_t)(msg->goal_pose.x * 18000.0 / M_PI); // rad -> deg x100
+
+        // command.middle_goal_pose.x = (int32_t)(msg->middle_goal_pose.x * 1000.0);   // m -> mm
+        // command.middle_goal_pose.y = (int32_t)(msg->middle_goal_pose.y * 1000.0);   // m -> mm
+        // command.middle_goal_pose.theta = (int32_t)(msg->middle_goal_pose.theta * 1000.0);   // m -> mm
+        // command.prohibited_zone_ignore = msg->prohidited_zone_ignore;   // ToDo: Fix variable name
+        // command.middle_target_flag = msg->middle_target_flag;
+        // command.kick_power = (uint32_t)(msg->kick_power);
+        // command.ball_kick_active = msg->ball_kick_active;
+        // command.ball_goal.y = (int32_t)(msg->ball_goal.y * 1000.0); // m -> mm
+        // command.dribble_power = (uint32_t)(msg->dribble_power);
+        // command.dribble_goal.x = (int32_t)(msg->dribble_goal.x * 1000.0);   // m -> mm
+        // command.dribble_goal.y = (int32_t)(msg->dribble_goal.y * 1000.0);   // m -> mm
+        // command.dribble_goal.theta = (int32_t)(msg->dribble_goal.theta * 18000.0 / M_PI);   // rad -> deg x100
+        // command.dribble_complete_distance = msg->dribble_complete_distance; // mm
+        // command.dribbler_active = msg->dribbler_active;
+
+        encodeStrategyPcCommand(&command, (char *)out.data());
     }
 
     void AisaacBitmapHandler::encodeVisionInfo(const consai_msgs::robot_commands_realConstPtr& msg, std::vector<unsigned char> &out) {
@@ -130,7 +146,7 @@ namespace aisaac
         }
         vision_data.number_of_obstacles = index+1;
 
-        encodeVisionData(&vision_data, out.data());
+        encodeVisionData(&vision_data, (char *)out.data());
     }
 
     void AisaacBitmapHandler::generateFT4(commandToRobot command, std::vector<unsigned char> &out) {
